@@ -1,1 +1,1 @@
-export { ImportScreen as default } from "../src/screens";
+export { ImportScreen as default } from "../src/screens/import";

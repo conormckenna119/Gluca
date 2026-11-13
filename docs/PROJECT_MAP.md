@@ -36,14 +36,14 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | --- | --- | --- |
 | `app/_layout.tsx` | Root stack, QueryClient, store provider, status bar | itself |
 | `app/(tabs)/_layout.tsx` | Tab bar with line icons and raised Create button | itself |
-| `app/(tabs)/index.tsx` | Home feed | `Home` in `src/screens.tsx` |
-| `app/(tabs)/glucose.tsx` | My Glucose dashboard | `Glucose` |
-| `app/(tabs)/create.tsx` | Create a graphic | `Create` |
-| `app/(tabs)/explore.tsx` | People and clubs | `Explore` |
-| `app/(tabs)/profile.tsx` | Profile | `Profile` |
-| `app/post/[id].tsx` | Post detail and comments | `PostDetail` |
-| `app/settings.tsx` | Settings and privacy | `Settings` |
-| `app/import.tsx` | CSV import and local export | `ImportScreen` |
+| `app/(tabs)/index.tsx` | Home feed | `Home` in `src/screens/home.tsx` |
+| `app/(tabs)/glucose.tsx` | My Glucose dashboard | `Glucose` in `src/screens/glucose.tsx` |
+| `app/(tabs)/create.tsx` | Create a graphic | `Create` in `src/screens/create.tsx` |
+| `app/(tabs)/explore.tsx` | People and clubs | `Explore` in `src/screens/explore.tsx` |
+| `app/(tabs)/profile.tsx` | Profile | `Profile` in `src/screens/profile.tsx` |
+| `app/post/[id].tsx` | Post detail and comments | `PostDetail` in `src/screens/post-detail.tsx` |
+| `app/settings.tsx` | Settings and privacy | `Settings` in `src/screens/settings.tsx` |
+| `app/import.tsx` | CSV import and local export | `ImportScreen` in `src/screens/import.tsx` |
 
 ## App code: `src/`
 
@@ -57,9 +57,18 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `src/export.ts` | 61 | `exportImage`: web draws SVG to canvas and downloads PNG; native uses view capture, then share sheet or photo library |
 | `src/story.ts` | 94 | Adapter between the app and `src/art/`: `StoryOptions`, `defaultOptions`, `switchTemplate`, `pickTone`, `storyArtwork`, `storySvg`, `nativeSafe` |
 | `src/ui.tsx` | 174 | Design tokens and primitives |
-| `src/screens.tsx` | 1131 | Every screen plus `Page`, `PostCard`, `useReadings`. Too large; split in M2 |
-
-Screens inside `src/screens.tsx`: `Page` (line 40), `Home` (217), `PostDetail` (272), `Glucose` (317), `Create` (540), `Explore` (856), `Profile` (906), `Settings` (935), `ImportScreen` (1014). Line numbers drift; search by name.
+| `src/screens/home.tsx` | 61 | `Home`; the feed with filters |
+| `src/screens/post-detail.tsx` | 51 | `PostDetail`; one post and its comments |
+| `src/screens/glucose.tsx` | 183 | `Glucose`; the My Glucose dashboard |
+| `src/screens/create.tsx` | 347 | `Create`; artwork preview, options, export and publish to the local feed (also holds `SHOW_LABELS` and `slug`) |
+| `src/screens/explore.tsx` | 54 | `Explore`; clubs and community members |
+| `src/screens/profile.tsx` | 35 | `Profile` |
+| `src/screens/settings.tsx` | 84 | `Settings` |
+| `src/screens/import.tsx` | 126 | `ImportScreen`; CSV import and local data export |
+| `src/components/page.tsx` | 43 | `Page`; scroll container, title and demo pills |
+| `src/components/post-card.tsx` | 133 | `PostCard`; one feed post with its actions |
+| `src/components/glucose-chart.tsx` | 51 | `GlucoseChart`; the SVG glucose trace and `areaPath` |
+| `src/hooks/use-readings.ts` | 16 | `useReadings`; TanStack Query over the Mock or CSV provider |
 
 ## Artwork engine: `src/art/`
 
@@ -83,7 +92,7 @@ Guarantees tested in `tests/core.test.ts`: every template at every format has th
 
 ```
 providers.ts (synthetic or imported CSV)
-   -> useReadings() in screens.tsx (TanStack Query)
+   -> useReadings() in src/hooks/use-readings.ts (TanStack Query)
         -> Glucose screen: analytics.ts summarize() + segments() -> react-native-svg chart
         -> Create screen: story.ts storyArtwork() -> art/model.ts -> art/templates.ts -> SVG string
               -> preview: SvgXml (native-safe SVG, no filters or embedded font)
@@ -137,21 +146,21 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 
 | # | Problem | Where | Milestone |
 | --- | --- | --- | --- |
-| 1 | ~~Restyled screens never run in a browser~~ Resolved for web 2026-11-13; devices remain (see 16) | all of `src/screens.tsx`, `app/(tabs)/_layout.tsx` | M0 done |
+| 1 | ~~Restyled screens never run in a browser~~ Resolved for web 2026-11-13; devices remain (see 16) | all of `src/screens/` and `src/components/`, `app/(tabs)/_layout.tsx` | M0 done |
 | 2 | ~~Playwright journey not run since the Create rebuild~~ Passing 2026-11-13 | `tests/e2e/journey.spec.ts` | M0 done |
 | 3 | ~~Not a git repository; stray `gitignore`~~ Resolved 2026-11-13. Backup folder still present pending D2 | root | M0 done |
 | 4 | Android adaptive icon `backgroundColor` is `#E6F4FE`, which may not match the dark icon | `app.json` | M1 |
 | 5 | In-app mark is a plain drop; the logo in `assets/` has a peak line | `src/ui.tsx` `Mark`, `src/art/svg.ts` `brandMark` | M1 |
-| 6 | One 1131-line screens file | `src/screens.tsx` | M2 |
+| 6 | ~~One 1131-line screens file~~ Resolved 2026-11-13: split into `src/screens/`, `src/components/`, `src/hooks/` | `src/screens/` | M2 done |
 | 7 | Two statistics modules and two reading shapes (`{timestamp}` vs `{t}`) | `src/analytics.ts`, `src/art/analytics.ts` | M3 |
 | 8 | App CSV parser is weaker than the prototype's | `src/csv.ts` | M3 |
-| 9 | Create reads the unit from Settings only when first opened, and always uses the default 70–180 mg/dL range | `Create` in `src/screens.tsx` | M3 |
-| 10 | Target range on My Glucose is local screen state, not saved | `Glucose` in `src/screens.tsx` | M3 |
+| 9 | Create reads the unit from Settings only when first opened, and always uses the default 70–180 mg/dL range | `Create` in `src/screens/create.tsx` | M3 |
+| 10 | Target range on My Glucose is local screen state, not saved | `Glucose` in `src/screens/glucose.tsx` | M3 |
 | 11 | Telemetry module not wired; no flags module | `src/art/telemetry.ts` | M4 |
 | 12 | No first-run flow; the share-first path takes several taps | `Home`, `Create` | M4 |
 | 13 | Native preview and export use the system font and no glow, so they differ from web exports | `src/story.ts` `nativeSafe` | M5 |
 | 14 | Date entry is a typed text field | `Create`, `Glucose` | M5 |
-| 15 | Explore, Profile, Settings, Import, Post detail only inherited the new primitives; not designed | `src/screens.tsx` | M6 |
+| 15 | Explore, Profile, Settings, Import, Post detail only inherited the new primitives; not designed | `src/screens/explore.tsx`, `profile.tsx`, `settings.tsx`, `import.tsx`, `post-detail.tsx` | M6 |
 | 16 | Native capture, share sheet and photo-library save unverified on real phones | `src/export.ts` | M7 |
 | 17 | Posts have no timestamps or photos; replies are text-prefixed | `src/types.ts`, `src/store.tsx` | M10 |
 | 18 | AsyncStorage is unencrypted | `src/store.tsx` | M10 |
@@ -159,4 +168,4 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 20 | DST days are not adjusted in the artwork engine | `src/art/analytics.ts` | backlog |
 | 21 | The 7-day recap uses a single-day headline ("Another day of showing up.") | `src/art/copy.ts`, `src/art/templates.ts` | M5 |
 | 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
-| 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens.tsx` | M6 |
+| 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |

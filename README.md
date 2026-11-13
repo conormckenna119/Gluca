@@ -74,7 +74,7 @@ Native capture, photo-library permission and the share sheet are implemented but
 | Path | What |
 | --- | --- |
 | `src/ui.tsx` | Design tokens (`palette`, `space`, `radius`) and primitives (`T`, `Card`, `Button`, `Input`, `Stat`, `Pill`, `Avatar`, `Mark`) |
-| `src/screens.tsx` | All screens |
+| `src/screens/`, `src/components/`, `src/hooks/` | One file per screen, shared components, hooks |
 | `src/story.ts` | Adapter from the app's data and unit names to the artwork engine; makes SVG safe for `react-native-svg` |
 | `src/art/` | Artwork engine: pure TypeScript, no React Native. `templates.ts` (layouts), `svg.ts` (text fitting, chart, colour), `copy.ts` (tone lines), `formats.ts` |
 | `src/art/brand.ts` | The product name in one place |
@@ -129,4 +129,4 @@ The dashboard's day selection uses local midnight; its 24-hour option follows th
 
 CSV timestamps with explicit offsets retain those offsets. Local timestamps require a user-selected date order and fixed UTC offset. Split local-time files at DST transitions or provide explicit offsets per row. This does not infer an IANA timezone or all vendor/localized CSV variants. It intentionally asks for units rather than guessing.
 
-`src/providers.ts` exposes Mock and CSV implementations plus rejecting placeholders for Dexcom, Apple Health and Health Connect. `src/analytics.ts` is pure calculation logic. `src/store.tsx` owns local community state; `src/screens.tsx` composes functional screens; `src/story.ts` produces export artwork independently of editor controls. See [integration preparation](docs/INTEGRATIONS.md) for server architecture requirements.
+`src/providers.ts` exposes Mock and CSV implementations plus rejecting placeholders for Dexcom, Apple Health and Health Connect. `src/analytics.ts` is pure calculation logic. `src/store.tsx` owns local community state; the files in `src/screens/` compose functional screens; `src/story.ts` produces export artwork independently of editor controls. See [integration preparation](docs/INTEGRATIONS.md) for server architecture requirements.

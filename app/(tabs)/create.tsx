@@ -1,1 +1,1 @@
-export { Create as default } from "../../src/screens";
+export { Create as default } from "../../src/screens/create";

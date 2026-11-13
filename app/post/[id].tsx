@@ -1,1 +1,1 @@
-export { PostDetail as default } from "../../src/screens";
+export { PostDetail as default } from "../../src/screens/post-detail";

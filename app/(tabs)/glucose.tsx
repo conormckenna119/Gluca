@@ -1,1 +1,1 @@
-export { Glucose as default } from "../../src/screens";
+export { Glucose as default } from "../../src/screens/glucose";
