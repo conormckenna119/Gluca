@@ -63,7 +63,7 @@ Run from the project root in PowerShell. Node 22.13+ (or 24.3+ / 26+).
 | `npx expo install --check` | Check dependency versions against the SDK |
 | `npx expo export --platform web` | Production web bundle into `dist/` |
 
-**Test runner gotcha:** `tools/test.cjs` transpiles a fixed list of files. When you add a `.ts` file that tests import (directly or indirectly), add it to the list in `tools/test.cjs`, or the test run fails with a missing module. Files containing JSX (`.tsx`) or importing `react-native` cannot be loaded by this runner; keep logic you want to test in plain `.ts`.
+**Test runner:** `tools/test.cjs` transpiles every plain `.ts` file under `src/` and runs every `tests/*.test.ts`. New files are picked up automatically. Files containing JSX (`.tsx`) or importing `react-native` cannot be loaded by this runner; keep logic you want to test in plain `.ts`.
 
 ## How to work
 

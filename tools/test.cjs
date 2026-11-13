@@ -4,23 +4,16 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const build = path.join(root, ".test-build");
-for (const file of [
-  "src/types.ts",
-  "src/analytics.ts",
-  "src/csv.ts",
-  "src/providers.ts",
-  "src/story.ts",
-  "src/art/analytics.ts",
-  "src/art/brand.ts",
-  "src/art/copy.ts",
-  "src/art/font-data.ts",
-  "src/art/formats.ts",
-  "src/art/model.ts",
-  "src/art/svg.ts",
-  "src/art/templates.ts",
-  "src/art/telemetry.ts",
-  "tests/core.test.ts",
-]) {
+// Every plain .ts file under src/ (no .tsx) and every tests/*.test.ts is transpiled, so new
+// source and test files are picked up without editing this list.
+function walk(dir) {
+  return fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? walk(`${dir}/${e.name}`) : e.name.endsWith(".ts") && !e.name.endsWith(".d.ts") ? [`${dir}/${e.name}`] : [],
+  );
+}
+const tests = fs.readdirSync(path.join(root, "tests")).filter((f) => f.endsWith(".test.ts")).sort().map((f) => `tests/${f}`);
+fs.rmSync(build, { recursive: true, force: true });
+for (const file of [...walk("src"), ...tests]) {
   const out = path.join(build, file.replace(/\.ts$/, ".js"));
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(
@@ -34,4 +27,4 @@ for (const file of [
     }).outputText,
   );
 }
-require(path.join(build, "tests/core.test.js"));
+for (const t of tests) require(path.join(build, t.replace(/\.ts$/, ".js")));
