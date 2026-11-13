@@ -7,8 +7,8 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | # | Milestone | Status | Depends on |
 | --- | --- | --- | --- |
 | M0 | Baseline: run it, fix what breaks, set up git | done 2026-11-13 (step 8 awaits owner, D2) | none |
-| M1 | Brand alignment: logo, icon config, name decision | not started | M0 |
-| M2 | Split `src/screens.tsx` | not started | M0 |
+| M1 | Brand alignment: logo, icon config, name decision | partly done 2026-11-13: in-app and artwork mark done; app icon files missing (see note) | M0 |
+| M2 | Split `src/screens.tsx` | done 2026-11-13 | M0 |
 | M3 | One data layer: analytics, CSV, units and range | not started | M2 |
 | M4 | Share-first first run, flags, local telemetry | not started | M3 |
 | M5 | Create screen polish | not started | M3 |
@@ -77,6 +77,12 @@ M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
 - A new test asserts the brand mark SVG contains the peak path and is absent when `show.brand` is false.
 - Screenshot of each template with the new mark in `docs/screenshots/m1/`.
 
+**Note, 2026-11-13 (M1 partly done).**
+- Done: one shared peak path (`PEAK_PATH` in `src/art/svg.ts`) drawn by both `Mark` and `brandMark`. On artwork the peak takes the background colour (opaque) or near-black (transparent), with a contrast fallback. In-app the peak uses the `accentInk` token so it shows in both themes. Two new tests (16 total): peak present with `show.brand`, absent without, zero overflow, contrast of at least 3 for every swatch. `app.json` has `backgroundColor` and a splash background of `#101412`.
+- Verified: typecheck, `npm test` 16/16, e2e, header mark in dark and light at three widths, the daily recap export by eye. Template screenshots in `docs/screenshots/m1/`.
+- **Not done: the app icon.** `assets/icon.png`, `assets/favicon.png` and the Android icon layers are the stock Expo placeholder (blue chevron), not the mint drop this section describes. The approved logo file is not in the repository. The peak was therefore drawn from the written description and has not been compared with the real logo. `android.adaptiveIcon.backgroundColor` was left at `#E6F4FE` because the foreground is not the mint drop. Needs the owner: supply the logo files, or approve generating the icon set from the in-app mark.
+- Skipped: step 4 (name), which waits for D1.
+
 ---
 
 ## M2. Split `src/screens.tsx`
@@ -114,6 +120,10 @@ src/
 - Typecheck, tests and e2e pass with no test changes other than import paths.
 - Screens look identical to `docs/screenshots/baseline/`.
 - `docs/PROJECT_MAP.md` updated with the new paths.
+
+**Note, 2026-11-13 (M2 done).**
+- `src/screens.tsx` deleted; 8 screens in `src/screens/`, `Page`, `PostCard` and `GlucoseChart` in `src/components/`, `useReadings` in `src/hooks/`. Not verbatim: `export` added to `useReadings` and `PostCard`; the chart `<Svg>` block became `GlucoseChart` with props, and `useColors()` moved into it.
+- Verified: typecheck clean, `npm test` 16/16, e2e passing, 8 routes with no console errors. Pixel comparison of 48 fresh screenshots against `docs/screenshots/baseline/`: Settings, Import and Post detail identical; Home, Explore and Profile differ only in the 14 by 8 px header mark (the M1 peak line); My Glucose and Create also differ in their data areas because the synthetic readings follow the clock, so those two were checked by eye, not pixel for pixel.
 
 ---
 

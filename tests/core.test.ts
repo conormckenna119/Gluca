@@ -10,6 +10,7 @@ import {
 } from "../src/providers";
 import { formats, storyArtwork, defaultOptions, switchTemplate, nativeSafe, templateIds } from "../src/story";
 import type { Reading } from "../src/types";
+import { PEAK_PATH, DROP_PATH, SWATCHES, peakColor, contrast, buildPalette } from "../src/art/svg";
 const minute = 60000;
 const r = (t: number, v: number): Reading => ({
   timestamp: t * minute,
@@ -126,4 +127,27 @@ test("a day with no readings yields a valid empty-state graphic", () => {
   const art = storyArtwork([], Date.parse("2026-11-11T12:00:00"), defaultOptions("daily_recap"));
   assert.equal(art.hasData, false);
   assert.equal(art.overflow, 0);
+});
+test("brand mark carries the peak path when show.brand is on and not when it is off", () => {
+  const rows = synthetic(Date.parse("2026-11-12T20:00:00"));
+  const anchor = Date.parse("2026-11-11T12:00:00");
+  for (const template of templateIds) {
+    const on = defaultOptions(template);
+    on.show = { ...on.show, brand: true };
+    const off = { ...on, show: { ...on.show, brand: false } };
+    const withMark = storyArtwork(rows, anchor, on);
+    assert.ok(withMark.svg.includes(`d="${PEAK_PATH}"`), `${template} is missing the peak`);
+    assert.ok(withMark.svg.includes(`d="${DROP_PATH}"`));
+    assert.equal(withMark.overflow, 0);
+    const without = storyArtwork(rows, anchor, off);
+    assert.ok(!without.svg.includes(PEAK_PATH) && !without.svg.includes(DROP_PATH), `${template} shows the mark with brand off`);
+  }
+});
+test("the peak line contrasts with the drop for every swatch, opaque and transparent", () => {
+  for (const accent of Object.values(SWATCHES)) {
+    for (const transparent of [false, true]) {
+      const p = buildPalette("dark", accent, transparent);
+      assert.ok(contrast(peakColor(p), p.accent) >= 3, `${accent} transparent=${transparent}`);
+    }
+  }
 });

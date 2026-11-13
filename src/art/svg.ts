@@ -257,6 +257,14 @@ export function distributionBar(x: number, y: number, w: number, pct: [number, n
 
 // ---------- brand mark ----------
 export const DROP_PATH = 'M18 2 C28 16 34 24 34 32 a16 16 0 0 1 -32 0 C2 24 8 16 18 2 Z';
+/** The single-peak line across the lower half of the drop, on the same 36x36 grid. Stroke it ~2.6 wide with round caps and joins. */
+export const PEAK_PATH = 'M6.5 25.5 H12 L15.6 17.6 Q18 12.6 20.4 17.6 L24 25.5 H29.5';
+export const PEAK_STROKE = 2.6;
+/** Peak colour that contrasts with the drop fill: the artwork background when opaque, near-black when transparent (white if the fill is itself near-black). */
+export function peakColor(p: Palette): string {
+  const c = p.transparent ? NEAR_BLACK : p.bg0;
+  return contrast(c, p.accent) >= 3 ? c : contrast(NEAR_BLACK, p.accent) >= contrast('#FFFFFF', p.accent) ? NEAR_BLACK : '#FFFFFF';
+}
 export function brandMark(x: number, y: number, name: string, size: number, p: Palette, anchor: 'start' | 'middle' = 'start'): { svg: string; w: number } {
   const s = size / 44;
   const textW = name.length * size * 0.56;
@@ -266,6 +274,7 @@ export function brandMark(x: number, y: number, name: string, size: number, p: P
   return {
     w,
     svg: `<g transform="translate(${n1(ox)},${n1(y)}) scale(${s.toFixed(3)})"${sh}><path d="${DROP_PATH}" fill="${p.accent}"/>` +
+      `<path d="${PEAK_PATH}" fill="none" stroke="${peakColor(p)}" stroke-width="${PEAK_STROKE}" stroke-linecap="round" stroke-linejoin="round"/>` +
       `<text x="46" y="38" font-size="44" font-weight="800" letter-spacing="-1" fill="${p.text}">${esc(name)}</text></g>`,
   };
 }

@@ -15,7 +15,7 @@ Last verified against the folder: 2026-11-13.
 | `tests/` | Core tests and Playwright journey | |
 | `tools/test.cjs` | Test runner | Transpiles a fixed file list; see `AGENTS.md` |
 | `tools/screenshots.mjs` | Screenshot script | `node tools/screenshots.mjs [outDir]`; 8 routes x 375/430/1280 px x dark/light against a running web server on port 8081; exits 1 on console errors |
-| `assets/` | App icon, Android adaptive icon layers, favicon, splash | The owner likes this logo: mint drop with a single-peak line |
+| `assets/` | App icon, Android adaptive icon layers, favicon, splash | **Still the stock Expo placeholder (blue chevron).** The approved mint-drop logo file is not in the repository; see problem 24 |
 | `samples/` | Synthetic sample CSV and two reference PNGs | No real data, ever |
 | `docs/` | Project docs | See "Docs" below |
 | `prototypes/share-first-web/` | Standalone browser prototype of the share-first flow | Reference implementation; not part of the Expo build |
@@ -150,7 +150,7 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 2 | ~~Playwright journey not run since the Create rebuild~~ Passing 2026-11-13 | `tests/e2e/journey.spec.ts` | M0 done |
 | 3 | ~~Not a git repository; stray `gitignore`~~ Resolved 2026-11-13. Backup folder still present pending D2 | root | M0 done |
 | 4 | Android adaptive icon `backgroundColor` is `#E6F4FE`, which may not match the dark icon | `app.json` | M1 |
-| 5 | In-app mark is a plain drop; the logo in `assets/` has a peak line | `src/ui.tsx` `Mark`, `src/art/svg.ts` `brandMark` | M1 |
+| 5 | ~~In-app mark is a plain drop~~ Resolved 2026-11-13: drop-and-peak mark in-app and on artwork | `src/ui.tsx` `Mark`, `src/art/svg.ts` `brandMark` | M1 |
 | 6 | ~~One 1131-line screens file~~ Resolved 2026-11-13: split into `src/screens/`, `src/components/`, `src/hooks/` | `src/screens/` | M2 done |
 | 7 | Two statistics modules and two reading shapes (`{timestamp}` vs `{t}`) | `src/analytics.ts`, `src/art/analytics.ts` | M3 |
 | 8 | App CSV parser is weaker than the prototype's | `src/csv.ts` | M3 |
@@ -169,3 +169,4 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 21 | The 7-day recap uses a single-day headline ("Another day of showing up.") | `src/art/copy.ts`, `src/art/templates.ts` | M5 |
 | 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
 | 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |
+| 24 | App icon, favicon, Android icon layers and splash icon are the stock Expo placeholder; the approved logo file is missing, and the in-app peak line has not been compared with it | `assets/` | M1 (needs owner) |

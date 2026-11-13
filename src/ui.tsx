@@ -3,6 +3,7 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useDemo } from "./store";
 import { BRAND } from "./art/brand";
+import { DROP_PATH, NEAR_BLACK, PEAK_PATH, PEAK_STROKE } from "./art/svg";
 
 // Design tokens. Below / in / above range are never red or green: they are labelled in words and use
 // amber / mint / lavender so colour alone never says "good" or "bad".
@@ -168,7 +169,8 @@ export function Mark({ size = 22, color }: { size?: number; color?: string }) {
   const c = useColors();
   return (
     <Svg width={size} height={size} viewBox="0 0 36 36" accessibilityLabel={BRAND.name}>
-      <Path d="M18 2 C28 16 34 24 34 32 a16 16 0 0 1 -32 0 C2 24 8 16 18 2 Z" fill={color ?? c.accent} />
+      <Path d={DROP_PATH} fill={color ?? c.accent} />
+      <Path d={PEAK_PATH} fill="none" stroke={color ? NEAR_BLACK : c.accentInk} strokeWidth={PEAK_STROKE} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
 }
