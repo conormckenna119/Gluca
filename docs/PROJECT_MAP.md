@@ -14,6 +14,7 @@ Last verified against the folder: 2026-11-13.
 | `src/art/` | Artwork engine | Pure TypeScript, no React Native |
 | `tests/` | Core tests and Playwright journey | |
 | `tools/test.cjs` | Test runner | Transpiles a fixed file list; see `AGENTS.md` |
+| `tools/screenshots.mjs` | Screenshot script | `node tools/screenshots.mjs [outDir]`; 8 routes x 375/430/1280 px x dark/light against a running web server on port 8081; exits 1 on console errors |
 | `assets/` | App icon, Android adaptive icon layers, favicon, splash | The owner likes this logo: mint drop with a single-peak line |
 | `samples/` | Synthetic sample CSV and two reference PNGs | No real data, ever |
 | `docs/` | Project docs | See "Docs" below |
@@ -24,11 +25,10 @@ Last verified against the folder: 2026-11-13.
 | `playwright.config.ts` | E2E config | Edge channel, port 8081, 390×844 viewport |
 | `.env.example` | Reserved Supabase variables | Nothing is read in demo mode |
 | `.gitignore` | Ignore rules | |
-| `gitignore` | Stray template file with no dot | Remove in M0 after merging any useful lines |
-| `_backup_before_claude/` | Copy of the source before the visual pass | Delete in M0 once the owner agrees |
+| `_backup_before_claude/` | Copy of the source before the visual pass | Ignored by git, so not in history. Delete only once the owner agrees (D2) |
 | `.expo/`, `.test-build/`, `dist/`, `test-results/`, `node_modules/` | Generated | Never edit |
 
-The folder is **not a git repository yet** (M0).
+Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 
 ## Routes: `app/`
 
@@ -98,7 +98,7 @@ Timestamps: the app stores UTC epoch milliseconds. `story.ts` shifts them to wal
 | File | Runner | Covers |
 | --- | --- | --- |
 | `tests/core.test.ts` | `npm test` | Conversions, weighted statistics, duplicates, gaps, CSV parsing, providers, all templates and formats, transparency, escaping, native-safe SVG |
-| `tests/e2e/journey.spec.ts` | `npm run test:e2e` | Feed, kudos, comment, dashboard, Create, export a 1080×1920 transparent PNG. Updated for the new Create screen but **not yet run** |
+| `tests/e2e/journey.spec.ts` | `npm run test:e2e` | Feed, kudos, comment, dashboard, Create, export a 1080×1920 transparent PNG. Updated for the new Create screen first run and passing 2026-11-13 |
 
 ## Docs
 
@@ -137,9 +137,9 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 
 | # | Problem | Where | Milestone |
 | --- | --- | --- | --- |
-| 1 | Restyled screens never run in a browser or on a device | all of `src/screens.tsx`, `app/(tabs)/_layout.tsx` | M0 |
-| 2 | Playwright journey not run since the Create rebuild | `tests/e2e/journey.spec.ts` | M0 |
-| 3 | Not a git repository; stray `gitignore`; backup folder present | root | M0 |
+| 1 | ~~Restyled screens never run in a browser~~ Resolved for web 2026-11-13; devices remain (see 16) | all of `src/screens.tsx`, `app/(tabs)/_layout.tsx` | M0 done |
+| 2 | ~~Playwright journey not run since the Create rebuild~~ Passing 2026-11-13 | `tests/e2e/journey.spec.ts` | M0 done |
+| 3 | ~~Not a git repository; stray `gitignore`~~ Resolved 2026-11-13. Backup folder still present pending D2 | root | M0 done |
 | 4 | Android adaptive icon `backgroundColor` is `#E6F4FE`, which may not match the dark icon | `app.json` | M1 |
 | 5 | In-app mark is a plain drop; the logo in `assets/` has a peak line | `src/ui.tsx` `Mark`, `src/art/svg.ts` `brandMark` | M1 |
 | 6 | One 1131-line screens file | `src/screens.tsx` | M2 |
@@ -157,3 +157,6 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 18 | AsyncStorage is unencrypted | `src/store.tsx` | M10 |
 | 19 | Educational caption lines not clinically reviewed | `src/art/copy.ts` | M9 |
 | 20 | DST days are not adjusted in the artwork engine | `src/art/analytics.ts` | backlog |
+| 21 | The 7-day recap uses a single-day headline ("Another day of showing up.") | `src/art/copy.ts`, `src/art/templates.ts` | M5 |
+| 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
+| 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens.tsx` | M6 |

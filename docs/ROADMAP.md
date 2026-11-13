@@ -6,7 +6,7 @@ Work the milestones in order unless a milestone says it is independent. Each one
 
 | # | Milestone | Status | Depends on |
 | --- | --- | --- | --- |
-| M0 | Baseline: run it, fix what breaks, set up git | not started | none |
+| M0 | Baseline: run it, fix what breaks, set up git | done 2026-11-13 (step 8 awaits owner, D2) | none |
 | M1 | Brand alignment: logo, icon config, name decision | not started | M0 |
 | M2 | Split `src/screens.tsx` | not started | M0 |
 | M3 | One data layer: analytics, CSV, units and range | not started | M2 |
@@ -46,6 +46,14 @@ M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
 - A git history exists.
 
 **Out of scope.** Redesign. Only fix what is broken.
+
+**Note, 2026-11-13 (M0 done).**
+- Verified: `npm run typecheck` clean; `npm test` 14/14; `npm run test:e2e` 1 passed (run twice); `npx expo export --platform web` succeeds. All 8 routes load in Edge at 375 and 1280 px with no console errors, page errors or failed requests, and no horizontal scroll. Create: 72 combinations (6 templates x 3 formats x transparent on/off x Day/7 days) render a preview; exports are RGBA PNGs at exactly 1080x1920, 1080x1350 and 1080x1080. No code changes were needed.
+- Git: repository created on `main`, baseline commit `a4d3d60`. Stray `gitignore` merged into `.gitignore` and deleted. `_backup_before_claude/` is ignored by git, so it is not in history.
+- Screenshots: 48 files in `docs/screenshots/baseline/` (8 routes x 375/430/1280 x dark/light), made with `node tools/screenshots.mjs [outDir]` against a running web server. Six of the 48 were looked at by eye.
+- Not verified: native iOS and Android (M7); the production `dist/` bundle was built but not served and loaded; only the square export image was inspected by eye.
+- Not done: step 8. Deleting `_backup_before_claude/` waits for the owner's answer to D2.
+- Cosmetic findings, logged in `docs/PROJECT_MAP.md` as problems 21 to 23, not fixed here.
 
 ---
 
