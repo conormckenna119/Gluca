@@ -14,6 +14,7 @@ import { captionFor, headlineFor } from "../art/copy";
 import { exportImage } from "../export";
 import { Post, Visibility } from "../types";
 import { Page } from "../components/page";
+import { rangeToText } from "../state";
 import { useReadings } from "../hooks/use-readings";
 const SHOW_LABELS: { key: keyof ShowOptions; label: string; group: "numbers" | "elements" }[] = [
   { key: "tir", label: "Time in range", group: "numbers" },
@@ -34,7 +35,9 @@ export function Create() {
   const c = useColors();
   const { width } = useWindowDimensions();
   const { data = [] } = useReadings();
-  const [o, O] = useState<StoryOptions>(() => defaultOptions("daily_recap", state.unit));
+  const [base, O] = useState<StoryOptions>(() => defaultOptions("daily_recap", state.unit));
+  // Unit and range come from the store on every render, so Settings changes apply without a reload.
+  const o = React.useMemo<StoryOptions>(() => ({ ...base, unit: state.unit, range: state.range }), [base, state.unit, state.range]);
   const [caption, C] = useState("");
   const [visibility, V] = useState<Visibility>("private");
   const [status, Status] = useState("");
@@ -264,7 +267,7 @@ export function Create() {
               />
             ))}
           </View>
-          <T small muted>Units follow Settings & privacy ({state.unit}). The target range follows the 70–180 mg/dL default.</T>
+          <T small muted>Units and target range follow Settings & privacy ({rangeToText(state.range.low, state.unit)}–{rangeToText(state.range.high, state.unit)} {state.unit}).</T>
         </Card>
       ) : null}
 

@@ -23,6 +23,7 @@ export type State = {
   blocked: string[];
   reports: string[];
   unit: "mg/dL" | "mmol/L";
+  range: { low: number; high: number }; // mg/dL
   dark: boolean;
   imported: Reading[];
 };

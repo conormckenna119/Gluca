@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
 import { Button, Card, Eyebrow, Input, Stat, T, row, space } from "../ui";
+import { RangeInputs } from "../components/range-inputs";
 import { useDemo } from "../store";
 import { convert, segments, summarize } from "../analytics";
 import { Page } from "../components/page";
@@ -14,8 +15,6 @@ export function Glucose() {
   const [date, D] = useState(new Date().toLocaleDateString("en-CA"));
   const [selected, S] = useState("");
   const [chartWidth, setChartWidth] = useState(320);
-  const [low, L] = useState("70");
-  const [high, U] = useState("180");
   const parsed = Date.parse(`${date}T00:00:00`);
   const start =
     hours <= 24
@@ -31,15 +30,8 @@ export function Glucose() {
       : hours < 24
         ? start + hours * 3600000
         : Date.now();
-  const valid =
-    Number(low) >= 20 && Number(high) <= 600 && Number(low) < Number(high);
-  const s = summarize(
-    data,
-    start,
-    end,
-    valid ? Number(low) : 70,
-    valid ? Number(high) : 180,
-  );
+  const { low, high } = state.range;
+  const s = summarize(data, start, end, low, high);
   const rows = data.filter((r) => r.timestamp >= start && r.timestamp < end);
   const latest = data.at(-1);
   const paths = segments(data, start, end);
@@ -84,13 +76,9 @@ export function Glucose() {
           </View>
           <T>
             Short ranges start at local midnight. Longer ranges end now. Target
-            values below are stored in mg/dL.
+            values are stored in mg/dL and shown in {state.unit}.
           </T>
-          <View style={row}>
-            <Input label="Target low" value={low} onChange={L} />
-            <Input label="Target high" value={high} onChange={U} />
-          </View>
-          {!valid ? <T>Invalid target; using 70–180 mg/dL.</T> : null}
+          <RangeInputs />
           <Card>
             <View
               accessibilityLabel={`Glucose chart. ${s.count} readings, ${s.coverage.toFixed(0)} percent coverage.`}
@@ -119,7 +107,7 @@ export function Glucose() {
                   );
               }}
             >
-              <GlucoseChart paths={paths} valid={valid} high={high} low={low} />
+              <GlucoseChart paths={paths} valid high={String(high)} low={String(low)} />
             </View>
             <T>
               Y: 20–600 mg/dL · X: {new Date(start).toLocaleString()} →{" "}

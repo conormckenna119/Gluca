@@ -3,7 +3,7 @@
 import type { Reading } from "./types";
 import { buildArtwork, defaultShow, TEMPLATE_INFO, TEMPLATE_ORDER, type Artwork, type ShowOptions } from "./art/templates";
 import { defaultSettings, makeArtModel, withTemplate, type Settings } from "./art/model";
-import { cleanReadings } from "./art/analytics";
+import { toEngine, wall } from "./analytics";
 import { captionFor, headlineFor, TONES, TONE_LABEL, type Tone } from "./art/copy";
 import { FORMATS as ART_FORMATS, type FormatId } from "./art/formats";
 import { SWATCHES, type Measure } from "./art/svg";
@@ -61,9 +61,6 @@ export function switchTemplate(o: StoryOptions, template: TemplateId): StoryOpti
 export const pickTone = (o: StoryOptions, tone: Tone, index = 0): StoryOptions =>
   tone === "custom" ? { ...o, tone } : { ...o, tone, headline: headlineFor(tone, index), caption: captionFor(tone, index) };
 
-/** The engine treats a timestamp as wall-clock time ("UTC-as-local"), so days line up with the person's own midnight. */
-const wall = (t: number) => t - new Date(t).getTimezoneOffset() * 60000;
-
 /** Remove SVG features react-native-svg does not render (filters, <style>, font lists) so native matches the web preview. */
 export function nativeSafe(svg: string): string {
   return svg
@@ -85,7 +82,7 @@ export function storyArtwork(
   o: StoryOptions,
   opts: { embedFont?: boolean; native?: boolean; measure?: Measure } = {},
 ): StoryArtwork {
-  const { readings } = cleanReadings(rows.map((r) => ({ t: wall(r.timestamp), mgdl: r.mgdl })));
+  const readings = toEngine(rows);
   const source = rows.length && rows[0].source === "csv" ? "csv" : "demo";
   const art = buildArtwork(makeArtModel(readings, source, wall(anchorMs), toSettings(o), { embedFont: !!opts.embedFont, measure: opts.measure }));
   return opts.native ? { ...art, svg: nativeSafe(art.svg) } : art;

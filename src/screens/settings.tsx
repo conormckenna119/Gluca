@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Button, Card, T } from "../ui";
 import { useDemo, seed } from "../store";
 import { Page } from "../components/page";
+import { RangeInputs } from "../components/range-inputs";
 export function Settings() {
   const { state, set } = useDemo();
   const [confirm, C] = useState(false);
@@ -18,6 +19,8 @@ export function Settings() {
           set((s) => ({ ...s, unit: s.unit === "mg/dL" ? "mmol/L" : "mg/dL" }))
         }
       />
+      <T>Target range, used for time in range on My Glucose and Create.</T>
+      <RangeInputs />
       <Card>
         <T large>Privacy center</T>
         <T>

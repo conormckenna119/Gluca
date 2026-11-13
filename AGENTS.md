@@ -18,7 +18,7 @@ All paths in these docs are relative to that root.
 
 ## Current state in one paragraph
 
-Expo SDK 58 / React Native 0.88 / Expo Router / strict TypeScript app with five tabs (Home, My Glucose, Create, Explore, Profile) plus Settings, Import and Post detail. Everything is local: fictional community, synthetic glucose, AsyncStorage, no backend, no accounts. A visual pass restyled the UI and rebuilt the Create screen on a tested artwork engine (`src/art/`) with six templates and exact-size PNG exports. `npm run typecheck` is clean and `npm test` passes (14 tests). M0 is done (2026-11-13): every route runs clean in a browser, the Playwright journey passes and the folder is a git repository. **Nothing has been run on a real phone yet** (M7).
+Expo SDK 58 / React Native 0.88 / Expo Router / strict TypeScript app with five tabs (Home, My Glucose, Create, Explore, Profile) plus Settings, Import and Post detail. Everything is local: fictional community, synthetic glucose, AsyncStorage, no backend, no accounts. A visual pass restyled the UI and rebuilt the Create screen on a tested artwork engine (`src/art/`) with six templates and exact-size PNG exports. `npm run typecheck` is clean and `npm test` passes (45 tests as of M3). M0 is done (2026-11-13): every route runs clean in a browser, the Playwright journey passes and the folder is a git repository. **Nothing has been run on a real phone yet** (M7).
 
 ## Rules that never change
 
@@ -59,7 +59,7 @@ Run from the project root in PowerShell. Node 22.13+ (or 24.3+ / 26+).
 | `npm start` | Dev server with QR code for a phone (see `README.md`) |
 | `npm run typecheck` | `tsc --noEmit`; must be clean |
 | `npm test` | Core tests via `tools/test.cjs`; must pass |
-| `npm run test:e2e` | Playwright journey in Microsoft Edge against port 8081 |
+| `npm run test:e2e` | Playwright journey in Microsoft Edge against port 8081. Set `E2E_BASE_URL` to use an already-running server on another port |
 | `npx expo install --check` | Check dependency versions against the SDK |
 | `npx expo export --platform web` | Production web bundle into `dist/` |
 

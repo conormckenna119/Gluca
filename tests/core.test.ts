@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { convert, summarize, normalize, segments } from "../src/analytics";
-import { parseCsv } from "../src/csv";
 import {
   MockGlucoseProvider,
   CsvGlucoseProvider,
@@ -51,30 +50,6 @@ test("duplicates are deterministic, invalid readings excluded", () => {
 test("empty and reversed intervals have zero coverage", () => {
   assert.equal(summarize([], 0, minute).coverage, 0);
   assert.equal(summarize([r(0, 100)], minute, 0).coverage, 0);
-});
-test("CSV preamble, quotes, units, deduplication and invalid rows", () => {
-  const csv =
-    'Export metadata\nTimestamp,Glucose Value (mg/dL)\n"2026-11-01T01:30:00-04:00",100\n2026-11-01T01:30:00-05:00,120\n2026-11-01T01:30:00-05:00,120\nbad,NOPE';
-  const p = parseCsv(csv);
-  assert.equal(p.readings.length, 2);
-  assert.equal(p.readings[1].timestamp - p.readings[0].timestamp, 3600000);
-  assert.equal(p.duplicates, 1);
-  assert.equal(p.errors.length, 1);
-});
-test("CSV locale selection and explicit offset", () => {
-  const badDates = parseCsv(
-    "Timestamp,Glucose (mg/dL)\n2026-02-30T12:00:00Z,100\n11/12/2026 8:00 AM,100",
-  );
-  assert.equal(badDates.readings.length, 0);
-  assert.equal(badDates.errors.length, 2);
-  const p = parseCsv(
-    'Device Timestamp;Glucose (mmol/L)\n12/11/2026 08:00;"5,5"',
-    "DMY",
-    "+01:00",
-  );
-  assert.equal(p.readings[0].timestamp, Date.parse("2026-11-12T07:00:00Z"));
-  assert.ok(Math.abs(p.readings[0].mgdl - 99.1001) < 0.001);
-  assert.throws(() => parseCsv("Timestamp,Glucose\n2026-01-01,100"), /units/);
 });
 test("provider window boundaries and unconnected adapters", async () => {
   const csv = new CsvGlucoseProvider([r(0, 100), r(5, 120)]);

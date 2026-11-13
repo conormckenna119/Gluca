@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Post, State } from "./types";
+import { DEFAULT_RANGE, loadState } from "./state";
 export const people = [
   "Alex Morgan",
   "Sam Rivera",
@@ -49,6 +50,7 @@ export const seed = (): State => ({
   blocked: [],
   reports: [],
   unit: "mg/dL",
+  range: { ...DEFAULT_RANGE },
   dark: true,
   imported: [],
 });
@@ -65,7 +67,7 @@ export function DemoStore({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     AsyncStorage.getItem("gluca-demo-v1")
       .then((raw) => {
-        if (raw) setState({ ...seed(), ...JSON.parse(raw) });
+        if (raw) setState(loadState(raw, seed()));
       })
       .catch(() => setError("Local storage could not be loaded."))
       .finally(() => setReady(true));

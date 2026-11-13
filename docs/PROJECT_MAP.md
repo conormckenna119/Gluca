@@ -53,8 +53,10 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `src/types.ts` | 28 | `Reading {timestamp, mgdl, source}`, `Post`, `Visibility`, `State` |
 | `src/store.tsx` | 85 | `DemoStore` context, `useDemo()`, seed data (10 fictional people, 24 posts, clubs). Persists to AsyncStorage key `gluca-demo-v1` |
 | `src/providers.ts` | 61 | `GlucoseProvider` interface, `synthetic()` generator, Mock and CSV providers, rejecting placeholders for Dexcom / Apple Health / Health Connect |
-| `src/analytics.ts` | 95 | App statistics: `convert`, `normalize`, `summarize`, `segments`. Duration-weighted, 5-minute cap |
-| `src/csv.ts` | 103 | App CSV parser `parseCsv` (asks for unit, date order and UTC offset) |
+| `src/analytics.ts` | 86 | Thin adapter over the engine: `convert`, `normalize`, `wall` (the one UTC to wall-clock conversion), `toEngine`, `summarize`, `segments` |
+| `src/csv.ts` | - | Clarity-aware parser `parseCsv(text, options)`: header detection, EGV rows only, unit from header or `needsUnit`, Low/High flags, rejected rows with line numbers. Returns a result object; never throws; keeps no patient info |
+| `src/state.ts` | - | Pure helpers: `loadState` (merge and validate saved state), `DEFAULT_RANGE`, `isValidRange`, `rangeToText`, `parseRange` |
+| `src/components/range-inputs.tsx` | - | Target low/high inputs shared by My Glucose and Settings; writes `state.range` in mg/dL only when valid |
 | `src/export.ts` | 61 | `exportImage`: web draws SVG to canvas and downloads PNG; native uses view capture, then share sheet or photo library |
 | `src/story.ts` | 94 | Adapter between the app and `src/art/`: `StoryOptions`, `defaultOptions`, `switchTemplate`, `pickTone`, `storyArtwork`, `storySvg`, `nativeSafe` |
 | `src/ui.tsx` | 174 | Design tokens and primitives |
@@ -107,7 +109,10 @@ Timestamps: the app stores UTC epoch milliseconds. `story.ts` shifts them to wal
 
 | File | Runner | Covers |
 | --- | --- | --- |
-| `tests/core.test.ts` | `npm test` | Conversions, weighted statistics, duplicates, gaps, CSV parsing, providers, all templates and formats, transparency, escaping, native-safe SVG |
+| `tests/core.test.ts` | `npm test` | Conversions, weighted statistics, duplicates, gaps, providers, all templates and formats, transparency, escaping, native-safe SVG, brand mark |
+| `tests/stats.test.ts` | `npm test` | The statistics rules, `wall()`, and that My Glucose and Create agree |
+| `tests/csv.test.ts` | `npm test` | Parser cases ported from the prototype; the sample file against an independent calculation; no patient info in the result |
+| `tests/settings.test.ts` | `npm test` | Saved-state loading, range validation, unit and range reaching the artwork |
 | `tests/e2e/journey.spec.ts` | `npm run test:e2e` | Feed, kudos, comment, dashboard, Create, export a 1080×1920 transparent PNG. Updated for the new Create screen first run and passing 2026-11-13 |
 
 ## Docs
@@ -153,10 +158,10 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 4 | Android adaptive icon `backgroundColor` is `#E6F4FE`, which may not match the dark icon | `app.json` | M1 |
 | 5 | ~~In-app mark is a plain drop~~ Resolved 2026-11-13: drop-and-peak mark in-app and on artwork | `src/ui.tsx` `Mark`, `src/art/svg.ts` `brandMark` | M1 |
 | 6 | ~~One 1131-line screens file~~ Resolved 2026-11-13: split into `src/screens/`, `src/components/`, `src/hooks/` | `src/screens/` | M2 done |
-| 7 | Two statistics modules and two reading shapes (`{timestamp}` vs `{t}`) | `src/analytics.ts`, `src/art/analytics.ts` | M3 |
-| 8 | App CSV parser is weaker than the prototype's | `src/csv.ts` | M3 |
-| 9 | Create reads the unit from Settings only when first opened, and always uses the default 70–180 mg/dL range | `Create` in `src/screens/create.tsx` | M3 |
-| 10 | Target range on My Glucose is local screen state, not saved | `Glucose` in `src/screens/glucose.tsx` | M3 |
+| 7 | ~~Resolved 2026-11-13 (M3)~~ Two statistics modules and two reading shapes (`{timestamp}` vs `{t}`) | `src/analytics.ts`, `src/art/analytics.ts` | M3 |
+| 8 | ~~Resolved 2026-11-13 (M3)~~ App CSV parser is weaker than the prototype's | `src/csv.ts` | M3 |
+| 9 | ~~Resolved 2026-11-13 (M3)~~ Create reads the unit from Settings only when first opened, and always uses the default 70–180 mg/dL range | `Create` in `src/screens/create.tsx` | M3 |
+| 10 | ~~Resolved 2026-11-13 (M3)~~ Target range on My Glucose is local screen state, not saved | `Glucose` in `src/screens/glucose.tsx` | M3 |
 | 11 | Telemetry module not wired; no flags module | `src/art/telemetry.ts` | M4 |
 | 12 | No first-run flow; the share-first path takes several taps | `Home`, `Create` | M4 |
 | 13 | Native preview and export use the system font and no glow, so they differ from web exports | `src/story.ts` `nativeSafe` | M5 |
@@ -171,3 +176,4 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
 | 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |
 | 24 | ~~App icons are the stock Expo placeholder~~ Resolved 2026-11-13: generated from the in-app mark. Still unverified on devices, and never compared with the owner's original logo file | `assets/`, `tools/make-icons.cjs` | M7 |
+| 25 | A dev server left running for many hours can serve compressed bundles very slowly (about 10 s per load), timing out the e2e journey. Restart it, or use `E2E_BASE_URL` with a fresh server on another port | dev tooling | note |
