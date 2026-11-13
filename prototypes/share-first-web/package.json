@@ -1,0 +1,24 @@
+{
+  "name": "gluca-share-first",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Share-first MVP: turn a day of glucose data into a graphic you choose to share. Runs entirely in the browser.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "node scripts/build.mjs",
+    "serve": "node scripts/serve.mjs",
+    "e2e": "tsx scripts/e2e.ts",
+    "samples": "tsx scripts/make-sample-csv.ts samples/clarity-sample.csv && tsx scripts/render-samples.ts out"
+  },
+  "devDependencies": {
+    "@playwright/test": "*",
+    "@types/node": "*",
+    "esbuild": "*",
+    "sharp": "*",
+    "tsx": "*",
+    "typescript": "~6.0.3"
+  }
+}

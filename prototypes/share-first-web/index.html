@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Gluca — Create your glucose story</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Cpath d='M18 2C28 16 34 24 34 32a16 16 0 0 1-32 0C2 24 8 16 18 2Z' fill='%2391E6B2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <div class="brand"><svg viewBox="0 0 36 36" width="22" height="22" aria-hidden="true"><path d="M18 2C28 16 34 24 34 32a16 16 0 0 1-32 0C2 24 8 16 18 2Z" fill="currentColor"/></svg><span id="brand-name">Gluca</span></div>
+  <button id="reset" class="ghost" type="button" hidden>Start over</button>
+</header>
+
+<main id="main">
+  <!-- Step 1: choose data -->
+  <section id="landing" aria-labelledby="h-landing">
+    <h1 id="h-landing">Create your glucose story.</h1>
+    <p class="lede">Turn a day of glucose data into a graphic you choose to share. No account. Nothing is uploaded.</p>
+    <div class="actions">
+      <button id="btn-demo" class="primary" type="button">Try demo data</button>
+      <label id="lbl-import" class="btn secondary" tabindex="0" role="button">Import Dexcom Clarity CSV
+        <input id="file" type="file" accept=".csv,text/csv,text/plain" hidden>
+      </label>
+      <button id="btn-milestone" class="link" type="button">Make a milestone graphic (no data)</button>
+    </div>
+    <p class="fine">Your file is read inside this browser tab. Readings are never sent anywhere, and the file name is not kept.</p>
+    <div id="import-status" role="status" aria-live="polite"></div>
+    <div id="import-unit" class="card" hidden>
+      <p><strong>Which unit does this file use?</strong> The file doesn't say, and guessing could change every number.</p>
+      <div class="row"><button class="secondary" type="button" data-unit="mgdl">mg/dL</button><button class="secondary" type="button" data-unit="mmol">mmol/L</button></div>
+    </div>
+    <div id="import-dates" class="card" hidden>
+      <p><strong>Is the date written day/month or month/day?</strong> Dates like 03/04/2026 are ambiguous.</p>
+      <div class="row"><button class="secondary" type="button" data-order="MDY">Month / Day</button><button class="secondary" type="button" data-order="DMY">Day / Month</button></div>
+    </div>
+  </section>
+
+  <!-- Step 2-3: preview, customise, export -->
+  <section id="studio" hidden aria-label="Studio">
+    <div id="databar" class="databar">
+      <div class="seg" role="group" aria-label="Period">
+        <button type="button" data-period="day" aria-pressed="true">Day</button>
+        <button type="button" data-period="week" aria-pressed="false">7 days</button>
+      </div>
+      <div class="datepick">
+        <button id="prev" class="icon" type="button" aria-label="Previous day">‹</button>
+        <input id="date" type="date" aria-label="Date">
+        <button id="next" class="icon" type="button" aria-label="Next day">›</button>
+      </div>
+      <p id="source-note" class="fine"></p>
+    </div>
+
+    <div class="layout">
+      <div class="stage">
+        <div id="preview" class="preview" aria-label="Preview of your graphic"></div>
+        <div class="seg formats" role="group" aria-label="Format">
+          <button type="button" data-format="story" aria-pressed="true">Story 9:16</button>
+          <button type="button" data-format="portrait" aria-pressed="false">Portrait 4:5</button>
+          <button type="button" data-format="square" aria-pressed="false">Square 1:1</button>
+        </div>
+        <label class="check"><input id="transparent" type="checkbox"> Transparent background (PNG with alpha)</label>
+      </div>
+
+      <div class="controls">
+        <h2 class="sr">Template</h2>
+        <div id="templates" class="templates" role="group" aria-label="Template"></div>
+
+        <div class="actions export">
+          <button id="btn-export" class="primary" type="button">Export PNG</button>
+          <button id="btn-share" class="secondary" type="button" hidden>Share…</button>
+        </div>
+        <p id="export-status" class="fine" role="status" aria-live="polite"></p>
+
+        <details id="contents-d" open>
+          <summary>What's on this image</summary>
+          <ul id="contents" class="list"></ul>
+          <p class="fine">Only what is listed here appears in the export. Nothing is posted for you.</p>
+        </details>
+
+        <details id="custom-d">
+          <summary>Customize</summary>
+          <div class="form">
+            <div class="field"><span class="lab">Tone</span><div id="tones" class="chips" role="group" aria-label="Tone"></div></div>
+            <div class="field"><label for="headline">Headline</label><input id="headline" type="text" maxlength="90" autocomplete="off"></div>
+            <div class="field"><label for="caption">Caption</label><input id="caption" type="text" maxlength="140" autocomplete="off"></div>
+            <div class="row"><button id="shuffle" class="secondary" type="button">Another line</button></div>
+            <div id="milestone-field" class="field" hidden><label for="milestoneBig">Milestone</label><input id="milestoneBig" type="text" maxlength="24" autocomplete="off" placeholder="e.g. 10 years"></div>
+            <fieldset id="stats" class="field"><legend class="lab">Numbers to show (all optional)</legend>
+              <label class="check"><input type="checkbox" data-show="tir"> Time in range</label>
+              <label class="check"><input type="checkbox" data-show="avg"> Average glucose</label>
+              <label class="check"><input type="checkbox" data-show="readings"> Number of readings</label>
+              <label class="check"><input type="checkbox" data-show="coverage"> Data coverage</label>
+            </fieldset>
+            <fieldset class="field"><legend class="lab">Elements</legend>
+              <label class="check"><input type="checkbox" data-show="date"> Date</label>
+              <label class="check"><input type="checkbox" data-show="chart"> Glucose trace</label>
+              <label class="check"><input type="checkbox" data-show="band"> Target range band</label>
+              <label class="check"><input type="checkbox" data-show="axis"> Time labels</label>
+              <label class="check"><input type="checkbox" data-show="partialNote"> “Based on X%” note when data is incomplete</label>
+              <label class="check"><input type="checkbox" data-show="brand"> Small “Gluca” mark</label>
+            </fieldset>
+            <div class="field"><span class="lab">Theme</span><div class="seg" role="group" aria-label="Theme"><button type="button" data-theme="dark" aria-pressed="true">Dark</button><button type="button" data-theme="light" aria-pressed="false">Light</button></div></div>
+            <div class="field"><span class="lab">Accent</span><div id="swatches" class="swatches" role="group" aria-label="Accent colour"></div></div>
+            <div class="field"><span class="lab">Units</span><div class="seg" role="group" aria-label="Units"><button type="button" data-unitset="mgdl" aria-pressed="true">mg/dL</button><button type="button" data-unitset="mmol" aria-pressed="false">mmol/L</button></div></div>
+            <div class="field two"><div><label for="rlow">Range low</label><input id="rlow" type="number" inputmode="decimal" step="any"></div><div><label for="rhigh">Range high</label><input id="rhigh" type="number" inputmode="decimal" step="any"></div></div>
+            <p class="fine">The range is whatever you or your care team use. The default 70–180 mg/dL is a common display range, not a recommendation.</p>
+          </div>
+        </details>
+
+        <details id="data-d">
+          <summary>Your data</summary>
+          <p class="fine" id="data-summary"></p>
+          <button id="btn-remove" class="danger" type="button">Remove imported data</button>
+        </details>
+
+        <details id="fb-d">
+          <summary>Tell us how this went (optional)</summary>
+          <form id="fb" class="form">
+            <div class="field"><span class="lab">Did you share or plan to share this?</span>
+              <div class="chips" role="group" aria-label="Shared"><label class="chip"><input type="radio" name="shared" value="yes"> Yes</label><label class="chip"><input type="radio" name="shared" value="not_yet"> Not yet</label><label class="chip"><input type="radio" name="shared" value="no"> No</label></div></div>
+            <div class="field"><span class="lab">Does it feel like <em>your</em> day with diabetes? (1 = not at all, 5 = very much)</span>
+              <div class="chips" role="group" aria-label="Felt represented"><label class="chip"><input type="radio" name="rep" value="1">1</label><label class="chip"><input type="radio" name="rep" value="2">2</label><label class="chip"><input type="radio" name="rep" value="3">3</label><label class="chip"><input type="radio" name="rep" value="4">4</label><label class="chip"><input type="radio" name="rep" value="5">5</label></div></div>
+            <button class="secondary" type="submit">Send</button>
+            <p class="fine" id="fb-status" role="status" aria-live="polite">Answers are counted in this tab only. There is no server, and no free text is collected.</p>
+          </form>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <aside id="debug" class="card" hidden aria-label="Local analytics"><strong>Local analytics (this tab only)</strong><pre id="debug-pre"></pre></aside>
+</main>
+
+<footer class="foot">
+  <p>Gluca is not a medical device and gives no medical, dosing or treatment advice. Graphics show data you provide; they do not measure your worth, your effort or your care. Sharing is always your choice.</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
