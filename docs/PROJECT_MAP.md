@@ -14,8 +14,9 @@ Last verified against the folder: 2026-11-13.
 | `src/art/` | Artwork engine | Pure TypeScript, no React Native |
 | `tests/` | Core tests and Playwright journey | |
 | `tools/test.cjs` | Test runner | Transpiles a fixed file list; see `AGENTS.md` |
+| `tools/make-icons.cjs` | Icon generator | `node tools/make-icons.cjs .` renders every file in `assets/` from the drop and peak paths; needs Edge |
 | `tools/screenshots.mjs` | Screenshot script | `node tools/screenshots.mjs [outDir]`; 8 routes x 375/430/1280 px x dark/light against a running web server on port 8081; exits 1 on console errors |
-| `assets/` | App icon, Android adaptive icon layers, favicon, splash | **Still the stock Expo placeholder (blue chevron).** The approved mint-drop logo file is not in the repository; see problem 24 |
+| `assets/` | App icon, Android adaptive icon layers, favicon, splash | Generated from the in-app drop-and-peak mark by `tools/make-icons.cjs` (2026-11-13). Do not hand-edit; change the script and re-run |
 | `samples/` | Synthetic sample CSV and two reference PNGs | No real data, ever |
 | `docs/` | Project docs | See "Docs" below |
 | `prototypes/share-first-web/` | Standalone browser prototype of the share-first flow | Reference implementation; not part of the Expo build |
@@ -169,4 +170,4 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 21 | The 7-day recap uses a single-day headline ("Another day of showing up.") | `src/art/copy.ts`, `src/art/templates.ts` | M5 |
 | 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
 | 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |
-| 24 | App icon, favicon, Android icon layers and splash icon are the stock Expo placeholder; the approved logo file is missing, and the in-app peak line has not been compared with it | `assets/` | M1 (needs owner) |
+| 24 | ~~App icons are the stock Expo placeholder~~ Resolved 2026-11-13: generated from the in-app mark. Still unverified on devices, and never compared with the owner's original logo file | `assets/`, `tools/make-icons.cjs` | M7 |

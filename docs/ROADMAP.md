@@ -7,7 +7,7 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | # | Milestone | Status | Depends on |
 | --- | --- | --- | --- |
 | M0 | Baseline: run it, fix what breaks, set up git | done 2026-11-13 (step 8 awaits owner, D2) | none |
-| M1 | Brand alignment: logo, icon config, name decision | partly done 2026-11-13: in-app and artwork mark done; app icon files missing (see note) | M0 |
+| M1 | Brand alignment: logo, icon config, name decision | done 2026-11-13 (name step waits for D1; icons unverified on devices) | M0 |
 | M2 | Split `src/screens.tsx` | done 2026-11-13 | M0 |
 | M3 | One data layer: analytics, CSV, units and range | not started | M2 |
 | M4 | Share-first first run, flags, local telemetry | not started | M3 |
@@ -82,6 +82,8 @@ M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
 - Verified: typecheck, `npm test` 16/16, e2e, header mark in dark and light at three widths, the daily recap export by eye. Template screenshots in `docs/screenshots/m1/`.
 - **Not done: the app icon.** `assets/icon.png`, `assets/favicon.png` and the Android icon layers are the stock Expo placeholder (blue chevron), not the mint drop this section describes. The approved logo file is not in the repository. The peak was therefore drawn from the written description and has not been compared with the real logo. `android.adaptiveIcon.backgroundColor` was left at `#E6F4FE` because the foreground is not the mint drop. Needs the owner: supply the logo files, or approve generating the icon set from the in-app mark.
 - Skipped: step 4 (name), which waits for D1.
+
+**Note, 2026-11-13, later (icon set generated).** The owner chose to generate the icons from the in-app mark. `node tools/make-icons.cjs .` renders `icon.png` (1024), `favicon.png` (48), `android-icon-foreground.png` (512, mark inside the adaptive safe zone), `android-icon-background.png` (flat `#101412`), `android-icon-monochrome.png` (432, peak cut out of the drop) and `splash-icon.png` (1024, transparent) from the same drop and peak paths. `android.adaptiveIcon.backgroundColor` is now `#101412` and the splash entry points at `splash-icon.png`. Verified: `icon.png` and `favicon.png` by eye; transparency of the three transparent files by pixel count; `npx expo config` accepts the config. Not verified: how the icon, adaptive icon mask, themed (monochrome) icon and splash look on a real phone (M7). The mark has still never been compared with the owner's original logo file, which is not in the repository.
 
 ---
 

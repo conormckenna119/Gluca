@@ -31,3 +31,4 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 | 2026-11-13 | `src/art/` is the source of truth for the engine; `prototypes/share-first-web/` is a frozen reference | Avoid maintaining two copies |
 | 2026-11-13 | Correction to the entry above: the approved logo is not in `assets/`; those files are the stock Expo placeholder. The in-app mark was drawn from the written description (mint drop, near-black single-peak line) | Found during M1. The owner needs to supply the file or approve generating icons from the in-app mark |
 | 2026-11-13 | In-app `Mark` draws its peak line in the `accentInk` token | Near-black on the light theme's dark green drop was too faint |
+| 2026-11-13 | Owner chose to generate the app icon set from the in-app mark rather than supply a logo file | The original logo file is not in the repository; `tools/make-icons.cjs` makes the set reproducible |
