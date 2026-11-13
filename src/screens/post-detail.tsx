@@ -4,7 +4,15 @@ import { Button, Card, Input, T } from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
+import { Guard } from "../components/guard";
 export function PostDetail() {
+  return (
+    <Guard route="/post">
+      <PostConversation />
+    </Guard>
+  );
+}
+function PostConversation() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, set } = useDemo();
   const [comment, change] = useState("");

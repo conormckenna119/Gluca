@@ -3,6 +3,8 @@ import { Tabs } from "expo-router";
 import { View, type ColorValue } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Mark, useColors } from "../../src/ui";
+import { getFlags } from "../../src/flags";
+import { tabVisible } from "../../src/nav";
 
 // Original line icons (24 px grid). Each tab keeps its text label, so icons are never the only cue.
 const ICONS: Record<string, (p: { color: string; filled: boolean }) => React.ReactElement> = {
@@ -33,6 +35,10 @@ const ICONS: Record<string, (p: { color: string; filled: boolean }) => React.Rea
 
 export default function Layout() {
   const c = useColors();
+  const flags = getFlags();
+  // A flagged-off tab gets no button but its route stays registered, so its URL reaches the Guard and redirects to Create
+  // (href: null would make the navigator fall back to the first tab, My Glucose, instead).
+  const hide = (tab: "index" | "explore") => (tabVisible(tab, flags) ? {} : { tabBarButton: () => null, tabBarItemStyle: { display: "none" as const } });
   const icon = (name: string) => ({ color, focused }: { color: ColorValue; focused: boolean }) => ICONS[name]({ color: String(color), filled: focused });
   return (
     <Tabs
@@ -53,7 +59,7 @@ export default function Layout() {
         sceneStyle: { backgroundColor: c.bg },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon("index"), tabBarAccessibilityLabel: "Home" }} />
+      <Tabs.Screen name="index" options={{ title: "Home", tabBarIcon: icon("index"), tabBarAccessibilityLabel: "Home", ...hide("index") }} />
       <Tabs.Screen name="glucose" options={{ title: "My Glucose", tabBarIcon: icon("glucose") }} />
       <Tabs.Screen
         name="create"
@@ -68,7 +74,7 @@ export default function Layout() {
           ),
         }}
       />
-      <Tabs.Screen name="explore" options={{ title: "Explore", tabBarIcon: icon("explore") }} />
+      <Tabs.Screen name="explore" options={{ title: "Explore", tabBarIcon: icon("explore"), ...hide("explore") }} />
       <Tabs.Screen name="profile" options={{ title: "Profile", tabBarIcon: icon("profile") }} />
     </Tabs>
   );

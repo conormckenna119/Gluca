@@ -2,7 +2,17 @@ import React from "react";
 import { Button, Card, T } from "../ui";
 import { useDemo, people, clubNames } from "../store";
 import { Page } from "../components/page";
+import { Guard } from "../components/guard";
+import { getFlags } from "../flags";
 export function Explore() {
+  return (
+    <Guard route="/explore">
+      <ExploreBody />
+    </Guard>
+  );
+}
+function ExploreBody() {
+  const flags = getFlags();
   const { state, set } = useDemo();
   return (
     <Page title="Explore">
@@ -10,7 +20,7 @@ export function Explore() {
         Participation over competition. This week's invitation: encourage
         another community member.
       </T>
-      {clubNames.map((n) => (
+      {flags.clubs ? clubNames.map((n) => (
         <Card key={n}>
           <T large>{n}</T>
           <T>
@@ -29,9 +39,9 @@ export function Explore() {
             }
           />
         </Card>
-      ))}
-      <T large>Community members</T>
-      {people
+      )) : null}
+      {flags.communityFeed ? <T large>Community members</T> : null}
+      {(flags.communityFeed ? people : [])
         .filter((p) => !state.blocked.includes(p))
         .map((p) => (
           <Card key={p}>

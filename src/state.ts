@@ -34,8 +34,19 @@ export function loadState(raw: string | null | undefined, defaults: State): Stat
   if (!saved || typeof saved !== "object" || Array.isArray(saved)) return defaults;
   const merged = { ...defaults, ...(saved as Partial<State>) };
   merged.range = isValidRange(merged.range) ? { low: merged.range.low, high: merged.range.high } : { ...DEFAULT_RANGE };
+  // Saved state from before the Welcome screen existed belongs to someone who has already used the app.
+  merged.seenWelcome = typeof (saved as { seenWelcome?: unknown }).seenWelcome === "boolean" ? (saved as State).seenWelcome : true;
   return merged;
 }
+
+/** True when CSV readings are stored and the app is not on synthetic demo data. */
+export const hasImported = (s: Pick<State, "imported">): boolean => s.imported.length > 0;
+
+/** Drop imported readings at once. Everything else (posts, preferences) is kept. */
+export const removeImported = <S extends Pick<State, "imported">>(s: S): S => ({ ...s, imported: [] });
+
+export const REMOVED_IMPORT_MESSAGE =
+  "Imported readings were removed from this device. The app is back on synthetic demo data.";
 
 /** mg/dL to the text shown in the display unit. */
 export const rangeToText = (mgdl: number, unit: Unit): string =>

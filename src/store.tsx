@@ -53,6 +53,7 @@ export const seed = (): State => ({
   range: { ...DEFAULT_RANGE },
   dark: true,
   imported: [],
+  seenWelcome: false,
 });
 const Context = createContext<{
   state: State;

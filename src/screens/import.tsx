@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Platform, Share } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { File } from "expo-file-system";
+import { router, useLocalSearchParams } from "expo-router";
 import { Button, Card, Input, T } from "../ui";
 import { useDemo } from "../store";
+import { hasImported, removeImported, REMOVED_IMPORT_MESSAGE } from "../state";
 import {
   parseCsv,
   type CsvResult,
@@ -11,23 +13,50 @@ import {
   type DateOrder,
 } from "../csv";
 import { Page } from "../components/page";
+import { Guard } from "../components/guard";
+import { track, importFailReason } from "../telemetry";
 export function ImportScreen() {
+  return (
+    <Guard route="/import">
+      <ImportFlow />
+    </Guard>
+  );
+}
+function ImportFlow() {
   const { state, set } = useDemo();
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const [text, Text] = useState("");
   const [offset, Offset] = useState("");
   const [order, Order] = useState<DateOrder>("auto");
   const [unit, Unit] = useState<CsvUnit | undefined>(undefined);
   const [result, R] = useState<CsvResult | null>(null);
   const [error, E] = useState("");
-  const run = (u: CsvUnit | undefined = unit) =>
-    R(parseCsv(text, { unit: u, dateOrder: order, utcOffset: offset }));
+  // One import attempt = start (file chosen or preview pressed) to confirm / failure. Counted once per attempt.
+  const attempt = React.useRef(false);
+  const begin = () => {
+    if (!attempt.current) track("import_started");
+    attempt.current = true;
+  };
+  const run = (u: CsvUnit | undefined = unit) => {
+    const r = parseCsv(text, { unit: u, dateOrder: order, utcOffset: offset });
+    if (!r.ok && !r.needsUnit) {
+      track("import_failed", { reason: importFailReason(r.error) });
+      attempt.current = false;
+    }
+    R(r);
+  };
   const pick = async () => {
+    begin();
     try {
       const file = await DocumentPicker.getDocumentAsync({
         type: ["text/csv", "text/plain", "application/vnd.ms-excel"],
         copyToCacheDirectory: true,
       });
-      if (file.canceled) return;
+      if (file.canceled) {
+        track("import_failed", { reason: "user_cancelled" });
+        attempt.current = false;
+        return;
+      }
       const a = file.assets[0];
       // Only the contents are used; the file name is never read or stored.
       const content =
@@ -38,6 +67,8 @@ export function ImportScreen() {
       Unit(undefined);
       R(null);
     } catch {
+      track("import_failed", { reason: "unknown" });
+      attempt.current = false;
       E("Unable to read the selected file. You can paste CSV text below.");
     }
   };
@@ -79,6 +110,7 @@ export function ImportScreen() {
       <Button
         label="Preview import"
         onPress={() => {
+          begin();
           run();
           E("");
         }}
@@ -140,19 +172,34 @@ export function ImportScreen() {
             label="Confirm import"
             disabled={!result.readings.length}
             onPress={() => {
+              track("import_succeeded");
+              attempt.current = false;
               set((s) => ({ ...s, imported: result.readings }));
               Text("");
               Unit(undefined);
               E("Imported locally. Dashboard now uses CSV data.");
               R(null);
+              // Arrived from the welcome screen: go straight to a graphic.
+              if (from === "welcome") router.replace("/create");
             }}
           />
         </Card>
       ) : null}
-      <Button
-        label="Use synthetic source again"
-        onPress={() => set((s) => ({ ...s, imported: [] }))}
-      />
+      {hasImported(state) ? (
+        <Card>
+          <T>
+            {state.imported.length} imported readings are stored on this
+            device.
+          </T>
+          <Button
+            label="Remove imported data"
+            onPress={() => {
+              set(removeImported);
+              E(REMOVED_IMPORT_MESSAGE);
+            }}
+          />
+        </Card>
+      ) : null}
       <Button
         label="Export local data JSON"
         onPress={() => {

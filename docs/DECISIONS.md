@@ -9,7 +9,7 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 | D1 | Product name | Working name is "Gluca". The owner is concerned it may conflict with an unreleased product. A web search on 2026-11-12 found no exact match but many similar "Gluco…" apps. Earlier briefs also used "GlucoClub". Needs a trademark attorney's clearance search. The name lives in `src/art/brand.ts`; rename steps are in `docs/ROADMAP.md` M1 | Public release |
 | D2 | Delete `_backup_before_claude/` | Copy of the source before the visual pass | M0 cleanup |
 | D3 | Dark or light by default | Currently dark first (`dark: true` in `src/store.tsx`) with a light option | M6 |
-| D4 | Is the fictional community (feed, Explore, clubs) visible in the default build, or flagged off so the app is purely share-first? | The share-first brief says to test sharing before building community | M4 |
+| D4 | ~~Is the fictional community visible in the default build?~~ **Decided 2026-11-13: keep visible** (see Made) | | |
 | D5 | Analytics provider | None today; telemetry is local only. A provider needs a privacy review and consent copy | After M9 |
 | D6 | Real health data, backend, paid services, public deployment | All unapproved | M10 |
 
@@ -32,3 +32,4 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 | 2026-11-13 | Correction to the entry above: the approved logo is not in `assets/`; those files are the stock Expo placeholder. The in-app mark was drawn from the written description (mint drop, near-black single-peak line) | Found during M1. The owner needs to supply the file or approve generating icons from the in-app mark |
 | 2026-11-13 | In-app `Mark` draws its peak line in the `accentInk` token | Near-black on the light theme's dark green drop was too faint |
 | 2026-11-13 | Owner chose to generate the app icon set from the in-app mark rather than supply a logo file | The original logo file is not in the repository; `tools/make-icons.cjs` makes the set reproducible |
+| 2026-11-13 | D4: the fictional feed, Explore and clubs stay visible in the default build. `communityFeed` and `clubs` default to on; turning them off must still remove them from navigation. They stay labelled as a local demo with a fictional community | Owner's choice |

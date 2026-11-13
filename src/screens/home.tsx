@@ -4,7 +4,15 @@ import { Button, T, row } from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
+import { Guard } from "../components/guard";
 export function Home() {
+  return (
+    <Guard route="/">
+      <HomeFeed />
+    </Guard>
+  );
+}
+function HomeFeed() {
   const { state } = useDemo();
   const [filter, setFilter] = useState("All");
   const [limit, setLimit] = useState(8);

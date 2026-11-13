@@ -26,4 +26,5 @@ export type State = {
   range: { low: number; high: number }; // mg/dL
   dark: boolean;
   imported: Reading[];
+  seenWelcome: boolean; // false only on a brand-new install, until a Welcome action is taken
 };

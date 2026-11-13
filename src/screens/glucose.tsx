@@ -8,6 +8,8 @@ import { convert, segments, summarize } from "../analytics";
 import { Page } from "../components/page";
 import { GlucoseChart } from "../components/glucose-chart";
 import { useReadings } from "../hooks/use-readings";
+import { getFlags } from "../flags";
+import { linkVisible } from "../nav";
 export function Glucose() {
   const { state } = useDemo();
   const { data = [], isPending, error } = useReadings();
@@ -160,10 +162,12 @@ export function Glucose() {
             label="Create a graphic"
             onPress={() => router.push("/create")}
           />
-          <Button
-            label="Import glucose CSV"
-            onPress={() => router.push("/import")}
-          />
+          {linkVisible("import", getFlags()) ? (
+            <Button
+              label="Import glucose CSV"
+              onPress={() => router.push("/import")}
+            />
+          ) : null}
         </>
       )}
     </Page>

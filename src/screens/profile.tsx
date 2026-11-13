@@ -4,6 +4,7 @@ import { Button, Card, T } from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
+import { getFlags } from "../flags";
 export function Profile() {
   const { state } = useDemo();
   return (
@@ -25,7 +26,7 @@ export function Profile() {
           onPress={() => router.push("/settings")}
         />
       </Card>
-      {state.posts
+      {(getFlags().communityFeed ? state.posts : [])
         .filter((p) => p.author === "You")
         .map((p) => (
           <PostCard key={p.id} post={p} />

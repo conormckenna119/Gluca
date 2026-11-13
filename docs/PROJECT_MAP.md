@@ -45,6 +45,7 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `app/post/[id].tsx` | Post detail and comments | `PostDetail` in `src/screens/post-detail.tsx` |
 | `app/settings.tsx` | Settings and privacy | `Settings` in `src/screens/settings.tsx` |
 | `app/import.tsx` | CSV import and local export | `ImportScreen` in `src/screens/import.tsx` |
+| `app/welcome.tsx` | First-run welcome | `Welcome` in `src/screens/welcome.tsx` |
 
 ## App code: `src/`
 
@@ -55,7 +56,12 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `src/providers.ts` | 61 | `GlucoseProvider` interface, `synthetic()` generator, Mock and CSV providers, rejecting placeholders for Dexcom / Apple Health / Health Connect |
 | `src/analytics.ts` | 86 | Thin adapter over the engine: `convert`, `normalize`, `wall` (the one UTC to wall-clock conversion), `toEngine`, `summarize`, `segments` |
 | `src/csv.ts` | - | Clarity-aware parser `parseCsv(text, options)`: header detection, EGV rows only, unit from header or `needsUnit`, Low/High flags, rejected rows with line numbers. Returns a result object; never throws; keeps no patient info |
-| `src/state.ts` | - | Pure helpers: `loadState` (merge and validate saved state), `DEFAULT_RANGE`, `isValidRange`, `rangeToText`, `parseRange` |
+| `src/state.ts` | - | Pure helpers: `loadState` (merge and validate saved state, `seenWelcome`), range helpers, `hasImported`, `removeImported` |
+| `src/flags.ts` | - | Feature flags: `DEFAULT_FLAGS`, `configureFlags`, `isEnabled`, `getFlags`. Overrides from `EXPO_PUBLIC_FLAGS` |
+| `src/nav.ts` | - | Which tabs, links and routes exist for a set of flags: `tabVisible`, `linkVisible`, `redirectFor` |
+| `src/components/guard.tsx` | - | Wraps a flagged route and redirects to `/create` when its flag is off |
+| `src/telemetry.ts` | - | App glue for the closed telemetry spec: `configureTelemetry`, `track`, enum mappers. Off unless `EXPO_PUBLIC_TELEMETRY=local` |
+| `src/screens/welcome.tsx` | - | First-run screen with three share-first actions |
 | `src/components/range-inputs.tsx` | - | Target low/high inputs shared by My Glucose and Settings; writes `state.range` in mg/dL only when valid |
 | `src/export.ts` | 61 | `exportImage`: web draws SVG to canvas and downloads PNG; native uses view capture, then share sheet or photo library |
 | `src/story.ts` | 94 | Adapter between the app and `src/art/`: `StoryOptions`, `defaultOptions`, `switchTemplate`, `pickTone`, `storyArtwork`, `storySvg`, `nativeSafe` |
@@ -113,6 +119,9 @@ Timestamps: the app stores UTC epoch milliseconds. `story.ts` shifts them to wal
 | `tests/stats.test.ts` | `npm test` | The statistics rules, `wall()`, and that My Glucose and Create agree |
 | `tests/csv.test.ts` | `npm test` | Parser cases ported from the prototype; the sample file against an independent calculation; no patient info in the result |
 | `tests/settings.test.ts` | `npm test` | Saved-state loading, range validation, unit and range reaching the artwork |
+| `tests/flags.test.ts`, `tests/nav.test.ts` | `npm test` | Flag defaults and parsing; which tabs, links and routes exist per flag set |
+| `tests/telemetry.test.ts` | `npm test` | Enum-only payloads for every wired event; off mode records nothing |
+| `tests/welcome.test.ts` | `npm test` | `seenWelcome` for new installs and old saved state; removing imported data |
 | `tests/e2e/journey.spec.ts` | `npm run test:e2e` | Feed, kudos, comment, dashboard, Create, export a 1080×1920 transparent PNG. Updated for the new Create screen first run and passing 2026-11-13 |
 
 ## Docs
@@ -162,8 +171,8 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 8 | ~~Resolved 2026-11-13 (M3)~~ App CSV parser is weaker than the prototype's | `src/csv.ts` | M3 |
 | 9 | ~~Resolved 2026-11-13 (M3)~~ Create reads the unit from Settings only when first opened, and always uses the default 70–180 mg/dL range | `Create` in `src/screens/create.tsx` | M3 |
 | 10 | ~~Resolved 2026-11-13 (M3)~~ Target range on My Glucose is local screen state, not saved | `Glucose` in `src/screens/glucose.tsx` | M3 |
-| 11 | Telemetry module not wired; no flags module | `src/art/telemetry.ts` | M4 |
-| 12 | No first-run flow; the share-first path takes several taps | `Home`, `Create` | M4 |
+| 11 | ~~Resolved 2026-11-13 (M4)~~ Telemetry module not wired; no flags module | `src/art/telemetry.ts` | M4 |
+| 12 | ~~Resolved 2026-11-13 (M4)~~ No first-run flow; the share-first path takes several taps | `Home`, `Create` | M4 |
 | 13 | Native preview and export use the system font and no glow, so they differ from web exports | `src/story.ts` `nativeSafe` | M5 |
 | 14 | Date entry is a typed text field | `Create`, `Glucose` | M5 |
 | 15 | Explore, Profile, Settings, Import, Post detail only inherited the new primitives; not designed | `src/screens/explore.tsx`, `profile.tsx`, `settings.tsx`, `import.tsx`, `post-detail.tsx` | M6 |
@@ -177,3 +186,4 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |
 | 24 | ~~App icons are the stock Expo placeholder~~ Resolved 2026-11-13: generated from the in-app mark. Still unverified on devices, and never compared with the owner's original logo file | `assets/`, `tools/make-icons.cjs` | M7 |
 | 25 | A dev server left running for many hours can serve compressed bundles very slowly (about 10 s per load), timing out the e2e journey. Restart it, or use `E2E_BASE_URL` with a fresh server on another port | dev tooling | note |
+| 26 | With `communityFeed` and `clubs` off, the page header still shows the "Fictional community" pill | `src/components/page.tsx` | M6 |

@@ -1,8 +1,27 @@
 import { test, expect } from "@playwright/test";
-test("demo social, glucose, transparent export, publishing and persistence", async ({
+test("welcome, demo graphic, export, then demo social, glucose, transparent export, publishing and persistence", async ({
   page,
-}) => {
+}, testInfo) => {
+  // Fresh context: no saved state, so the first run lands on the welcome screen, not the feed.
   await page.goto("/");
+  const demo = page.getByRole("button", { name: "Try demo data", exact: true });
+  await expect(demo).toBeVisible();
+  await expect(page).toHaveURL(/\/welcome$/);
+  const t0 = Date.now();
+  await demo.click();
+  await expect(page.getByRole("img", { name: /Preview of your graphic/ })).toBeVisible();
+  const firstGraphicMs = Date.now() - t0;
+  console.log(`fresh install: welcome visible to graphic visible = ${firstGraphicMs} ms`);
+  testInfo.annotations.push({ type: "welcome-to-graphic-ms", description: String(firstGraphicMs) });
+  expect(firstGraphicMs).toBeLessThan(30000);
+  // Export the default graphic straight from Create.
+  const firstDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export PNG / Share", exact: true }).click();
+  expect((await firstDownload).suggestedFilename()).toBe("gluca-daily-recap-story.png");
+  await expect(page.getByText(/Nothing was posted/).first()).toBeVisible();
+  // Welcome is not shown again once it has been used.
+  await page.goto("/");
+  await expect(page).not.toHaveURL(/welcome/);
   await expect(
     page.getByText("A walk before work", { exact: true }).first(),
   ).toBeVisible();

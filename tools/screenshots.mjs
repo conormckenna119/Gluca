@@ -20,6 +20,7 @@ const ROUTES = [
   { name: 'settings', path: '/settings' },
   { name: 'import', path: '/import' },
   { name: 'post', path: `/post/${SEED_POST_ID}` },
+  { name: 'welcome', path: '/welcome' },
 ];
 
 const outDir = path.resolve(process.argv[2] ?? 'docs/screenshots/baseline');
@@ -33,6 +34,26 @@ async function readDark(page) {
       return undefined;
     }
   }, STORAGE_KEY);
+}
+
+// A fresh context is redirected to /welcome. Complete it through the real UI once, then confirm it was saved.
+async function completeWelcome(page) {
+  await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Try demo data', exact: true }).click();
+  await page.getByRole('button', { name: 'Export PNG / Share', exact: true }).waitFor();
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    const seen = await page.evaluate((key) => {
+      try {
+        return JSON.parse(window.localStorage.getItem(key) ?? '{}').seenWelcome;
+      } catch {
+        return undefined;
+      }
+    }, STORAGE_KEY);
+    if (seen === true) return;
+    await page.waitForTimeout(100);
+  }
+  throw new Error('welcome completion was not saved');
 }
 
 // Sets the theme through the real Settings UI, then confirms the saved state.
@@ -73,6 +94,7 @@ async function main() {
           const setupPage = await context.newPage();
           let setupError = null;
           try {
+            await completeWelcome(setupPage);
             await setThemeViaUI(setupPage, theme);
           } catch (err) {
             setupError = String(err.message ?? err);

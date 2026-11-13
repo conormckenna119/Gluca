@@ -10,7 +10,7 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M1 | Brand alignment: logo, icon config, name decision | done 2026-11-13 (name step waits for D1; icons unverified on devices) | M0 |
 | M2 | Split `src/screens.tsx` | done 2026-11-13 | M0 |
 | M3 | One data layer: analytics, CSV, units and range | done 2026-11-13 | M2 |
-| M4 | Share-first first run, flags, local telemetry | not started | M3 |
+| M4 | Share-first first run, flags, local telemetry | done 2026-11-13 | M3 |
 | M5 | Create screen polish | not started | M3 |
 | M6 | Design pass on the remaining screens | not started | M2 |
 | M7 | Real-device verification | not started | M5 |
@@ -179,6 +179,16 @@ src/
 - A test proves flag parsing ignores unknown names.
 - Flagged-off features are not reachable by navigation.
 - E2E journey extended: welcome, demo, export.
+
+**Note, 2026-11-13 (M4 done).**
+- Welcome: `/welcome` on first launch (`seenWelcome` in state; saved state from before this field counts as seen). Three actions land on Create with a graphic, or on Import and then Create. Settings has "Show welcome screen". Measured in the e2e journey on the dev build: 237 ms from welcome visible to graphic visible, one tap.
+- Flags: `src/flags.ts`, configured once in `app/_layout.tsx` from `EXPO_PUBLIC_FLAGS`. Per D4, `communityFeed` and `clubs` default on. `src/nav.ts` decides which tabs, links and routes exist; `src/components/guard.tsx` redirects a flagged-off route to `/create`. `communityFeed` gates the Home tab, post detail and publishing from Create; Explore stays while `communityFeed` or `clubs` is on; `localCsvImport` gates Import and every link to it.
+- Telemetry: `src/telemetry.ts` wraps the closed spec. Off unless `EXPO_PUBLIC_TELEMETRY=local`; no remote mode. Wired: `app_opened`, `demo_started`, `import_started` / `_succeeded` / `_failed`, `template_selected`, `customization_opened`, `export_started` / `_succeeded` / `_failed`, `share_sheet_opened`. Not wired: `feedback_submitted`, because there is no feedback UI. Settings shows a "Local analytics" panel in local mode.
+- Remove imported data: button in Settings and on Import, shown only when imported readings exist; clears at once and confirms in words.
+- Share wording was already correct and was left alone.
+- Verified: typecheck clean; `npm test` 64/64; extended e2e journey passing (welcome, demo, export, then the earlier steps); web export; 54 route screenshots (9 routes) with no console errors. A separate build with `communityFeed=false,clubs=false,localCsvImport=false` and local telemetry was checked in a browser: tabs are My Glucose, Create and Profile; `/`, `/explore`, `/import` and `/post/seed-0` redirect to `/create`; the welcome import action and the publish-to-feed UI are absent; the Local analytics panel appears; no console errors.
+- Not verified: the event counts shown in the Local analytics panel against the actions taken (payload shape is unit-tested); the redirect timing on native; anything on a device.
+- Known nit: with the community flags off, the page header still shows the "Fictional community" pill. Logged as problem 26.
 
 ---
 
