@@ -1,7 +1,7 @@
 // Glue between data + user settings and the artwork engine. Pure; shared by the web app, scripts and tests.
 
 import { DAY_MS, DEFAULT_RANGE, computeStats, dayStart, segmentsFor, type Reading, type TargetRange, type Unit } from './analytics';
-import { defaultCopy, type Tone } from './copy';
+import { defaultCopy, headlineForPeriod, type Tone } from './copy';
 import type { FormatId } from './formats';
 import { SWATCHES, type Measure } from './svg';
 import { TEMPLATE_INFO, defaultShow, type ArtModel, type ShowOptions } from './templates';
@@ -53,6 +53,6 @@ export function makeArtModel(readings: readonly Reading[], source: 'demo' | 'csv
   return {
     template: s.template, format: s.format, transparent: s.transparent, theme: s.theme, accent: s.accent, unit: s.unit, range: s.range, source,
     start, end, stats: computeStats(readings, start, end, s.range), segs: segmentsFor(readings, start, end),
-    headline: s.headline, caption: s.caption, milestoneBig: s.milestoneBig, show: s.show, embedFont: o.embedFont, measure: o.measure,
+    headline: headlineForPeriod(s.headline, s.period), caption: s.caption, milestoneBig: s.milestoneBig, show: s.show, embedFont: o.embedFont, measure: o.measure,
   };
 }

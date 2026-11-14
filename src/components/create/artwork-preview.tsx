@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { Image, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useColors } from "../../ui";
 
@@ -14,7 +14,7 @@ type Props = {
 export const ArtworkPreview = React.forwardRef<
   React.ElementRef<typeof View>,
   Props
->(function ArtworkPreview({ svg, width, height, label }, ref) {
+>(function ArtworkPreview({ svg, width, height, label, photoUri }, ref) {
   const c = useColors();
   return (
     <View
@@ -41,6 +41,14 @@ export const ArtworkPreview = React.forwardRef<
           overflow: "hidden",
         }}
       >
+        {photoUri ? (
+          <Image
+            source={{ uri: photoUri }}
+            accessibilityIgnoresInvertColors
+            resizeMode="cover"
+            style={{ position: "absolute", top: 0, left: 0, width, height }}
+          />
+        ) : null}
         <SvgXml xml={svg} width={width} height={height} />
       </View>
     </View>

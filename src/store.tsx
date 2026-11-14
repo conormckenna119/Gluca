@@ -29,32 +29,41 @@ const titles = [
   "Showing up for myself",
   "A new route with friends",
 ];
-export const seed = (): State => ({
-  posts: Array.from({ length: 24 }, (_, i): Post => ({
-    id: `seed-${i}`,
-    author: people[i % 10],
-    title: titles[i % 6],
-    caption: [
-      "Made time for a walk and a conversation.",
-      "Today was a lot. Grateful for this community.",
-      "Celebrating a personal moment, one day at a time.",
-    ][i % 3],
-    visibility: "public",
-    kudos: 3 + i,
-    liked: false,
-    saved: false,
-    comments: i % 3 ? ["Thanks for sharing this."] : [],
-  })),
-  following: [],
-  clubs: [],
-  blocked: [],
-  reports: [],
-  unit: "mg/dL",
-  range: { ...DEFAULT_RANGE },
-  dark: true,
-  imported: [],
-  seenWelcome: false,
-});
+// Minutes before app start for the first posts; later ones step back roughly 9 hours at a time.
+const SEED_AGES_MIN = [40, 180, 1500, 2100, 3000, 4400, 5900, 7300];
+const seedAge = (i: number) =>
+  (SEED_AGES_MIN[i] ??
+    SEED_AGES_MIN[SEED_AGES_MIN.length - 1] + (i - 7) * 540) * 60_000;
+export const seed = (): State => {
+  const start = Date.now();
+  return {
+    posts: Array.from({ length: 24 }, (_, i): Post => ({
+      id: `seed-${i}`,
+      createdAt: start - seedAge(i),
+      author: people[i % 10],
+      title: titles[i % 6],
+      caption: [
+        "Made time for a walk and a conversation.",
+        "Today was a lot. Grateful for this community.",
+        "Celebrating a personal moment, one day at a time.",
+      ][i % 3],
+      visibility: "public",
+      kudos: 3 + i,
+      liked: false,
+      saved: false,
+      comments: i % 3 ? ["Thanks for sharing this."] : [],
+    })),
+    following: [],
+    clubs: [],
+    blocked: [],
+    reports: [],
+    unit: "mg/dL",
+    range: { ...DEFAULT_RANGE },
+    dark: true,
+    imported: [],
+    seenWelcome: false,
+  };
+};
 const Context = createContext<{
   state: State;
   set: (fn: (s: State) => State) => void;

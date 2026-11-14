@@ -18,7 +18,7 @@ All paths in these docs are relative to that root.
 
 ## Current state in one paragraph
 
-Expo SDK 58 / React Native 0.88 / Expo Router / strict TypeScript app with five tabs (Home, My Glucose, Create, Explore, Profile) plus Settings, Import and Post detail. Everything is local: fictional community, synthetic glucose, AsyncStorage, no backend, no accounts. A visual pass restyled the UI and rebuilt the Create screen on a tested artwork engine (`src/art/`) with six templates and exact-size PNG exports. `npm run typecheck` is clean and `npm test` passes (64 tests as of M4). M0 is done (2026-11-13): every route runs clean in a browser, the Playwright journey passes and the folder is a git repository. **Nothing has been run on a real phone yet** (M7).
+Expo SDK 58 / React Native 0.88 / Expo Router / strict TypeScript app with five tabs (Home, My Glucose, Create, Explore, Profile) plus Settings, Import and Post detail. Everything is local: fictional community, synthetic glucose, AsyncStorage, no backend, no accounts. A visual pass restyled the UI and rebuilt the Create screen on a tested artwork engine (`src/art/`) with six templates and exact-size PNG exports. `npm run typecheck` is clean and `npm test` passes (88 tests as of M6). M0 to M6 are done on web (2026-11-13): every route runs clean in a browser, the Playwright journey passes and the folder is a git repository. **Nothing has been run on a real phone yet** (M7).
 
 ## Rules that never change
 

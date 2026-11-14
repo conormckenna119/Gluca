@@ -1,36 +1,77 @@
 import React from "react";
+import { View } from "react-native";
 import { router } from "expo-router";
-import { Button, Card, T } from "../ui";
+import {
+  Avatar,
+  Button,
+  EmptyState,
+  Group,
+  ListRow,
+  Section,
+  Stat,
+  T,
+  space,
+} from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
 import { getFlags } from "../flags";
+import { linkVisible } from "../nav";
+
 export function Profile() {
   const { state } = useDemo();
+  const flags = getFlags();
+  const mine = state.posts.filter((p) => p.author === "You");
   return (
-    <Page title="Your demo profile">
-      <Card>
-        <T large>You · @demo</T>
-        <T>A fictional journey. Making room for life and community.</T>
-        <T>
-          {state.posts.filter((p) => p.author === "You").length} posts ·
-          Following {state.following.length} · {state.clubs.length} clubs
+    <Page title="Profile">
+      <View style={{ alignItems: "center", gap: space.md }}>
+        <Avatar name="You" size={88} />
+        <T heading>You</T>
+        <T muted align="center">
+          This profile exists only on this device.
         </T>
-        <T>
-          Achievements: Community explorer
-          {state.posts.some((p) => p.author === "You") ? " · First post" : ""}
-        </T>
-        <T>Health profile fields are private and unset.</T>
-        <Button
-          label="Settings & privacy"
-          onPress={() => router.push("/settings")}
-        />
-      </Card>
-      {(getFlags().communityFeed ? state.posts : [])
-        .filter((p) => p.author === "You")
-        .map((p) => (
-          <PostCard key={p.id} post={p} />
-        ))}
+      </View>
+      <View style={{ flexDirection: "row", gap: space.lg }}>
+        <Stat value={String(mine.length)} label="Posts" />
+        <Stat value={String(state.following.length)} label="Following" />
+        <Stat value={String(state.clubs.length)} label="Clubs" />
+      </View>
+      {flags.communityFeed ? (
+        <Section title="Your posts">
+          {mine.length ? (
+            mine.map((p) => <PostCard key={p.id} post={p} />)
+          ) : (
+            <EmptyState
+              icon="image"
+              title="No posts yet"
+              body="Make a graphic and share it when you choose. Nothing is posted automatically."
+              action={
+                <Button
+                  kind="primary"
+                  label="Create a graphic"
+                  onPress={() => router.push("/create")}
+                />
+              }
+            />
+          )}
+        </Section>
+      ) : null}
+      <Section title="More">
+        <Group>
+          <ListRow
+            title="Settings & privacy"
+            icon="settings"
+            onPress={() => router.push("/settings")}
+          />
+          {linkVisible("import", flags) ? (
+            <ListRow
+              title="Import & export"
+              icon="upload"
+              onPress={() => router.push("/import")}
+            />
+          ) : null}
+        </Group>
+      </Section>
     </Page>
   );
 }

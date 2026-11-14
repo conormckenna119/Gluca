@@ -102,7 +102,7 @@ export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
   for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   const tint = tints[h % tints.length];
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: tint, alignItems: "center", justifyContent: "center" }}>
+    <View aria-hidden style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: tint, alignItems: "center", justifyContent: "center" }}>
       <Text style={{ color: "#101412", fontWeight: "800", fontSize: size * 0.4 }}>{(name.match(/[A-Za-z]/)?.[0] ?? "·").toUpperCase()}</Text>
     </View>
   );
@@ -194,9 +194,11 @@ export function Icon({ name, size = 22, color, filled = false }: { name: IconNam
   const c = useColors();
   const ink = color ?? c.text;
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" accessibilityElementsHidden importantForAccessibility="no">
-      <Path d={ICONS[name]} fill={filled ? ink : "none"} stroke={ink} strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" />
-    </Svg>
+    <View aria-hidden style={{ width: size, height: size }}>
+      <Svg width={size} height={size} viewBox="0 0 24 24">
+        <Path d={ICONS[name]} fill={filled ? ink : "none"} stroke={ink} strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    </View>
   );
 }
 

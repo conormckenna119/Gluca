@@ -14,6 +14,10 @@ export type Post = {
   liked: boolean;
   saved: boolean;
   comments: string[];
+  /** Parallel to `comments`; missing on older saved state. */
+  commentAuthors?: string[];
+  /** Epoch ms; missing on posts saved before times existed. */
+  createdAt?: number;
   snapshot?: { average: number; tir: number; coverage: number; label: string };
 };
 export type State = {

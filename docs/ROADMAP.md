@@ -11,8 +11,8 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M2 | Split `src/screens.tsx` | done 2026-11-13 | M0 |
 | M3 | One data layer: analytics, CSV, units and range | done 2026-11-13 | M2 |
 | M4 | Share-first first run, flags, local telemetry | done 2026-11-13 | M3 |
-| M5 | Create screen polish | not started | M3 |
-| M6 | Design pass on the remaining screens | not started | M2 |
+| M5 | Create screen polish | done on web 2026-11-13 (native font, glow, photo and sheet unverified until M7) | M3 |
+| M6 | Design pass on the remaining screens | done on web 2026-11-13 (D3 still open; dark stays default) | M2 |
 | M7 | Real-device verification | not started | M5 |
 | M8 | Event logging on the trace (flagged) | not started | M5 |
 | M9 | Validation with real people and copy review | not started | M7 |
@@ -214,6 +214,12 @@ src/
 - Works with the screen reader: each control announces its name and state.
 - Screenshots in `docs/screenshots/m5/`.
 
+**Done 2026-11-13.** Create was split into `src/components/create/` (artwork-preview, photo-background, template-strip, day-picker, export-panel, customize, publish-card); state stays in `src/screens/create.tsx`.
+- Verified on web (Edge, dev server): type-check clean; 88 unit tests; e2e journey passes; all 18 template × format exports are the exact size (scripted check, not part of the e2e); a photo-background export at 1080×1920 has the photo's corner pixels; 375 / 430 / 1280, dark and light, no horizontal scroll and no console errors; screenshots in `docs/screenshots/m5/`.
+- Engine: week artwork gets week wording for default headlines (problem 21); range labels sit in a right gutter clear of the trace, tested for every template, format and period (problem 22); native-safe SVG maps each weight to an Inter family and replaces the blur glow with two soft strokes.
+- Not verified: anything on a phone: Inter on Android per weight, the glow emulation, the image picker and its permission, the photo composite through `captureRef`, the Modal sheet, text overflow on a device. Screen-reader behaviour was checked by roles, names and states in the accessibility tree, not with VoiceOver or TalkBack. Photo export checked in Story format only (crop maths unit-tested for all three). Previous / next day buttons and disabled thumbnails were not clicked through.
+- Known gap: with "7 days" selected the image says "Another week…" while the Headline box in Customize still shows the day wording. My Glucose still has a typed date field.
+
 ---
 
 ## M6. Design pass on the remaining screens
@@ -234,6 +240,11 @@ src/
 - Keep the "Local demo" and "Fictional community" labels visible wherever fictional content appears.
 
 **Acceptance.** Screenshots of every screen and state at 375, 430 and 1280 px in `docs/screenshots/m6/`; e2e passing; no hardcoded colours in screens (search for `#` in `src/screens/`).
+
+**Done 2026-11-13.** New primitives in `src/ui.tsx`: `Icon`, `IconButton`, `Chip`, `Section`, `Group`, `ListRow`, `SwitchRow`, `Notice`, `EmptyState`, `Steps`, `Sheet`, `ConfirmSheet`, and a `heading` size on `T`. `Page` takes a subtitle, is 720 px wide at most, and shows "Fictional community" only while a community flag is on (problem 26).
+- Verified on web: 54 screenshots (9 routes × 375 / 430 / 1280 × dark / light) in `docs/screenshots/m6/` with no console errors; e2e passing (button names updated for the new post card and My Glucose); no hardcoded colours in `src/screens/` (the only literals in `src/components/` are the black / white check on accent swatches); Import driven once with `samples/synthetic-clarity.csv` through review, confirm and remove.
+- Posts have `createdAt` and relative times; My Glucose chart axis is fitted to the data and target band (problem 23); destructive actions ask first.
+- Not verified: empty, loading and error states were built but mostly not looked at (Home empty, My Glucose empty and error, Import missing-unit, ambiguous-date and failure states, post not found at 1280); Follow / Join toggles and the post "More options" sheet were not clicked; nothing on a phone. D3 (dark or light default) is still the owner's decision.
 
 ---
 

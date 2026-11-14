@@ -25,12 +25,12 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   await expect(
     page.getByText("A walk before work", { exact: true }).first(),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Kudos 3", exact: true }).click();
+  await page.getByRole("button", { name: "Give kudos, 3", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "Kudos 4", exact: true }).first(),
+    page.getByRole("button", { name: "Remove kudos, 4", exact: true }).first(),
   ).toBeVisible();
   await page
-    .getByRole("button", { name: "Comments 0", exact: true })
+    .getByRole("button", { name: "Comments, 0", exact: true })
     .first()
     .click();
   await page
@@ -45,7 +45,7 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
     .getByLabel("Date (YYYY-MM-DD, local day)", { exact: true })
     .fill("2026-11-11");
   await page.getByRole("button", { name: "6 hours", exact: true }).click();
-  await expect(page.getByText(/estimated time in range/).first()).toBeVisible();
+  await expect(page.getByText("Time in range", { exact: true }).first()).toBeVisible();
   await page
     .getByRole("button", { name: "Create a graphic", exact: true })
     .click();

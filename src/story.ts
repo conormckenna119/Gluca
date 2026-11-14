@@ -61,14 +61,58 @@ export function switchTemplate(o: StoryOptions, template: TemplateId): StoryOpti
 export const pickTone = (o: StoryOptions, tone: Tone, index = 0): StoryOptions =>
   tone === "custom" ? { ...o, tone } : { ...o, tone, headline: headlineFor(tone, index), caption: captionFor(tone, index) };
 
+let nativeFonts: Record<number, string> | null = null;
+/** Per-weight font families for native text (weight -> family name). null (the default) strips font-family, as before. */
+export function configureNativeFonts(map: Record<number, string> | null): void {
+  nativeFonts = map && Object.keys(map).length ? { ...map } : null;
+}
+const nearestFamily = (map: Record<number, string>, weight: number): string => {
+  const ws = Object.keys(map).map(Number);
+  const best = ws.reduce((a, b) => (Math.abs(b - weight) < Math.abs(a - weight) || (Math.abs(b - weight) === Math.abs(a - weight) && b > a) ? b : a));
+  return map[best];
+};
+const weightOf = (attrs: string): number | null => {
+  const m = /font-weight="(\d+)"/.exec(attrs);
+  return m ? Number(m[1]) : null;
+};
+/** Give every <text>/<tspan> its own per-weight family (a tspan without a weight inherits its parent's). */
+function applyFonts(svg: string, map: Record<number, string>): string {
+  let out = "";
+  let i = 0;
+  const stack: number[] = [];
+  const tag = /<(\/?)(text|tspan)\b([^>]*?)(\/?)>/g;
+  let m: RegExpExecArray | null;
+  while ((m = tag.exec(svg))) {
+    out += svg.slice(i, m.index);
+    i = m.index + m[0].length;
+    const [whole, close, name, attrs, selfClose] = m;
+    if (close) { stack.pop(); out += whole; continue; }
+    const w = weightOf(attrs) ?? stack[stack.length - 1] ?? 400;
+    const family = nearestFamily(map, w);
+    // the numeric weight is dropped: with a per-weight family it is redundant and unreliable on Android
+    const cleaned = attrs.replace(/ font-weight="\d+"/, "");
+    out += `<${name}${cleaned} font-family="${family}"${selfClose}>`;
+    if (!selfClose) stack.push(w);
+  }
+  return out + svg.slice(i);
+}
+
 /** Remove SVG features react-native-svg does not render (filters, <style>, font lists) so native matches the web preview. */
 export function nativeSafe(svg: string): string {
-  return svg
+  // The blur filter is not rendered natively: stand in for it with two wider, low-opacity round strokes under the trace.
+  let out = svg.replace(/<path ([^>]*?) opacity="0\.5" filter="url\(#bl\)"\/>/g, (_all, attrs: string) => {
+    const w = Number(/stroke-width="([\d.]+)"/.exec(attrs)?.[1] ?? 0);
+    const layer = (k: number, op: number) =>
+      `<path ${attrs.replace(/stroke-width="[\d.]+"/, `stroke-width="${Math.round(w * k * 10) / 10}"`)} opacity="${op}"/>`;
+    return layer(1.9, 0.1) + layer(1.25, 0.16);
+  });
+  out = out
     .replace(/<filter[\s\S]*?<\/filter>/g, "")
     .replace(/<style>[\s\S]*?<\/style>/g, "")
     .replace(/ filter="url\(#[^"]*\)"/g, "")
     .replace(/ data-bg="1"/g, "")
     .replace(/ font-family="[^"]*"/g, "");
+  return nativeFonts ? applyFonts(out, nativeFonts) : out;
 }
 
 export type StoryArtwork = Artwork & { svg: string };

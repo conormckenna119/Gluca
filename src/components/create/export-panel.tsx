@@ -1,5 +1,6 @@
 import React from "react";
-import { Button, Card, Eyebrow, T } from "../../ui";
+import { View } from "react-native";
+import { Button, Card, Eyebrow, Icon, Notice, T, space } from "../../ui";
 
 export type ExportResult =
   | { kind: "idle" }
@@ -21,6 +22,28 @@ export function ExportPanel({
 }) {
   return (
     <>
+      <Card tone="raised">
+        <Eyebrow>What’s on this image</Eyebrow>
+        {contents.map((line, i) => (
+          <View
+            key={i}
+            style={{
+              flexDirection: "row",
+              gap: space.sm,
+              alignItems: "center",
+            }}
+          >
+            <Icon name="check" size={16} />
+            <View style={{ flex: 1 }}>
+              <T small>{line}</T>
+            </View>
+          </View>
+        ))}
+        <T small muted>
+          Only what is listed here is in the export. Exporting never posts
+          anything.
+        </T>
+      </Card>
       <Button
         kind="primary"
         label={busy ? "Exporting…" : "Export PNG / Share"}
@@ -34,22 +57,18 @@ export function ExportPanel({
           onPress={onSave}
         />
       ) : null}
-      {result.kind !== "idle" && result.text ? (
-        <T small>{result.text}</T>
+      {result.kind === "success" && result.text ? (
+        <Notice tone="success">{result.text}</Notice>
       ) : null}
-
-      <Card tone="raised">
-        <Eyebrow>What’s on this image</Eyebrow>
-        {contents.map((line, i) => (
-          <T key={i} small>
-            • {line}
+      {result.kind === "error" ? (
+        <Notice tone="error">
+          <T small>{result.text}</T>
+          <T small muted>
+            Try again. If it keeps failing, try a different format or turn off
+            Transparent.
           </T>
-        ))}
-        <T small muted>
-          Only what is listed here is in the export. Exporting never posts
-          anything.
-        </T>
-      </Card>
+        </Notice>
+      ) : null}
     </>
   );
 }

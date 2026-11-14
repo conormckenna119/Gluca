@@ -1,17 +1,27 @@
 import { Platform } from "react-native";
 import { formats } from "./story";
+import { coverFit } from "./cover-fit";
 export async function exportImage(
   svg: string,
   format: keyof typeof formats,
   nativeCapture: () => Promise<string>,
   save = false,
   filename = `gluca-${format.toLowerCase()}.png`,
-  // Reserved for the photo-background feature; not used yet.
-  _backgroundUri?: string,
+  backgroundUri?: string,
 ) {
   if (Platform.OS === "web") {
     const [w, h] = formats[format];
     const img = new Image();
+    let photo: HTMLImageElement | null = null;
+    if (backgroundUri) {
+      photo = new Image();
+      const p = photo;
+      await new Promise<void>((resolve, reject) => {
+        p.onload = () => resolve();
+        p.onerror = () => reject(new Error("Unable to read the photo."));
+        p.src = backgroundUri;
+      });
+    }
     const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
     try {
       await new Promise<void>((resolve, reject) => {
@@ -25,11 +35,18 @@ export async function exportImage(
       canvas.height = h;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas is unavailable.");
-      ctx.drawImage(img, 0, 0, w, h);
+      const paint = () => {
+        ctx.clearRect(0, 0, w, h);
+        if (photo) {
+          const r = coverFit(photo.naturalWidth, photo.naturalHeight, w, h);
+          ctx.drawImage(photo, r.sx, r.sy, r.sw, r.sh, 0, 0, w, h);
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+      };
+      paint();
       // Some browsers decode the embedded font lazily; draw again so the first frame never uses a fallback face.
       await new Promise((r) => setTimeout(r, 60));
-      ctx.clearRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
+      paint();
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error("PNG export failed."))),

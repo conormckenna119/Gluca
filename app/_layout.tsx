@@ -8,6 +8,7 @@ import { useColors } from "../src/ui";
 import { BRAND } from "../src/art/brand";
 import { configureFlags } from "../src/flags";
 import { configureTelemetry, track } from "../src/telemetry";
+import { useArtFonts } from "../src/fonts";
 
 // Literal env access: Expo inlines these at bundle time. Telemetry stays "off" unless EXPO_PUBLIC_TELEMETRY=local.
 configureFlags(process.env.EXPO_PUBLIC_FLAGS);
@@ -19,6 +20,7 @@ function Nav() {
   const c = useColors();
   const { state, ready } = useDemo();
   const pathname = usePathname();
+  const fontsDone = useArtFonts();
   const navReady = !!useRootNavigationState()?.key;
   // First run: once saved state has loaded, a person who has not seen the welcome screen is sent there.
   const needsWelcome = ready && !state.seenWelcome && pathname !== "/welcome";
@@ -27,6 +29,10 @@ function Nav() {
   }, [navReady, needsWelcome]);
   // Cover the tabs until the saved state is known and any redirect has happened, so they never flash.
   const covered = !ready || needsWelcome;
+  // Hold the screens back until Inter has loaded or failed, so the first artwork preview is built with the right fonts.
+  if (!fontsDone) {
+    return <View style={{ flex: 1, backgroundColor: c.bg }} />;
+  }
   return (
     <>
       <StatusBar style={state.dark ? "light" : "dark"} />

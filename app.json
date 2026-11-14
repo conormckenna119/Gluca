@@ -37,7 +37,15 @@
           "photosPermission": "Allow Gluca to save a graphic you explicitly export."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Gluca to use a photo you choose as the background of a graphic. The photo stays on this device.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "scheme": "gluca"
   }

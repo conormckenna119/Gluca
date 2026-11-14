@@ -1,10 +1,29 @@
 import React, { useState } from "react";
-import { View, ScrollView, RefreshControl } from "react-native";
-import { Button, T, row } from "../ui";
+import { View } from "react-native";
+import { router } from "expo-router";
+import { Button, Chip, EmptyState, T, space } from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
 import { Guard } from "../components/guard";
+
+const FILTERS = ["All", "Following", "Bookmarks"] as const;
+const EMPTY: Record<(typeof FILTERS)[number], { title: string; body: string }> =
+  {
+    All: {
+      title: "No posts yet",
+      body: "Make a graphic and share it to the local demo feed.",
+    },
+    Following: {
+      title: "Nobody followed yet",
+      body: "Follow a fictional member from a post's options menu.",
+    },
+    Bookmarks: {
+      title: "Nothing saved",
+      body: "Use the bookmark on a post to keep it here.",
+    },
+  };
+
 export function Home() {
   return (
     <Guard route="/">
@@ -13,10 +32,9 @@ export function Home() {
   );
 }
 function HomeFeed() {
-  const { state } = useDemo();
-  const [filter, setFilter] = useState("All");
+  const { state, ready } = useDemo();
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("All");
   const [limit, setLimit] = useState(8);
-  const [refreshing, refresh] = useState(false);
   const posts = state.posts.filter(
     (p) =>
       !state.blocked.includes(p.author) &&
@@ -24,12 +42,15 @@ function HomeFeed() {
         (filter === "Following" && state.following.includes(p.author)) ||
         (filter === "Bookmarks" && p.saved)),
   );
+  const shown = posts.slice(0, limit);
   return (
-    <Page title="Home">
-      <T>Progress, not perfection. Share the moments behind the numbers.</T>
-      <View style={row}>
-        {["All", "Following", "Bookmarks"].map((f) => (
-          <Button
+    <Page
+      title="Home"
+      subtitle="A local demo feed. Members are fictional and nothing leaves this device."
+    >
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+        {FILTERS.map((f) => (
+          <Chip
             key={f}
             label={f}
             selected={f === filter}
@@ -40,30 +61,38 @@ function HomeFeed() {
           />
         ))}
       </View>
-      <ScrollView
-        scrollEnabled={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => {
-              refresh(true);
-              setLimit(8);
-              setTimeout(() => refresh(false), 300);
-            }}
-          />
-        }
-        contentContainerStyle={{ gap: 20 }}
-      >
-        {posts.slice(0, limit).map((p) => (
-          <PostCard key={p.id} post={p} />
-        ))}
-      </ScrollView>
-      {!posts.length ? (
-        <T>No posts here yet. Follow a demo member or create a post.</T>
-      ) : null}
-      {limit < posts.length ? (
-        <Button label="Load more posts" onPress={() => setLimit(limit + 8)} />
-      ) : null}
+      {!ready ? (
+        <T muted>Loading your feed…</T>
+      ) : !posts.length ? (
+        <EmptyState
+          icon="image"
+          title={EMPTY[filter].title}
+          body={EMPTY[filter].body}
+          action={
+            <Button
+              kind="primary"
+              label="Go to Create"
+              onPress={() => router.push("/create")}
+            />
+          }
+        />
+      ) : (
+        <View style={{ gap: space.xl - 4 }}>
+          {shown.map((p) => (
+            <PostCard key={p.id} post={p} />
+          ))}
+          {limit < posts.length ? (
+            <Button
+              label="Load more posts"
+              onPress={() => setLimit(limit + 8)}
+            />
+          ) : (
+            <T small muted align="center">
+              You're all caught up.
+            </T>
+          )}
+        </View>
+      )}
     </Page>
   );
 }

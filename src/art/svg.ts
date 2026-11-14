@@ -177,13 +177,23 @@ export interface ChartOpts {
   weekLabels?: boolean;
 }
 
+const RANGE_LABEL_SIZE = 24;
+/** Width reserved right of the plot for the two target labels, so they never sit on the trace. 0 when the band is off. */
+export function rangeGutter(o: Pick<ChartOpts, 'showBand' | 'range' | 'unit'>): number {
+  if (!o.showBand) return 0;
+  const chars = Math.max(formatGlucose(o.range.high, o.unit).length, formatGlucose(o.range.low, o.unit).length);
+  return Math.ceil(chars * RANGE_LABEL_SIZE * 0.62 + 18);
+}
+
 export function chartSvg(o: ChartOpts): { svg: string; axisH: number } {
-  const { x, y, w, h, start, end, p } = o;
+  const { x, y, h, start, end, p } = o;
+  const gutter = rangeGutter(o);
+  const w = o.w - gutter; // plot width; the target labels live in the gutter to the right
   const lo = Math.max(20, Math.min(50, (o.stats.min ?? o.range.low) - 8));
   const hi = Math.min(420, Math.max(240, (o.stats.max ?? o.range.high) + 10));
   const px = (t: number) => x + ((t - start) / (end - start)) * w;
   const py = (v: number) => y + (1 - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) * h;
-  const lab = 24;
+  const lab = RANGE_LABEL_SIZE;
   const sh = p.shadow ? ' filter="url(#sh)"' : '';
   let s = '';
   if (o.gradientStops) {
@@ -194,9 +204,12 @@ export function chartSvg(o: ChartOpts): { svg: string; axisH: number } {
     const yh = py(o.range.high), yl = py(o.range.low);
     s += `<rect x="${x}" y="${n1(yh)}" width="${w}" height="${n1(yl - yh)}" rx="10" fill="${p.band}" fill-opacity="${p.bandOpacity}"/>`;
     for (const yy of [yh, yl]) s += `<line x1="${x}" y1="${n1(yy)}" x2="${x + w}" y2="${n1(yy)}" stroke="${p.band}" stroke-opacity="0.6" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>`;
-    s += text(x + w - 8, yh - 10, formatGlucose(o.range.high, o.unit), { size: lab, weight: 600, fill: p.muted, anchor: 'end', shadow: !!p.shadow });
-    // both edge labels sit just above their lines, so the low label never collides with the x-axis labels below the chart
-    s += text(x + w - 8, yl - 10, formatGlucose(o.range.low, o.unit), { size: lab, weight: 600, fill: p.muted, anchor: 'end', shadow: !!p.shadow });
+    // labels sit in the gutter right of the plot, centred on their lines; if the band is very short they are pushed apart so they never overlap
+    const half = lab * 0.36;
+    let ty1 = yh + half, ty2 = yl + half;
+    if (ty2 - ty1 < lab + 2) { const mid = (ty1 + ty2) / 2; ty1 = mid - (lab + 2) / 2; ty2 = mid + (lab + 2) / 2; }
+    s += text(x + o.w, ty1, formatGlucose(o.range.high, o.unit), { size: lab, weight: 600, fill: p.muted, anchor: 'end', shadow: !!p.shadow });
+    s += text(x + o.w, ty2, formatGlucose(o.range.low, o.unit), { size: lab, weight: 600, fill: p.muted, anchor: 'end', shadow: !!p.shadow });
   }
   // "no data" markers: dashed edges around each gap. Gaps are never bridged or interpolated.
   for (const [a, b] of gapEdges(o.segs)) {

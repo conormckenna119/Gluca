@@ -75,6 +75,7 @@ export function PublishCard({
               const s = summarize(rows, start, end);
               const p: Post = {
                 id: `local-${Date.now()}`,
+                createdAt: Date.now(),
                 author: "You",
                 title: templateInfo[o.template].label,
                 caption: (caption || o.caption || o.headline).slice(0, 1000),

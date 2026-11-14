@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Input, T, row } from "../ui";
+import { Input, Notice, space } from "../ui";
 import { useDemo } from "../store";
 import { parseRange, rangeToText } from "../state";
 
@@ -16,17 +16,35 @@ function Inputs() {
   };
   const ok = parseRange(low, high, state.unit) !== null;
   return (
-    <>
-      <View style={row}>
-        <Input label={`Target low (${state.unit})`} value={low} onChange={(v) => { L(v); apply(v, high); }} />
-        <Input label={`Target high (${state.unit})`} value={high} onChange={(v) => { H(v); apply(low, v); }} />
+    <View style={{ gap: space.md }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.md }}>
+        <View style={{ flexGrow: 1, flexBasis: 140 }}>
+          <Input
+            label={`Target low (${state.unit})`}
+            value={low}
+            onChange={(v) => {
+              L(v);
+              apply(v, high);
+            }}
+          />
+        </View>
+        <View style={{ flexGrow: 1, flexBasis: 140 }}>
+          <Input
+            label={`Target high (${state.unit})`}
+            value={high}
+            onChange={(v) => {
+              H(v);
+              apply(low, v);
+            }}
+          />
+        </View>
       </View>
       {!ok ? (
-        <T>
-          Invalid target; still using {rangeToText(state.range.low, state.unit)}–{rangeToText(state.range.high, state.unit)} {state.unit}. Low must be below high, within 20–600 mg/dL.
-        </T>
+        <Notice tone="error" title="That range can't be used yet">
+          {`Still using ${rangeToText(state.range.low, state.unit)}–${rangeToText(state.range.high, state.unit)} ${state.unit}. Low must be below high, within 20–600 mg/dL.`}
+        </Notice>
       ) : null}
-    </>
+    </View>
   );
 }
 // Re-mount when the unit changes so the text boxes show the new unit.

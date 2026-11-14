@@ -1,10 +1,23 @@
 import React, { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { Button, Card, Input, T } from "../ui";
+import { View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import {
+  Avatar,
+  Button,
+  Card,
+  EmptyState,
+  Eyebrow,
+  Input,
+  Pill,
+  T,
+  space,
+  useColors,
+} from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
 import { Guard } from "../components/guard";
+
 export function PostDetail() {
   return (
     <Guard route="/post">
@@ -15,45 +28,119 @@ export function PostDetail() {
 function PostConversation() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state, set } = useDemo();
+  const c = useColors();
   const [comment, change] = useState("");
   const p = state.posts.find((p) => p.id === id);
   if (!p || state.blocked.includes(p.author))
     return (
-      <Page title="Post unavailable">
-        <T>This post was removed or its author is blocked.</T>
+      <Page title="Post not found">
+        <EmptyState
+          icon="alert"
+          title="This post isn't here"
+          body="It may have been deleted, or its author is blocked on this device."
+          action={
+            <Button
+              kind="primary"
+              label="Back to Home"
+              onPress={() => router.replace("/")}
+            />
+          }
+        />
       </Page>
     );
+  const send = () => {
+    const text = comment.trim().slice(0, 1000);
+    if (!text) return;
+    set((s) => ({
+      ...s,
+      posts: s.posts.map((x) =>
+        x.id === id
+          ? {
+              ...x,
+              comments: [...x.comments, text],
+              commentAuthors: [
+                ...x.comments.map(
+                  (_, i) => x.commentAuthors?.[i] ?? "Community member",
+                ),
+                "You",
+              ],
+            }
+          : x,
+      ),
+    }));
+    change("");
+  };
   return (
     <Page title="Conversation">
-      <PostCard post={p} />
-      {p.comments.map((c, i) => (
-        <Card key={i}>
-          <T>{c}</T>
-          <Button
-            label={`Reply to comment ${i + 1}`}
-            onPress={() => change(`Reply to comment ${i + 1}: `)}
+      <PostCard post={p} inDetail />
+      <View style={{ gap: space.md }}>
+        <Eyebrow>{`Comments · ${p.comments.length}`}</Eyebrow>
+        {p.comments.length ? (
+          <View style={{ gap: space.lg }}>
+            {p.comments.map((text, i) => {
+              const who = p.commentAuthors?.[i] ?? "Community member";
+              return (
+                <View key={i} style={{ flexDirection: "row", gap: space.md }}>
+                  <Avatar name={who} size={36} />
+                  <View
+                    style={{
+                      flex: 1,
+                      gap: 2,
+                      padding: space.md,
+                      borderRadius: 14,
+                      borderWidth: 1,
+                      borderColor: c.border,
+                      backgroundColor: c.surface,
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        gap: space.sm,
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <T small bold>
+                        {who}
+                      </T>
+                      {who === "You" ? (
+                        <Pill tone="accent">You</Pill>
+                      ) : (
+                        <Pill>Fictional</Pill>
+                      )}
+                    </View>
+                    <T>{text}</T>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        ) : (
+          <EmptyState
+            icon="comment"
+            title="No comments yet"
+            body="Be the first to say something kind."
           />
-        </Card>
-      ))}
-      <Input label="Your comment" value={comment} onChange={change} multiline />
-      <Button
-        label="Add comment"
-        disabled={!comment.trim()}
-        onPress={() => {
-          set((s) => ({
-            ...s,
-            posts: s.posts.map((x) =>
-              x.id === id
-                ? {
-                    ...x,
-                    comments: [...x.comments, comment.trim().slice(0, 1000)],
-                  }
-                : x,
-            ),
-          }));
-          change("");
-        }}
-      />
+        )}
+      </View>
+      <Card>
+        <Input
+          label="Your comment"
+          value={comment}
+          onChange={change}
+          multiline
+        />
+        <T small muted>
+          Comments stay on this device. Nothing is posted to any other app.
+        </T>
+        <Button
+          kind="primary"
+          label="Add comment"
+          disabled={!comment.trim()}
+          onPress={send}
+        />
+      </Card>
     </Page>
   );
 }

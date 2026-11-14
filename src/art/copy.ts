@@ -76,3 +76,13 @@ export function captionFor(tone: Tone, index: number): string {
   const list = CAPTIONS[tone];
   return list[((index % list.length) + list.length) % list.length];
 }
+
+/** Default headlines that talk about a single day, with the wording to use when the artwork covers a week. */
+const WEEK_HEADLINES: Record<string, string> = {
+  'Another day of showing up.': 'Another week of showing up.',
+  'What a CGM sees in a day.': 'What a CGM sees in a week.',
+};
+/** Swap a built-in single-day headline for its week wording. Anything the person typed is returned untouched. */
+export function headlineForPeriod(headline: string, period: 'day' | 'week'): string {
+  return period === 'week' ? WEEK_HEADLINES[headline.trim()] ?? headline : headline;
+}

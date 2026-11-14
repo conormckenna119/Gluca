@@ -1,4 +1,5 @@
-# Project map
+#
+| 26 | ~~Resolved 2026-11-13 (M6)~~ | 23 | ~~Resolved 2026-11-13 (M6)~~ | 22 | ~~Resolved 2026-11-13 (M5)~~ | 21 | ~~Resolved 2026-11-13 (M5)~~ | 15 | ~~Resolved 2026-11-13 (M6)~~ | 13 | ~~Resolved 2026-11-13 (M5, web only; phones in M7)~~ Project map
 
 Root: `C:\Users\conor\Documents\Codex\2026-11-12\le\outputs\gluca`
 Last verified against the folder: 2026-11-13.
@@ -74,7 +75,10 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `src/screens/profile.tsx` | 35 | `Profile` |
 | `src/screens/settings.tsx` | 84 | `Settings` |
 | `src/screens/import.tsx` | 126 | `ImportScreen`; CSV import and local data export |
-| `src/components/page.tsx` | 43 | `Page`; scroll container, title and demo pills |
+| `src/components/page.tsx` | - | `Page`; scroll container, title, subtitle and demo pills |
+| `src/components/create/` | - | Parts of the Create screen: `artwork-preview`, `photo-background`, `template-strip`, `day-picker`, `export-panel`, `customize` (bottom sheet), `publish-card` |
+| `src/days.ts`, `src/time.ts`, `src/chart-scale.ts`, `src/cover-fit.ts` | - | Pure helpers with tests: days that have data; relative time; chart domain and ticks; cover-fit crop for photo backgrounds |
+| `src/fonts.ts` | - | Loads Inter with `expo-font` and tells `src/story.ts` which family to use per weight |
 | `src/components/post-card.tsx` | 133 | `PostCard`; one feed post with its actions |
 | `src/components/glucose-chart.tsx` | 51 | `GlucoseChart`; the SVG glucose trace and `areaPath` |
 | `src/hooks/use-readings.ts` | 16 | `useReadings`; TanStack Query over the Mock or CSV provider |
@@ -174,7 +178,9 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 11 | ~~Resolved 2026-11-13 (M4)~~ Telemetry module not wired; no flags module | `src/art/telemetry.ts` | M4 |
 | 12 | ~~Resolved 2026-11-13 (M4)~~ No first-run flow; the share-first path takes several taps | `Home`, `Create` | M4 |
 | 13 | Native preview and export use the system font and no glow, so they differ from web exports | `src/story.ts` `nativeSafe` | M5 |
-| 14 | Date entry is a typed text field | `Create`, `Glucose` | M5 |
+| 14 | Date entry is a typed text field on My Glucose (Create now has previous / next and a day sheet, M5) | `src/screens/glucose.tsx` | backlog |
+| 27 | With "7 days" selected, the image uses week wording but the Headline box in Customize still shows the day wording | `src/components/create/customize.tsx`, `src/art/model.ts` | backlog |
+| 28 | Stat tiles on My Glucose have uneven heights at 1280 px | `src/screens/glucose.tsx` | backlog |
 | 15 | Explore, Profile, Settings, Import, Post detail only inherited the new primitives; not designed | `src/screens/explore.tsx`, `profile.tsx`, `settings.tsx`, `import.tsx`, `post-detail.tsx` | M6 |
 | 16 | Native capture, share sheet and photo-library save unverified on real phones | `src/export.ts` | M7 |
 | 17 | Posts have no timestamps or photos; replies are text-prefixed | `src/types.ts`, `src/store.tsx` | M10 |

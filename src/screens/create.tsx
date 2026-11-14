@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { BRAND } from "../art/brand";
 import { View, Platform, useWindowDimensions } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { captureRef } from "react-native-view-shot";
@@ -85,6 +86,18 @@ export function Create() {
     () => storyArtwork(data, anchor, o, { native: true }),
     [data, anchor, o],
   );
+  // The contents list must match the image: a chosen photo is part of the export, so it is listed.
+  const hasPhoto = o.transparent && !!photoUri;
+  const contents = React.useMemo(
+    () =>
+      hasPhoto
+        ? [
+            ...built.contents.filter((l) => !/transparent/i.test(l)),
+            "Your photo as the background",
+          ]
+        : built.contents,
+    [built.contents, hasPhoto],
+  );
   const pw = Math.min(width - 40, 360);
   const ph = (pw * h) / w;
 
@@ -124,10 +137,10 @@ export function Create() {
         kind: "success",
         text:
           Platform.OS === "web"
-            ? `Saved a ${w}×${h} PNG${o.transparent ? " with a transparent background" : ""}. Nothing was posted.`
+            ? `Saved a ${w}×${h} PNG${hasPhoto ? " with your photo behind it" : o.transparent ? " with a transparent background" : ""}. Nothing was posted.`
             : save
               ? "Saved to your photo library. Nothing was posted."
-              : "The share sheet was opened. Gluca can’t see what you choose, and never posts for you.",
+              : `The share sheet was opened. ${BRAND.name} can’t see what you choose, and never posts for you.`,
       });
     } catch (e) {
       track("export_failed", { ...evt, reason: exportFailReason(e) });
@@ -160,12 +173,16 @@ export function Create() {
           svg={built.svg}
           width={pw}
           height={ph}
-          label={`Preview of your graphic. ${built.contents.join(". ")}`}
+          label={`Preview of your graphic. ${contents.join(". ")}`}
           photoUri={o.transparent ? photoUri : null}
         />
         <T small muted align="center">
-          {w} × {h} px · {o.transparent ? "transparent PNG" : "solid PNG"} ·
-          preview omits the soft glow that appears in web exports
+          {w} × {h} px ·{" "}
+          {hasPhoto
+            ? "PNG with your photo"
+            : o.transparent
+              ? "transparent PNG"
+              : "solid PNG"}
         </T>
       </View>
 
@@ -215,7 +232,7 @@ export function Create() {
       <ExportPanel
         busy={busy}
         result={result}
-        contents={built.contents}
+        contents={contents}
         onShare={() => void doExport()}
         onSave={Platform.OS !== "web" ? () => void doExport(true) : undefined}
       />
