@@ -36,7 +36,8 @@
           "savePhotosPermission": "Allow Gluca to save your exported graphic.",
           "photosPermission": "Allow Gluca to save a graphic you explicitly export."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "scheme": "gluca"
   }

@@ -6,6 +6,8 @@ export async function exportImage(
   nativeCapture: () => Promise<string>,
   save = false,
   filename = `gluca-${format.toLowerCase()}.png`,
+  // Reserved for the photo-background feature; not used yet.
+  _backgroundUri?: string,
 ) {
   if (Platform.OS === "web") {
     const [w, h] = formats[format];
