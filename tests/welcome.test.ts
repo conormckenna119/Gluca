@@ -6,6 +6,7 @@ import type { Reading, State } from "../src/types";
 const defaults: State = {
   posts: [], following: [], clubs: [], blocked: [], reports: [], unit: "mg/dL",
   range: { ...DEFAULT_RANGE }, dark: true, imported: [], seenWelcome: false,
+  events: [],
 };
 const reading: Reading = { timestamp: 1, mgdl: 100, source: "csv" };
 

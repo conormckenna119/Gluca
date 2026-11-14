@@ -36,6 +36,8 @@ export function loadState(raw: string | null | undefined, defaults: State): Stat
   merged.range = isValidRange(merged.range) ? { low: merged.range.low, high: merged.range.high } : { ...DEFAULT_RANGE };
   // Saved state from before the Welcome screen existed belongs to someone who has already used the app.
   merged.seenWelcome = typeof (saved as { seenWelcome?: unknown }).seenWelcome === "boolean" ? (saved as State).seenWelcome : true;
+  // Saved state from before event logging has no events; anything that is not a list is dropped.
+  merged.events = Array.isArray(merged.events) ? merged.events : [];
   return merged;
 }
 

@@ -20,6 +20,14 @@ export type Post = {
   createdAt?: number;
   snapshot?: { average: number; tir: number; coverage: number; label: string };
 };
+/** A meal, activity or note the person marked after the fact. Never holds carbohydrate, insulin or dose amounts. */
+export type GlucaEvent = {
+  id: string;
+  kind: "meal" | "activity" | "note";
+  start: number; // epoch ms
+  durationMin: number; // 0 for a point in time
+  label?: string;
+};
 export type State = {
   posts: Post[];
   following: string[];
@@ -31,4 +39,5 @@ export type State = {
   dark: boolean;
   imported: Reading[];
   seenWelcome: boolean; // false only on a brand-new install, until a Welcome action is taken
+  events: GlucaEvent[];
 };

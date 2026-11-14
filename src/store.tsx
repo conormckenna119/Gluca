@@ -62,6 +62,7 @@ export const seed = (): State => {
     dark: true,
     imported: [],
     seenWelcome: false,
+  events: [],
   };
 };
 const Context = createContext<{

@@ -7,6 +7,7 @@ import type { Reading, State } from "../src/types";
 const defaults: State = {
   posts: [], following: [], clubs: [], blocked: [], reports: [], unit: "mg/dL",
   range: { ...DEFAULT_RANGE }, dark: true, imported: [], seenWelcome: false,
+  events: [],
 };
 
 test("old saved state without range loads with 70/180 and keeps its other fields", () => {
