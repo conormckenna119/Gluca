@@ -14,7 +14,7 @@ import { FONT_FACES } from './font-data';
 import { FORMATS, type FormatId } from './formats';
 import {
   FONT_FAMILY, NEAR_BLACK, SWATCHES, approxMeasure, block, brandMark, buildPalette, chartSvg, distributionBar, ensureContrast, esc,
-  fitText, luminance, n1, text, type Measure, type Palette,
+  eventsContentLine, fitText, luminance, n1, text, type ArtEvent, type Measure, type Palette,
 } from './svg';
 import type { TemplateId } from './telemetry';
 
@@ -31,9 +31,13 @@ export const TEMPLATE_INFO: Record<TemplateId, { label: string; blurb: string; n
 export interface ShowOptions {
   date: boolean; tir: boolean; avg: boolean; readings: boolean; coverage: boolean;
   chart: boolean; band: boolean; axis: boolean; brand: boolean; partialNote: boolean;
+  /** Draw logged events as icons on the trace. No effect when there are no events. */
+  events: boolean;
 }
+/** Templates whose trace can carry event icons. */
+export const supportsEvents = (t: TemplateId): boolean => t !== 'milestone';
 export function defaultShow(t: TemplateId): ShowOptions {
-  const base: ShowOptions = { date: true, tir: false, avg: false, readings: false, coverage: false, chart: true, band: true, axis: true, brand: true, partialNote: true };
+  const base: ShowOptions = { date: true, tir: false, avg: false, readings: false, coverage: false, chart: true, band: true, axis: true, brand: true, partialNote: true, events: true };
   switch (t) {
     case 'minimal_trace': return { ...base, tir: true, avg: true };
     case 'daily_recap': return { ...base, tir: true, avg: true, readings: true, coverage: true };
@@ -61,6 +65,8 @@ export interface ArtModel {
   caption: string;
   milestoneBig: string;
   show: ShowOptions;
+  /** Logged events in wall-clock time (same clock as `start`/`end`). Optional; absent or empty behaves exactly as before. */
+  events?: ArtEvent[];
   embedFont: boolean;
   measure?: Measure;
 }
@@ -166,8 +172,11 @@ export function buildArtwork(m: ArtModel): Artwork {
     const c = chartSvg({
       x: X, y, w: Wd, h, start: m.start, end: m.end, segs: m.segs, stats: m.stats, range: m.range, unit: m.unit, p,
       stroke: grad ? 'url(#lg)' : p.accent, strokeW: opts.sw ?? (compact ? 7 : 8), glow: opts.glow, showBand: m.show.band, showAxis: m.show.axis, gradientStops: grad,
+      events: m.show.events && supportsEvents(m.template) ? m.events : undefined,
     });
     contents.push(`Glucose trace${days <= 1 ? '' : ` for ${days} days`}${m.show.band ? ` with the ${formatGlucose(m.range.low, m.unit)}–${formatGlucose(m.range.high, m.unit)} ${U} target band` : ''}${gapsPresent() ? '; gaps in data are left empty' : ''}`);
+    const evLine = eventsContentLine(c.events);
+    if (evLine) contents.push(evLine);
     return c;
   };
   const gapsPresent = () => m.segs.length > 1;

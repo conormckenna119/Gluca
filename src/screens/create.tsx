@@ -30,7 +30,7 @@ import { Customize } from "../components/create/customize";
 import { PublishCard } from "../components/create/publish-card";
 import { rangeToText } from "../state";
 import { useReadings } from "../hooks/use-readings";
-import { getFlags } from "../flags";
+import { getFlags, isEnabled } from "../flags";
 import { track, exportFormatId, exportFailReason } from "../telemetry";
 const slug = (s: string) => s.replace(/_/g, "-");
 
@@ -82,9 +82,11 @@ export function Create() {
   const [w, h] = formats[o.format];
   const noData = !data.length;
 
+  // Logged events only reach the artwork while the eventLogging flag is on.
+  const events = isEnabled("eventLogging") ? state.events : undefined;
   const built = React.useMemo(
-    () => storyArtwork(data, anchor, o, { native: true }),
-    [data, anchor, o],
+    () => storyArtwork(data, anchor, o, { native: true, events }),
+    [data, anchor, o, events],
   );
   // The contents list must match the image: a chosen photo is part of the export, so it is listed.
   const hasPhoto = o.transparent && !!photoUri;
@@ -115,6 +117,7 @@ export function Create() {
       // Web: embed the font so the PNG looks the same on every device. Native: capture exactly what the preview shows.
       const svg = storySvg(data, anchor, o, {
         embedFont: Platform.OS === "web",
+        events,
       });
       await exportImage(
         svg,

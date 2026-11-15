@@ -13,8 +13,8 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M4 | Share-first first run, flags, local telemetry | done 2026-11-13 | M3 |
 | M5 | Create screen polish | done on web 2026-11-13 (native font, glow, photo and sheet unverified until M7) | M3 |
 | M6 | Design pass on the remaining screens | done on web 2026-11-13 (D3 still open; dark stays default) | M2 |
-| M7 | Real-device verification | not started | M5 |
-| M8 | Event logging on the trace (flagged) | not started | M5 |
+| M7 | Real-device verification | checklist ready 2026-11-14 (`docs/DEVICE_TESTS.md`); needs the owner with real phones | M5 |
+| M8 | Event logging on the trace (flagged) | done on web 2026-11-14, flag off by default; phones unverified | M5 |
 | M9 | Validation with real people and copy review | not started | M7 |
 | M10 | Backend, accounts, integrations, release | needs owner approval | M9 |
 
@@ -265,6 +265,8 @@ src/
 
 **Acceptance.** `docs/DEVICE_TESTS.md` filled in; every failure either fixed or listed in `docs/PROJECT_MAP.md` known problems.
 
+**Prepared 2026-11-14.** `docs/DEVICE_TESTS.md` holds the checklist with every result blank. Nothing has been run on a phone. A development build uses an Expo account and the paid EAS service, so it needs the owner's approval first; so does a cloud simulator.
+
 ---
 
 ## M8. Event logging on the trace (behind `eventLogging`)
@@ -282,6 +284,11 @@ src/
 - Copy never links an event to a "good" or "bad" outcome.
 
 **Acceptance.** Flag off: no trace of the feature. Flag on: add, edit and delete an event; it appears on the chart and on at least the daily recap and real-side templates without overflow; tests cover placement and the contents list.
+
+**Done 2026-11-14 (web only).** `src/events.ts` (validation, add / update / remove, window filter), `/log` form-sheet route (`src/screens/log.tsx`, custom `src/components/wheel.tsx`), a "Logged" list and entry button on My Glucose, and event icons in the artwork engine (every template except milestone; icons only, labels are never drawn on the image).
+- Verified with `EXPO_PUBLIC_FLAGS=eventLogging=true` in Edge: add an activity, it is listed on My Glucose, the Create contents list shows "Logged events: 1 activity (icons only, no text)", edit it into a meal, delete it after the confirmation; no console errors. Screenshots in `docs/screenshots/m8/`.
+- Verified with the flag off: no entry point on My Glucose, no switch in Customize, `/log` lands on Create; 54 screenshots with no console errors; e2e passes; 109 unit tests (placement, overlap, clipped duration bar, contents wording, output identical with no events).
+- Not verified: the form sheet's detents and grabber on iOS and Android (on web `/log` is a full page); dragging the wheel by hand (buttons and screen-reader actions were used); week-period artwork with events was rendered but not looked at; events on templates other than daily recap and real side were not looked at. The feature's code is in the bundle when the flag is off; it is hidden, not removed.
 
 ---
 

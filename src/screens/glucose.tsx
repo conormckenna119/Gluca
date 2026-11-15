@@ -9,7 +9,9 @@ import {
   Chip,
   EmptyState,
   Eyebrow,
+  Group,
   Input,
+  ListRow,
   Notice,
   Section,
   Stat,
@@ -27,6 +29,7 @@ import { CHART_PLOT, GlucoseChart } from "../components/glucose-chart";
 import { useReadings } from "../hooks/use-readings";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
+import { eventSummary, eventsInWindow } from "../events";
 import {
   STATUS_WORDS,
   chartSummary,
@@ -146,6 +149,8 @@ export function Glucose() {
     unit,
   });
   const canImport = linkVisible("import", getFlags());
+  const canLog = linkVisible("log", getFlags());
+  const logged = canLog ? eventsInWindow(state.events, start, end) : [];
 
   const importButton = canImport ? (
     <Button
@@ -335,6 +340,41 @@ export function Glucose() {
               />
             </Card>
           </Section>
+
+          {canLog ? (
+            <Section
+              title="Logged"
+              note="Meals, activity and notes you marked, for your own graphics."
+            >
+              {logged.length ? (
+                <Group>
+                  {logged.map((e) => (
+                    <ListRow
+                      key={e.id}
+                      title={`${eventSummary(e)}${e.label ? `: ${e.label}` : ""}`}
+                      detail={new Date(e.start).toLocaleString([], {
+                        weekday: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                      accessibilityLabel={`Edit ${eventSummary(e)} at ${new Date(e.start).toLocaleString()}`}
+                      onPress={() =>
+                        router.push({ pathname: "/log", params: { id: e.id } })
+                      }
+                    />
+                  ))}
+                </Group>
+              ) : (
+                <T small muted>
+                  Nothing logged in this period.
+                </T>
+              )}
+              <Button
+                label="Log a meal or activity"
+                onPress={() => router.push("/log")}
+              />
+            </Section>
+          ) : null}
 
           <Section title="This period">
             <View

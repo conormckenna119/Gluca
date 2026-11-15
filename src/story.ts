@@ -1,7 +1,7 @@
 // Story artwork for Gluca. The layout engine lives in src/art (pure TypeScript, no React Native dependency).
 // This file adapts the app's Reading type and unit names to it, and makes the SVG safe for react-native-svg.
-import type { Reading } from "./types";
-import { buildArtwork, defaultShow, TEMPLATE_INFO, TEMPLATE_ORDER, type Artwork, type ShowOptions } from "./art/templates";
+import type { GlucaEvent, Reading } from "./types";
+import { buildArtwork, defaultShow, supportsEvents, TEMPLATE_INFO, TEMPLATE_ORDER, type Artwork, type ShowOptions } from "./art/templates";
 import { defaultSettings, makeArtModel, withTemplate, type Settings } from "./art/model";
 import { toEngine, wall } from "./analytics";
 import { captionFor, headlineFor, TONES, TONE_LABEL, type Tone } from "./art/copy";
@@ -19,6 +19,7 @@ const FORMAT_ID: Record<FormatName, FormatId> = { Story: "story", Portrait: "por
 
 export const templateIds: TemplateId[] = TEMPLATE_ORDER;
 export const templateInfo = TEMPLATE_INFO;
+export { supportsEvents };
 export { TONES, TONE_LABEL, SWATCHES };
 export type { Tone, TemplateId, ShowOptions };
 export const SAFE_MARGINS = { Story: 250, Portrait: 110, Square: 90 } as const;
@@ -111,6 +112,7 @@ export function nativeSafe(svg: string): string {
     .replace(/<style>[\s\S]*?<\/style>/g, "")
     .replace(/ filter="url\(#[^"]*\)"/g, "")
     .replace(/ data-bg="1"/g, "")
+    .replace(/ data-(?:ev|b)="[^"]*"/g, "")
     .replace(/ font-family="[^"]*"/g, "");
   return nativeFonts ? applyFonts(out, nativeFonts) : out;
 }
@@ -124,12 +126,13 @@ export function storyArtwork(
   rows: Reading[],
   anchorMs: number,
   o: StoryOptions,
-  opts: { embedFont?: boolean; native?: boolean; measure?: Measure } = {},
+  opts: { embedFont?: boolean; native?: boolean; measure?: Measure; events?: GlucaEvent[] } = {},
 ): StoryArtwork {
   const readings = toEngine(rows);
   const source = rows.length && rows[0].source === "csv" ? "csv" : "demo";
-  const art = buildArtwork(makeArtModel(readings, source, wall(anchorMs), toSettings(o), { embedFont: !!opts.embedFont, measure: opts.measure }));
+  const art = buildArtwork(makeArtModel(readings, source, wall(anchorMs), toSettings(o), { embedFont: !!opts.embedFont, measure: opts.measure,
+    events: opts.events?.map((e) => ({ kind: e.kind, t: wall(e.start), durationMin: e.durationMin, label: e.label })) }));
   return opts.native ? { ...art, svg: nativeSafe(art.svg) } : art;
 }
-export const storySvg = (rows: Reading[], anchorMs: number, o: StoryOptions, opts?: { embedFont?: boolean; native?: boolean }) => storyArtwork(rows, anchorMs, o, opts).svg;
+export const storySvg = (rows: Reading[], anchorMs: number, o: StoryOptions, opts?: { embedFont?: boolean; native?: boolean; events?: GlucaEvent[] }) => storyArtwork(rows, anchorMs, o, opts).svg;
 export { ART_FORMATS };

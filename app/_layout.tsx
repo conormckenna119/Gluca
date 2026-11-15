@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { Stack, router, usePathname, useRootNavigationState } from "expo-router";
+import {
+  Stack,
+  router,
+  usePathname,
+  useRootNavigationState,
+} from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DemoStore, useDemo } from "../src/store";
@@ -48,13 +53,32 @@ function Nav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="welcome" options={{ headerShown: false }} />
         <Stack.Screen name="post/[id]" options={{ title: "Conversation" }} />
-        <Stack.Screen name="settings" options={{ title: "Settings & privacy" }} />
+        <Stack.Screen
+          name="settings"
+          options={{ title: "Settings & privacy" }}
+        />
         <Stack.Screen name="import" options={{ title: "Import & export" }} />
+        <Stack.Screen
+          name="log"
+          options={{
+            presentation: "formSheet",
+            sheetGrabberVisible: true,
+            sheetAllowedDetents: [0.75, 1],
+            title: "Log something",
+          }}
+        />
       </Stack>
       {covered ? (
         <View
           pointerEvents="auto"
-          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: c.bg }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: c.bg,
+          }}
         />
       ) : null}
     </>

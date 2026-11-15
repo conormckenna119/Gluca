@@ -175,6 +175,87 @@ export interface ChartOpts {
   showBand: boolean; showAxis: boolean;
   gradientStops?: string[];    // when set, a horizontal gradient is defined as #lg
   weekLabels?: boolean;
+  /** Logged events in wall-clock time. Drawn as icon badges in a lane above the plot; labels are never drawn. */
+  events?: ArtEvent[];
+}
+
+export type ArtEventKind = 'meal' | 'activity' | 'note';
+/** An event in the artwork's wall-clock time. `label` is carried for the app but never drawn. */
+export interface ArtEvent { kind: ArtEventKind; t: number; durationMin: number; label?: string }
+export interface EventBadge { kind: ArtEventKind; cx: number; cy: number; px: number; row: number; barX0: number; barX1: number }
+export interface EventLane { badges: EventBadge[]; laneH: number; counts: Record<ArtEventKind, number> }
+
+export const EVENT_R = 22;               // badge radius
+const EVENT_GAP = 6;                     // space between badges
+const EVENT_ROW = EVENT_R * 2 + EVENT_GAP + 2;
+const EVENT_BAR_STRIP = 14;              // strip between the badges and the plot top for activity duration bars
+const EVENT_MAX_ROWS = 3;
+
+/**
+ * Where event badges go. Only events whose start lies inside [start, end) are used. Badges sit in a lane above the plot
+ * (so never on the trace, the range labels or the right gutter), centred on their time but kept inside [x, x + w] and
+ * nudged apart (or stacked into more rows) so they never overlap. `cy` is measured from the top of the chart box.
+ */
+export function layoutEvents(events: readonly ArtEvent[] | undefined, start: number, end: number, x: number, w: number): EventLane | null {
+  const inside = (events ?? []).filter((e) => Number.isFinite(e.t) && e.t >= start && e.t < end).sort((a, b) => a.t - b.t);
+  if (!inside.length || w < EVENT_R * 2) return null;
+  const D = EVENT_R * 2 + EVENT_GAP;
+  const cap = Math.floor((w - EVENT_R * 2) / D) + 1;
+  const rows = Math.min(EVENT_MAX_ROWS, Math.ceil(inside.length / cap));
+  const used = inside.slice(0, rows * cap);
+  const pxOf = (t: number) => x + ((t - start) / (end - start)) * w;
+  const laneH = rows * EVENT_ROW + EVENT_BAR_STRIP;
+  const badges: EventBadge[] = [];
+  for (let r = 0; r < rows; r++) {
+    const row = used.filter((_, i) => i % rows === r);
+    const cs = row.map((e) => Math.min(x + w - EVENT_R, Math.max(x + EVENT_R, pxOf(e.t))));
+    for (let i = 1; i < cs.length; i++) cs[i] = Math.max(cs[i], cs[i - 1] + D);
+    const over = cs.length ? cs[cs.length - 1] - (x + w - EVENT_R) : 0;
+    if (over > 0) { cs[cs.length - 1] -= over; for (let i = cs.length - 2; i >= 0; i--) cs[i] = Math.min(cs[i], cs[i + 1] - D); }
+    const cy = laneH - EVENT_BAR_STRIP - EVENT_GAP / 2 - EVENT_R - r * EVENT_ROW;
+    row.forEach((e, i) => {
+      const px = pxOf(e.t);
+      const bx1 = e.kind === 'activity' && e.durationMin > 0 ? Math.min(x + w, pxOf(Math.min(end, e.t + e.durationMin * 60000))) : px;
+      badges.push({ kind: e.kind, cx: cs[i], cy, px, row: r, barX0: px, barX1: bx1 });
+    });
+  }
+  const counts: Record<ArtEventKind, number> = { meal: 0, activity: 0, note: 0 };
+  for (const b of badges) counts[b.kind]++;
+  return { badges, laneH, counts };
+}
+
+/** Original icons on a 24x24 grid, drawn in `ink` with round caps. */
+function eventIcon(kind: ArtEventKind, ink: string): string {
+  const st = `fill="none" stroke="${ink}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"`;
+  if (kind === 'meal') return `<path d="M6.5 4.5V9.5Q6.5 11.5 8.5 11.5Q10.5 11.5 10.5 9.5V4.5M8.5 4.5V19.5M16.5 19.5V4.5Q13.8 6.5 13.8 11.5H16.5" ${st}/>`;
+  if (kind === 'activity') return `<circle cx="14.6" cy="5.2" r="1.9" fill="${ink}"/><path d="M13.6 9.4L10.8 13.2L14 15.6L12.4 20M14.3 15.8L18 19M8.2 11.4L11.6 9.6L15.8 9.8L17.8 12.4" ${st}/>`;
+  return `<path d="M7 4.5H14L17.5 8V19.5H7ZM14 4.5V8H17.5M9.6 12.5H15M9.6 15.6H13.6" ${st}/>`;
+}
+
+function eventsSvg(lane: EventLane, o: { x: number; y: number; w: number; plotTop: number; p: Palette }): string {
+  const { p } = o;
+  const sh = p.shadow ? ' filter="url(#sh)"' : '';
+  const ink = peakColor(p);
+  let s = '';
+  for (const b of lane.badges) {
+    const cy = o.y + b.cy;
+    if (b.kind === 'activity' && b.barX1 - b.barX0 > 0.5) s += `<rect x="${n1(b.barX0)}" y="${n1(o.plotTop - 10)}" width="${n1(b.barX1 - b.barX0)}" height="6" rx="3" fill="${p.accent}" fill-opacity="0.9"${sh}/>`;
+    if (b.row === 0) s += `<line x1="${n1(b.cx)}" y1="${n1(cy + EVENT_R)}" x2="${n1(b.px)}" y2="${n1(o.plotTop - 10)}" stroke="${p.accent}" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"${sh}/>`;
+  }
+  for (const b of lane.badges) {
+    const cy = o.y + b.cy;
+    s += `<g data-ev="${b.kind}" data-b="${n1(b.cx)},${n1(cy)},${EVENT_R}"${sh}><circle cx="${n1(b.cx)}" cy="${n1(cy)}" r="${EVENT_R}" fill="${p.accent}"/><g transform="translate(${n1(b.cx - 15.6)},${n1(cy - 15.6)}) scale(1.3)">${eventIcon(b.kind, ink)}</g></g>`;
+  }
+  return s;
+}
+
+/** The "What's on this image" line for drawn events, e.g. "Logged events: 2 meals, 1 activity, 1 note (icons only, no text)". */
+export function eventsContentLine(c: Record<ArtEventKind, number>): string | null {
+  const parts: string[] = [];
+  if (c.meal) parts.push(`${c.meal} ${c.meal === 1 ? 'meal' : 'meals'}`);
+  if (c.activity) parts.push(`${c.activity} ${c.activity === 1 ? 'activity' : 'activities'}`);
+  if (c.note) parts.push(`${c.note} ${c.note === 1 ? 'note' : 'notes'}`);
+  return parts.length ? `Logged events: ${parts.join(', ')} (icons only, no text)` : null;
 }
 
 const RANGE_LABEL_SIZE = 24;
@@ -185,10 +266,13 @@ export function rangeGutter(o: Pick<ChartOpts, 'showBand' | 'range' | 'unit'>): 
   return Math.ceil(chars * RANGE_LABEL_SIZE * 0.62 + 18);
 }
 
-export function chartSvg(o: ChartOpts): { svg: string; axisH: number } {
-  const { x, y, h, start, end, p } = o;
+export function chartSvg(o: ChartOpts): { svg: string; axisH: number; events: Record<ArtEventKind, number> } {
+  const { x, start, end, p } = o;
   const gutter = rangeGutter(o);
   const w = o.w - gutter; // plot width; the target labels live in the gutter to the right
+  // With events, the top of the chart box becomes an icon lane and the plot shrinks to what is below it; without, nothing changes.
+  const lane = layoutEvents(o.events, start, end, x, w);
+  const y = o.y + (lane ? lane.laneH : 0), h = o.h - (lane ? lane.laneH : 0);
   const lo = Math.max(20, Math.min(50, (o.stats.min ?? o.range.low) - 8));
   const hi = Math.min(420, Math.max(240, (o.stats.max ?? o.range.high) + 10));
   const px = (t: number) => x + ((t - start) / (end - start)) * w;
@@ -241,7 +325,8 @@ export function chartSvg(o: ChartOpts): { svg: string; axisH: number } {
       }
     }
   }
-  return { svg: s, axisH };
+  if (lane) s += eventsSvg(lane, { x, y: o.y, w, plotTop: y, p });
+  return { svg: s, axisH, events: lane ? lane.counts : { meal: 0, activity: 0, note: 0 } };
 }
 
 // ---------- distribution bar (below / in range / above), labelled so colour is never the only signal ----------

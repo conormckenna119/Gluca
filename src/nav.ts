@@ -6,7 +6,7 @@ import type { FlagState } from "./flags";
 export const FALLBACK_ROUTE = "/create";
 
 export type TabName = "index" | "glucose" | "create" | "explore" | "profile";
-export type LinkName = "import" | "post" | "home";
+export type LinkName = "import" | "post" | "home" | "log";
 
 /** Explore holds clubs and community members; it stays while either is on. */
 export const exploreHasContent = (f: FlagState) => f.communityFeed || f.clubs;
@@ -19,15 +19,21 @@ export function tabVisible(tab: TabName, f: FlagState): boolean {
 
 export function linkVisible(link: LinkName, f: FlagState): boolean {
   if (link === "import") return f.localCsvImport;
+  if (link === "log") return f.eventLogging;
   return f.communityFeed; // "post" and "home" belong to the feed
 }
 
 /** Redirect target for a pathname, or null when the route may be shown. Query strings are ignored. */
 export function redirectFor(pathname: string, f: FlagState): string | null {
-  const p = ("/" + pathname.split("?")[0].replace(/^\/+|\/+$/g, "")).replace(/^\/index$/, "/");
+  const p = ("/" + pathname.split("?")[0].replace(/^\/+|\/+$/g, "")).replace(
+    /^\/index$/,
+    "/",
+  );
   if (p === "/" && !f.communityFeed) return FALLBACK_ROUTE;
-  if ((p === "/post" || p.startsWith("/post/")) && !f.communityFeed) return FALLBACK_ROUTE;
+  if ((p === "/post" || p.startsWith("/post/")) && !f.communityFeed)
+    return FALLBACK_ROUTE;
   if (p === "/explore" && !exploreHasContent(f)) return FALLBACK_ROUTE;
   if (p === "/import" && !f.localCsvImport) return FALLBACK_ROUTE;
+  if (p === "/log" && !f.eventLogging) return FALLBACK_ROUTE;
   return null;
 }

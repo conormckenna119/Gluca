@@ -78,6 +78,8 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `src/components/page.tsx` | - | `Page`; scroll container, title, subtitle and demo pills |
 | `src/components/create/` | - | Parts of the Create screen: `artwork-preview`, `photo-background`, `template-strip`, `day-picker`, `export-panel`, `customize` (bottom sheet), `publish-card` |
 | `src/days.ts`, `src/time.ts`, `src/chart-scale.ts`, `src/cover-fit.ts` | - | Pure helpers with tests: days that have data; relative time; chart domain and ticks; cover-fit crop for photo backgrounds |
+| `src/events.ts`, `src/screens/log.tsx`, `app/log.tsx`, `src/components/wheel.tsx` | - | Event logging behind `eventLogging`: pure event helpers, the `/log` form sheet, the snapping wheel picker |
+| `docs/DEVICE_TESTS.md` | - | Blank checklist for the owner's real-phone pass (M7) |
 | `src/fonts.ts` | - | Loads Inter with `expo-font` and tells `src/story.ts` which family to use per weight |
 | `src/components/post-card.tsx` | 133 | `PostCard`; one feed post with its actions |
 | `src/components/glucose-chart.tsx` | 51 | `GlucoseChart`; the SVG glucose trace and `areaPath` |
@@ -191,5 +193,6 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 22 | The "70" axis label sits on the trace line in the square export | `src/art/svg.ts` chart | M5 |
 | 23 | My Glucose chart uses a fixed 20 to 600 mg/dL axis, so the trace is squashed into a thin band and is hard to read | `Glucose` in `src/screens/glucose.tsx` | M6 |
 | 24 | ~~App icons are the stock Expo placeholder~~ Resolved 2026-11-13: generated from the in-app mark. Still unverified on devices, and never compared with the owner's original logo file | `assets/`, `tools/make-icons.cjs` | M7 |
+| 29 | `src/ui.tsx` has no chevron-up icon (the wheel rotates chevron-down) and `Input` has no placeholder prop (the log label field is a local `TextInput`) | `src/ui.tsx` | backlog |
 | 25 | A dev server left running for many hours can serve compressed bundles very slowly (about 10 s per load), timing out the e2e journey. Restart it, or use `E2E_BASE_URL` with a fresh server on another port | dev tooling | note |
 | 26 | With `communityFeed` and `clubs` off, the page header still shows the "Fictional community" pill | `src/components/page.tsx` | M6 |

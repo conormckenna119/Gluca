@@ -19,6 +19,7 @@ import {
   TONES,
   TONE_LABEL,
   pickTone,
+  supportsEvents,
   templateInfo,
   type ShowOptions,
   type StoryOptions,
@@ -26,6 +27,7 @@ import {
 import { captionFor, headlineFor } from "../../art/copy";
 import { BRAND } from "../../art/brand";
 import { track } from "../../telemetry";
+import { isEnabled } from "../../flags";
 
 const HEADLINE_MAX = 90;
 const CAPTION_MAX = 140;
@@ -46,6 +48,7 @@ const SHOW_LABELS: {
   { key: "axis", label: "Time labels", group: "elements" },
   { key: "partialNote", label: "“Based on X%” note", group: "elements" },
   { key: "brand", label: `${BRAND.name} mark`, group: "elements" },
+  { key: "events", label: "Logged events", group: "elements" },
 ];
 
 /** Black or white, whichever contrasts more with a #rrggbb swatch. */
@@ -93,7 +96,13 @@ export function Customize({
     patch({ show: { ...o.show, [k]: v } });
   const switches = (g: "numbers" | "elements") => (
     <Group>
-      {SHOW_LABELS.filter((x) => x.group === g).map((x) => (
+      {SHOW_LABELS.filter(
+        (x) =>
+          x.group === g &&
+          // Logged events: only with the flag on and a template that can draw them.
+          (x.key !== "events" ||
+            (isEnabled("eventLogging") && supportsEvents(o.template))),
+      ).map((x) => (
         <SwitchRow
           key={x.key}
           title={x.label}

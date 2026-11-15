@@ -1,21 +1,45 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { resolveFlags } from "../src/flags";
-import { redirectFor, tabVisible, linkVisible, FALLBACK_ROUTE } from "../src/nav";
+import {
+  redirectFor,
+  tabVisible,
+  linkVisible,
+  FALLBACK_ROUTE,
+} from "../src/nav";
 
 const defaults = resolveFlags(undefined);
 const off = resolveFlags("communityFeed=false,clubs=false");
 
 test("defaults: every route is reachable and every tab and link is visible", () => {
-  for (const p of ["/", "/glucose", "/create", "/explore", "/profile", "/settings", "/import", "/post/seed-0", "/welcome"]) {
+  for (const p of [
+    "/",
+    "/glucose",
+    "/create",
+    "/explore",
+    "/profile",
+    "/settings",
+    "/import",
+    "/post/seed-0",
+    "/welcome",
+  ]) {
     assert.equal(redirectFor(p, defaults), null, p);
   }
-  for (const t of ["index", "glucose", "create", "explore", "profile"] as const) assert.equal(tabVisible(t, defaults), true, t);
-  for (const l of ["import", "post", "home"] as const) assert.equal(linkVisible(l, defaults), true, l);
+  for (const t of ["index", "glucose", "create", "explore", "profile"] as const)
+    assert.equal(tabVisible(t, defaults), true, t);
+  for (const l of ["import", "post", "home"] as const)
+    assert.equal(linkVisible(l, defaults), true, l);
 });
 
 test("communityFeed=false,clubs=false: feed, post detail and Explore redirect to Create; the tabs are hidden", () => {
-  for (const p of ["/", "/index", "/post/seed-0", "/post", "/explore", "/explore/"]) {
+  for (const p of [
+    "/",
+    "/index",
+    "/post/seed-0",
+    "/post",
+    "/explore",
+    "/explore/",
+  ]) {
     assert.equal(redirectFor(p, off), FALLBACK_ROUTE, p);
   }
   assert.equal(FALLBACK_ROUTE, "/create");
@@ -23,13 +47,27 @@ test("communityFeed=false,clubs=false: feed, post detail and Explore redirect to
   assert.equal(tabVisible("explore", off), false);
   assert.equal(tabVisible("create", off), true);
   assert.equal(linkVisible("post", off), false);
-  for (const p of ["/create", "/glucose", "/profile", "/settings", "/import", "/welcome"]) assert.equal(redirectFor(p, off), null, p);
+  for (const p of [
+    "/create",
+    "/glucose",
+    "/profile",
+    "/settings",
+    "/import",
+    "/welcome",
+  ])
+    assert.equal(redirectFor(p, off), null, p);
 });
 
 test("Explore stays while either clubs or the feed is on", () => {
-  assert.equal(redirectFor("/explore", resolveFlags("communityFeed=false")), null);
+  assert.equal(
+    redirectFor("/explore", resolveFlags("communityFeed=false")),
+    null,
+  );
   assert.equal(redirectFor("/explore", resolveFlags("clubs=false")), null);
-  assert.equal(tabVisible("explore", resolveFlags("communityFeed=false")), true);
+  assert.equal(
+    tabVisible("explore", resolveFlags("communityFeed=false")),
+    true,
+  );
 });
 
 test("localCsvImport=false hides the Import route and links", () => {
@@ -40,6 +78,20 @@ test("localCsvImport=false hides the Import route and links", () => {
 });
 
 test("query strings and trailing slashes do not bypass a redirect", () => {
-  assert.equal(redirectFor("/import?from=welcome", resolveFlags("localCsvImport=false")), FALLBACK_ROUTE);
+  assert.equal(
+    redirectFor("/import?from=welcome", resolveFlags("localCsvImport=false")),
+    FALLBACK_ROUTE,
+  );
   assert.equal(redirectFor("/post/seed-0/", off), FALLBACK_ROUTE);
+});
+
+test("eventLogging is off by default: /log redirects and the entry link is hidden; on, both exist", () => {
+  assert.equal(redirectFor("/log", defaults), FALLBACK_ROUTE);
+  assert.equal(redirectFor("/log?id=ev-1", defaults), FALLBACK_ROUTE);
+  assert.equal(linkVisible("log", defaults), false);
+  const on = resolveFlags("eventLogging");
+  assert.equal(redirectFor("/log", on), null);
+  assert.equal(redirectFor("/log?id=ev-1", on), null);
+  assert.equal(linkVisible("log", on), true);
+  assert.equal(redirectFor("/glucose", defaults), null);
 });
