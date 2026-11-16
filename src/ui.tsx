@@ -140,9 +140,13 @@ export function Button({
 }
 
 export function Input({
-  label, value, onChange, multiline = false, placeholder, maxLength, secureTextEntry = false,
+  label, value, onChange, multiline = false, placeholder, maxLength, secureTextEntry = false, autoComplete, plainText = false,
 }: {
   label: string; value: string; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; maxLength?: number; secureTextEntry?: boolean;
+  /** Hint for password managers and autofill, e.g. "username", "new-password", "current-password". */
+  autoComplete?: React.ComponentProps<typeof TextInput>["autoComplete"];
+  /** No auto-capitalisation or autocorrect (usernames). Passphrase fields already get this. */
+  plainText?: boolean;
 }) {
   const c = useColors();
   return (
@@ -156,8 +160,9 @@ export function Input({
         placeholder={placeholder}
         maxLength={maxLength}
         secureTextEntry={secureTextEntry}
-        autoCapitalize={secureTextEntry ? 'none' : undefined}
-        autoCorrect={secureTextEntry ? false : undefined}
+        autoComplete={autoComplete}
+        autoCapitalize={secureTextEntry || plainText ? 'none' : undefined}
+        autoCorrect={secureTextEntry || plainText ? false : undefined}
         placeholderTextColor={c.muted}
         style={{
           minHeight: 50, padding: space.md, borderWidth: 1, borderColor: c.border, borderRadius: radius.md,
@@ -197,6 +202,8 @@ const ICONS = {
   lock: "M6.5 10.5 H17.5 V20 H6.5 Z M8.5 10.5 V7.5 A3.5 3.5 0 0 1 15.5 7.5 V10.5",
   link: "M10 14 L14 10 M8.5 11.5 L6.5 13.5 A3.2 3.2 0 0 0 11 18 L13 16 M15.5 12.5 L17.5 10.5 A3.2 3.2 0 0 0 13 6 L11 8",
   refresh: "M19 12 A7 7 0 1 1 16.5 6.6 M19 4 V8 H15",
+  eye: "M2.5 12 C5 7.5 8.3 5.5 12 5.5 C15.7 5.5 19 7.5 21.5 12 C19 16.5 15.7 18.5 12 18.5 C8.3 18.5 5 16.5 2.5 12 Z M12 9 A3 3 0 1 0 12 15 A3 3 0 1 0 12 9 Z",
+  "eye-off": "M4 4 L20 20 M9.5 6 C10.3 5.7 11.1 5.5 12 5.5 C15.7 5.5 19 7.5 21.5 12 C20.7 13.4 19.8 14.6 18.8 15.5 M15 17.9 C14 18.3 13 18.5 12 18.5 C8.3 18.5 5 16.5 2.5 12 C3.5 10.2 4.7 8.8 6 7.7",
   people: "M9 11 A3 3 0 1 0 9 5 A3 3 0 1 0 9 11 Z M3.5 19 C4 16 6 14.5 9 14.5 C12 14.5 14 16 14.5 19 M16 11 A2.6 2.6 0 1 0 15.5 5.9 M17 14.6 C19 15 20.2 16.6 20.5 19",
   user: "M12 12 A4 4 0 1 0 12 4 A4 4 0 1 0 12 12 Z M4.5 20 C5.5 16.5 8.5 15 12 15 C15.5 15 18.5 16.5 19.5 20",
 } as const;

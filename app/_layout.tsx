@@ -75,6 +75,7 @@ function Nav() {
         <Stack.Screen name="import" options={{ title: "Import & export" }} />
         <Stack.Screen name="trophies" options={{ title: "Medals" }} />
         <Stack.Screen name="onboarding" options={{ title: "Your profile" }} />
+        <Stack.Screen name="account" options={{ title: "Account" }} />
         <Stack.Screen
           name="profile-edit"
           options={{ title: "Edit profile" }}
