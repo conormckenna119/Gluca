@@ -63,3 +63,10 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 - Stage 2 explicitly disables glucose retrieval/persistence, superseding the earlier callback-ingestion decision. Existing schema/history are preserved, not silently deleted. No dashboard, artwork, source/provider, achievement or reaction behavior was implemented in this stage.
 - Keep dexcomApi off by default. Settings alone offers connection management; demo and CSV stay usable offline without account creation.
 - Live sandbox configuration/verification is pending; no hostname, credentials, tunnel or deployment is invented. Instructions and evidence are in docs/OAUTH_SETUP.md.
+
+## Ownership of the Dexcom track (owner's decision, 2026-11-16)
+
+- Codex handles the Dexcom developer API integration: everything under `server/`, the Dexcom client files (`src/services/dexcom-*.ts`, `src/components/dexcom-connection.tsx`, `src/screens/dexcom-data.tsx`), their tests and the Dexcom docs. The Stage 2 and Stage 3 decisions above stand; the earlier 2026-11-16 table rows about an anonymous session, a GET connect link and storing readings on the server are superseded.
+- The Claude session keeps identity, privacy, communities, Boosts and achievements, and does not edit the files above.
+- Left over from the Claude session's stopped sync task, for the Dexcom owner to remove or reuse: `server/dexcom/sync.ts` and `server/dexcom/data-routes.ts` (nothing imports them) and the `egvs` table in `server/db.ts`. They assume readings are stored, which Stage 3 decided against.
+- Still for the owner, whoever builds it: the developer terms on showing glucose data in shared images could not be read on 2026-11-16 and should be checked in the Dexcom portal before any public use.

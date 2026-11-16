@@ -22,7 +22,7 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M11 | Foundations for identity, Boosts, achievements and Dexcom | done 2026-11-16 | M8 |
 | M12 | Identity shields, onboarding, privacy, Boosts, communities | done on web 2026-11-16; `identity` flag off by default, Boosts live | M11 |
 | M13 | Achievements: engine, life and community medals, trophy cabinet, health prototype (flag off) | done on web 2026-11-16; `achievements` and `healthAchievements` off by default; health rules not clinically reviewed | M11 |
-| M14 | Dexcom sandbox integration (local backend) | taken over by the separate "Stage 2 / Stage 3" work (see `docs/DEXCOM_STAGE3.md`); this track is on hold pending the owner's decision on who owns it | M11 |
+| M14 | Dexcom sandbox integration (local backend) | taken over by the separate "Stage 2 / Stage 3" work (see `docs/DEXCOM_STAGE3.md`); owned by Codex by the owner's decision of 2026-11-16 (see `docs/DECISIONS.md`) | M11 |
 | M15 | Docs and close-out for M12 to M14 | not started | M12, M13, M14 |
 
 M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
