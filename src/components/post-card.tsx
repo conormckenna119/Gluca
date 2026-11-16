@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { reactionCount, toggleReaction } from "../domain/reactions";
+import { BoostButton } from "./boost-button";
 import { BRAND } from "../art/brand";
 import { View, Share } from "react-native";
 import { router } from "expo-router";
@@ -22,6 +22,9 @@ import {
 import { useDemo } from "../store";
 import { Post } from "../types";
 import { relativeTime } from "../time";
+import { isEnabled } from "../flags";
+import { NameLine } from "./identity/name-line";
+import { demoMember } from "../demo-members";
 
 const MGDL_PER_MMOL = 18.0182;
 
@@ -69,7 +72,14 @@ export function PostCard({
               flexWrap: "wrap",
             }}
           >
-            <T bold>{post.author}</T>
+            {isEnabled("identity") && !mine ? (
+              <NameLine
+                name={post.author}
+                publicProfile={demoMember(post.author)}
+              />
+            ) : (
+              <T bold>{post.author}</T>
+            )}
             {mine ? <Pill tone="accent">You</Pill> : <Pill>Fictional</Pill>}
           </View>
           <T small muted>
@@ -103,24 +113,13 @@ export function PostCard({
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
           gap: space.xs,
           marginLeft: -space.sm,
         }}
       >
-        <IconButton
-          icon="heart"
-          selected={post.reactions.mine === "boost"}
-          count={reactionCount(post.reactions)}
-          label={
-            post.reactions.mine === "boost"
-              ? `Remove kudos, ${reactionCount(post.reactions)}`
-              : `Give kudos, ${reactionCount(post.reactions)}`
-          }
-          onPress={() =>
-            update((p) => ({ ...p, reactions: toggleReaction(p.reactions) }))
-          }
-        />
+        <BoostButton post={post} />
         {inDetail ? null : (
           <IconButton
             icon="comment"

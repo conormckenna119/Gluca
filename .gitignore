@@ -39,3 +39,6 @@ playwright-report/
 .env*.local
 prototypes/share-first-web/dist/
 prototypes/share-first-web/node_modules/
+
+# Local backend database (may hold tokens and readings)
+server/data/

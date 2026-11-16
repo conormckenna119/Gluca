@@ -2,7 +2,15 @@
 // everything here is a thin adapter from the app's Reading ({timestamp, mgdl}, UTC epoch ms) to the engine's
 // Reading ({t, mgdl}, wall-clock epoch ms) and back to the shapes the screens already use.
 import type { Reading } from "./types";
-import { cleanReadings, computeStats, segmentsFor, STEP_MS, VALID_MAX, VALID_MIN, MG_PER_MMOL } from "./art/analytics";
+import {
+  cleanReadings,
+  computeStats,
+  segmentsFor,
+  STEP_MS,
+  VALID_MAX,
+  VALID_MIN,
+  MG_PER_MMOL,
+} from "./art/analytics";
 
 export const FIVE_MINUTES = STEP_MS;
 export const convert = (mgdl: number, unit: string) =>
@@ -30,7 +38,14 @@ export function normalize(readings: Reading[]) {
 
 /** App readings to engine readings: wall-clock time, validated, deduplicated, sorted. */
 export function toEngine(rows: Reading[]) {
-  return cleanReadings(rows.map((r) => ({ t: wall(r.timestamp), mgdl: r.mgdl }))).readings;
+  return cleanReadings(
+    rows.map((r) => ({ t: wall(r.timestamp), mgdl: r.mgdl })),
+  ).readings;
+}
+/** Same pure engine on absolute instants. This path never folds repeated DST wall-clock hours. */
+export function toUtcEngine(rows: Reading[]) {
+  return cleanReadings(rows.map((r) => ({ t: r.timestamp, mgdl: r.mgdl })))
+    .readings;
 }
 
 /**
@@ -44,8 +59,12 @@ export function summarize(
   end: number,
   low = 70,
   high = 180,
+  basis: "wall" | "utc" = "wall",
 ) {
-  const s = computeStats(toEngine(input), wall(start), wall(end), { low, high });
+  const s =
+    basis === "utc"
+      ? computeStats(toUtcEngine(input), start, end, { low, high })
+      : computeStats(toEngine(input), wall(start), wall(end), { low, high });
   return {
     count: s.readings,
     average: s.avg ?? 0,
@@ -70,14 +89,20 @@ export function segments(
   end: number,
   width = 900,
   height = 300,
+  basis: "wall" | "utc" = "wall",
 ) {
-  const ws = wall(start);
-  const we = wall(end);
-  return segmentsFor(toEngine(rows), ws, we).map((seg) =>
+  const ws = basis === "utc" ? start : wall(start);
+  const we = basis === "utc" ? end : wall(end);
+  return segmentsFor(
+    basis === "utc" ? toUtcEngine(rows) : toEngine(rows),
+    ws,
+    we,
+  ).map((seg) =>
     seg
       .map((p, i) => {
         const x = ((p.t - ws) / (we - ws)) * width;
-        const y = height - ((p.v - VALID_MIN) / (VALID_MAX - VALID_MIN)) * height;
+        const y =
+          height - ((p.v - VALID_MIN) / (VALID_MAX - VALID_MIN)) * height;
         return `${i ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)} `;
       })
       .join(""),

@@ -56,7 +56,8 @@ test("provider window boundaries and unconnected adapters", async () => {
   assert.equal((await csv.getReadings(0, 5 * minute)).length, 1);
   const mock = new MockGlucoseProvider([r(0, 100)]);
   assert.equal((await mock.getReadings(0, minute)).length, 1);
-  await assert.rejects(DexcomGlucoseProvider().getReadings(), /not connected/);
+  const dexcom = new DexcomGlucoseProvider((async () => new Response('{"error":"no_session"}', {status:401})) as typeof fetch);
+  await assert.rejects(dexcom.getReadings(0, minute), /no_session/);
 });
 test("synthetic month has realistic gaps and stable values", () => {
   const rows = synthetic(Date.parse("2026-11-12T12:00:00Z"));

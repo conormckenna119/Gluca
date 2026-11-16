@@ -1,5 +1,7 @@
 # Decisions
 
+Stage 3 decisions (2026-11-16): reuse the existing authenticated Node/SQLite token backend; return raw glucose transiently without SQL/device persistence. Keep the provider isolated from demo/CSV state and existing achievement hooks. Use the existing pure analytics engine with an explicit UTC adapter for diagnostics and honest full-calendar coverage denominators. No dependencies added. Configure Expo Router web `asyncRoutes: false`: development split chunks otherwise use eval and are rejected by the existing strict CSP. Synchronous web route bundling preserves CSP without enabling unsafe-eval; tradeoff is a larger initial route bundle. Public diagnostics remain blocked by build/server gates. Creative presentation is deferred to Claude. Details: [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md).
+
 Append new entries with a date. Do not rewrite history; add a superseding entry instead.
 
 ## Open: only the owner can decide
@@ -51,3 +53,13 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 | 2026-11-16 | The app reaches the server through `EXPO_PUBLIC_API_BASE_URL` (not a secret) and only while the `dexcomApi` flag is on. With the flag off the app makes no network call | Keeps demo and CSV modes fully local |
 | 2026-11-16 | Kudos become Boosts in saved state now (`Post.reactions`); the wording on screen changes with the `boosts` work | One data shape for one or many reaction kinds; old saved posts are converted on load |
 | 2026-11-16 | New flags `identity`, `boosts`, `achievements`, `healthAchievements`, `reactionPicker` all start off. `healthAchievements` stays off until a qualified clinical review | Unfinished work stays hidden; health-outcome medals are prototype only |
+
+## Stage 2 decisions — 2026-11-16 (supersedes earlier OAuth assumptions)
+
+- Reuse server/, node:http/node:sqlite/node:crypto and installed dependencies. No second backend or new runtime package.
+- The owner authorized sandbox OAuth implementation. Anonymous sessions no longer qualify: sandbox Gluca accounts authenticate usernames/passphrases with salted scrypt and HttpOnly signed sessions. These are controlled test accounts without recovery/MFA, not public production identity readiness.
+- Require the same authenticated browser session at callback; connect is now a CSRF-protected POST. APP_BASE_URL and callback origin must match; use existing backend static dist serving for browser tests. No global absent-cookie bypass or native handoff is enabled.
+- Provider base must be canonical HTTPS sandbox. Tokens use AES-GCM owner/generation/field AAD, strict rotation and a durable refresh lease. Disconnect invalidates pending grants and late writes.
+- Stage 2 explicitly disables glucose retrieval/persistence, superseding the earlier callback-ingestion decision. Existing schema/history are preserved, not silently deleted. No dashboard, artwork, source/provider, achievement or reaction behavior was implemented in this stage.
+- Keep dexcomApi off by default. Settings alone offers connection management; demo and CSV stay usable offline without account creation.
+- Live sandbox configuration/verification is pending; no hostname, credentials, tunnel or deployment is invented. Instructions and evidence are in docs/OAUTH_SETUP.md.

@@ -17,6 +17,7 @@ import {
   type StoryOptions,
 } from "../story";
 import { exportImage } from "../export";
+import { readShareParams } from "../achievement-share";
 import { Page } from "../components/page";
 import { ArtworkPreview } from "../components/create/artwork-preview";
 import { PhotoBackground } from "../components/create/photo-background";
@@ -35,7 +36,7 @@ import { track, exportFormatId, exportFailReason } from "../telemetry";
 const slug = (s: string) => s.replace(/_/g, "-");
 
 export function Create() {
-  const { state } = useDemo();
+  const { state, set } = useDemo();
   const { width } = useWindowDimensions();
   const { data = [] } = useReadings();
   const [base, O] = useState<StoryOptions>(() =>
@@ -52,17 +53,40 @@ export function Create() {
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const art = useRef<React.ElementRef<typeof View>>(null);
   // Welcome opens Create with ?template=milestone; apply it when the param arrives.
-  const { template: wanted } = useLocalSearchParams<{ template?: string }>();
+  const {
+    template: wanted,
+    headline: wantedHeadline,
+    big: wantedBig,
+  } = useLocalSearchParams<{
+    template?: string;
+    headline?: string;
+    big?: string;
+  }>();
   React.useEffect(() => {
     const id = templateIds.find((t) => t === wanted);
     if (id) {
-      O((prev) => switchTemplate(prev, id));
+      // A medal share passes its name as text for the milestone template (90 / 24 character limits).
+      const text = readShareParams({
+        headline: wantedHeadline,
+        big: wantedBig,
+      });
+      O((prev) => {
+        const next = switchTemplate(prev, id);
+        if (id !== "milestone") return next;
+        return {
+          ...next,
+          ...(text.headline
+            ? { tone: "custom" as const, headline: text.headline }
+            : {}),
+          ...(text.big ? { milestoneBig: text.big } : {}),
+        };
+      });
       track("template_selected", {
         template: id,
         source: state.imported.length ? "csv" : "demo",
       });
     }
-  }, [wanted]);
+  }, [wanted, wantedHeadline, wantedBig]);
 
   // Default day: the latest day that is mostly covered, so the first graphic is a real day, not a sliver of today.
   const defaultAnchor = React.useMemo(() => {
@@ -135,6 +159,10 @@ export function Create() {
         o.transparent && photoUri ? photoUri : undefined,
       );
       track("export_succeeded", evt);
+      set((s) => ({
+        ...s,
+        counters: { ...s.counters, exports: s.counters.exports + 1 },
+      }));
       if (Platform.OS !== "web" && !save) track("share_sheet_opened", evt);
       setResult({
         kind: "success",

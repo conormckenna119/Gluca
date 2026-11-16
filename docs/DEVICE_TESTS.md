@@ -1,5 +1,7 @@
 # Gluca device tests
 
+Stage 3 desktop browser verification (2026-11-16): synthetic authenticated Dexcom relay/viewer checked at 375, 430 and 1280 px in light/dark, no horizontal overflow, chart/statistics and clearing verified. Screenshots: `docs/screenshots/stage3/`. This is viewport simulation, not a real phone or live Dexcom test. See `docs/DEXCOM_STAGE3.md` for the external credential blocker and 295-test result.
+
 This is a checklist for testing Gluca on real phones. It is for the owner to fill in while holding the phones.
 As of 2026-11-13 nothing here has been run on a phone yet, so every result cell is blank.
 For each check, record Pass, Fail or Not tested in the matching cell, and add a short note. Log any failure in the table at the end and in `docs/PROJECT_MAP.md` known problems.
@@ -108,3 +110,7 @@ Log every Fail here. Then add it to `docs/PROJECT_MAP.md` known problems, or not
 | --- | --- | --- |
 |  |  |  |
 |  |  |  |
+
+## Stage 2 browser checks — 2026-11-16
+
+Browser-assisted checks against an isolated in-memory backend with synthetic credentials verified account controls, Disconnected/Connected/Reconnect labels and disconnect. Mock statuses were seeded through a scratch preview controller; this is not live Dexcom consent. Settings was captured at 375, 430 and 1280 px in dark/light; no horizontal overflow was detected. Screenshots are in docs/screenshots/stage2/. Native OAuth handoff is not implemented; phone-native verification remains outstanding. The standalone Playwright OAuth journey is included but its worker was blocked by spawn EPERM.

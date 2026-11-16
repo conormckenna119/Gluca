@@ -1,5 +1,9 @@
 # Dexcom API V3 integration notes
 
+**Stage 3 update (16 November 2026):** authenticated, transient dataRange/EGV retrieval and an opt-in development viewer are implemented. Read [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md) for Windows setup, normalization/privacy decisions, files and verification. This supersedes historical connection-only/disabled-provider notes below. No automatic sync or raw-history persistence is enabled. Live verification is blocked by absent local credentials and authorization.
+
+**Stage 2 implementation update (2026-11-16):** use `docs/OAUTH_SETUP.md` for the current connection-only implementation and verification record. `docs/DEXCOM_IMPLEMENTATION_PLAN.md` verified the previously unread dataRange schema and login/token reference details. Historical NOT VERIFIED entries below describe the original research snapshot; they do not mean glucose sync is enabled. Stage 2 makes token requests only.
+
 Researched 2026-11-16 from the official Dexcom developer portal. Nothing here is from memory: anything that could not be read on an official page is marked NOT VERIFIED.
 
 **Status key.** VERIFIED means it was seen on an official page on 2026-11-16 (date fetched for every row). NOT VERIFIED means the page did not state it, or the page could not be read.

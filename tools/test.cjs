@@ -13,7 +13,7 @@ function walk(dir) {
 }
 const tests = fs.readdirSync(path.join(root, "tests")).filter((f) => f.endsWith(".test.ts")).sort().map((f) => `tests/${f}`);
 fs.rmSync(build, { recursive: true, force: true });
-for (const file of [...walk("src"), ...tests]) {
+for (const file of [...walk("src"), ...walk("server"), ...tests]) {
   const out = path.join(build, file.replace(/\.ts$/, ".js"));
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(

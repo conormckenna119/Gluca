@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BRAND } from "../art/brand";
-import { View } from "react-native";
+import { Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import {
   Button,
@@ -13,7 +13,9 @@ import {
   T,
   row,
   space,
+  useColors,
 } from "../ui";
+import type { PrivacySettings } from "../domain/profile";
 import { useDemo, seed } from "../store";
 import { Page } from "../components/page";
 import { RangeInputs } from "../components/range-inputs";
@@ -21,8 +23,172 @@ import { telemetry } from "../telemetry";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
 import { hasImported, removeImported, REMOVED_IMPORT_MESSAGE } from "../state";
+import { DexcomConnection } from "../components/dexcom-connection";
 
 type Pending = null | "import" | "reset";
+
+/** A switch row that can be disabled while the information behind it is missing. */
+function GatedSwitchRow({
+  title,
+  detail,
+  value,
+  onChange,
+  disabled = false,
+}: {
+  title: string;
+  detail: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  const c = useColors();
+  return (
+    <View
+      style={{
+        minHeight: 56,
+        paddingHorizontal: space.lg,
+        paddingVertical: space.md,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: space.md,
+        opacity: disabled ? 0.6 : 1,
+      }}
+    >
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={{ color: c.text, fontSize: 16, fontWeight: "600" }}>
+          {title}
+        </Text>
+        <Text style={{ color: c.muted, fontSize: 13.5, lineHeight: 19 }}>
+          {detail}
+        </Text>
+      </View>
+      <Switch
+        accessibilityLabel={title}
+        value={value}
+        disabled={disabled}
+        onValueChange={onChange}
+        trackColor={{ false: c.border, true: c.accent }}
+        thumbColor={c.text}
+      />
+    </View>
+  );
+}
+
+const MISSING = "Add this in your profile first.";
+
+/** Each switch is a separate choice and starts off. Nothing is shared by creating a profile. */
+function ProfilePrivacy() {
+  const { state, set } = useDemo();
+  const { profile: p, privacy: v } = state;
+  const flip = (k: keyof PrivacySettings) => (on: boolean) =>
+    set((s) => ({ ...s, privacy: { ...s.privacy, [k]: on } }));
+  const real = (x?: string) => !!x && x !== "prefer_not";
+  const has = {
+    diagnosis: !!p.diagnosis,
+    emblem: !!p.emblem,
+    birthday: p.birthday?.month !== undefined && p.birthday?.day !== undefined,
+    type: real(p.diabetesType),
+    delivery: real(p.delivery?.method),
+    cgm: real(p.cgm?.brand),
+  };
+  const sw = (
+    key: keyof PrivacySettings,
+    title: string,
+    who: string,
+    available = true,
+    missing = MISSING,
+  ) => (
+    <GatedSwitchRow
+      key={key}
+      title={title}
+      detail={available || v[key] ? who : missing}
+      value={v[key]}
+      disabled={!available && !v[key]}
+      onChange={flip(key)}
+    />
+  );
+  return (
+    <Section
+      title="Profile and privacy"
+      note="Everything here starts off. Creating a profile shares nothing. Supporters never see your glucose data."
+    >
+      <Group>
+        {sw(
+          "showShield",
+          "Show diabetes experience shield",
+          "Anyone who sees your name will see a shield. It never shows your diagnosis date.",
+          has.diagnosis,
+        )}
+        {sw(
+          "showShieldNumber",
+          "Show years on the shield",
+          "Others see the number of years as well as the shield.",
+          has.diagnosis && v.showShield,
+          "Turn on the shield first.",
+        )}
+        {sw(
+          "showEmblem",
+          "Show supporter emblem",
+          "Anyone who sees your name will see your emblem.",
+          has.emblem,
+        )}
+        {sw(
+          "showBirthday",
+          "Show birthday celebration",
+          "Others see a celebration on your birthday only. Your date and age are never shown.",
+          has.birthday,
+        )}
+        {sw(
+          "showDiabetesType",
+          "Display diabetes type",
+          "Others who open your profile will see your diabetes type.",
+          has.type,
+        )}
+        {sw(
+          "showDelivery",
+          "Display insulin delivery method",
+          "Others who open your profile will see how you take insulin.",
+          has.delivery,
+        )}
+        {sw(
+          "showCgm",
+          "Display CGM device",
+          "Others who open your profile will see your CGM device.",
+          has.cgm,
+        )}
+        {sw(
+          "showMemberships",
+          "Display community memberships",
+          "Others will see only the clubs you have also made visible.",
+          state.clubs.length > 0,
+          "Join a club first.",
+        )}
+      </Group>
+      {getFlags().healthAchievements ? (
+        <>
+          <Notice title="Health achievements are private and optional">
+            They look back at your own data, only you can see them unless you
+            choose otherwise, and they are not medical advice.
+          </Notice>
+          <Group>
+            {sw(
+              "healthAchievements",
+              "Enable health achievements",
+              "Only you. Off until you turn it on.",
+            )}
+          </Group>
+        </>
+      ) : null}
+      <Group>
+        {sw(
+          "achievementNotifications",
+          "Enable achievement notifications",
+          "Only you. This saves your preference; notifications are not active in this prototype.",
+        )}
+      </Group>
+    </Section>
+  );
+}
 
 export function Settings() {
   const { state, set } = useDemo();
@@ -38,12 +204,20 @@ export function Settings() {
   const byVisibility = (v: string) =>
     mine.filter((p) => p.visibility === v).length;
   const imported = hasImported(state);
+  const flags = getFlags();
 
   return (
     <Page
       title="Settings & privacy"
-      subtitle={`Everything here stays on this device. ${BRAND.name} is not a medical device and gives no medical advice.`}
+      subtitle={`${flags.dexcomApi ? "Demo and CSV data stay on this device. Sandbox authorization uses a protected backend." : "Everything here stays on this device."} ${BRAND.name} is not a medical device and gives no medical advice.`}
     >
+      {flags.dexcomApi ? <DexcomConnection /> : null}
+      {__DEV__ && flags.dexcomApi && flags.dexcomDiagnostics ? (
+        <Button
+          label="Dexcom development data viewer"
+          onPress={() => router.push("/dexcom-data")}
+        />
+      ) : null}
       <Section title="Appearance">
         <Group>
           <ListRow
@@ -81,7 +255,11 @@ export function Settings() {
           <ListRow
             icon="info"
             title="Stays on this device"
-            detail="Glucose files are read on this device and never uploaded. There is no account, no server and no advertising tracker. Imported readings sit in unencrypted local demo storage, so use synthetic files only in this prototype."
+            detail={
+              flags.dexcomApi
+                ? "CSV files stay on this device. Dexcom sandbox authorization and encrypted tokens use the connection backend. The optional development viewer retrieves simulated readings into memory only. No advertising tracker is configured. Local demo storage is unencrypted; use synthetic files only."
+                : "Glucose files are read on this device and never uploaded. The connection service is off and no advertising tracker is configured. Imported readings sit in unencrypted local demo storage, so use synthetic files only in this prototype."
+            }
           />
           <ListRow
             icon="file"
@@ -90,8 +268,14 @@ export function Settings() {
           />
           <ListRow
             icon="user"
-            title="Not connected"
-            detail="Sign-in, notifications and live health connections (Dexcom, Apple Health, Health Connect) are planned and not enabled."
+            title={
+              flags.dexcomApi ? "Connection availability" : "Not connected"
+            }
+            detail={
+              flags.dexcomApi
+                ? "Dexcom sandbox connection status appears above. Real health-data connections, notifications, Apple Health and Health Connect remain unavailable."
+                : "Notifications and health connections (Dexcom, Apple Health, Health Connect) are not enabled. Sandbox OAuth can be enabled separately for testing."
+            }
           />
           <ListRow
             icon="info"
@@ -132,6 +316,8 @@ export function Settings() {
           </Group>
         ) : null}
       </Section>
+
+      {flags.identity ? <ProfilePrivacy /> : null}
 
       <Section title="Data">
         {removed && !imported ? (

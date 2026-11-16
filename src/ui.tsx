@@ -140,9 +140,9 @@ export function Button({
 }
 
 export function Input({
-  label, value, onChange, multiline = false, placeholder, maxLength,
+  label, value, onChange, multiline = false, placeholder, maxLength, secureTextEntry = false,
 }: {
-  label: string; value: string; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; maxLength?: number;
+  label: string; value: string; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; maxLength?: number; secureTextEntry?: boolean;
 }) {
   const c = useColors();
   return (
@@ -155,6 +155,9 @@ export function Input({
         multiline={multiline}
         placeholder={placeholder}
         maxLength={maxLength}
+        secureTextEntry={secureTextEntry}
+        autoCapitalize={secureTextEntry ? 'none' : undefined}
+        autoCorrect={secureTextEntry ? false : undefined}
         placeholderTextColor={c.muted}
         style={{
           minHeight: 50, padding: space.md, borderWidth: 1, borderColor: c.border, borderRadius: radius.md,

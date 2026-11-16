@@ -43,6 +43,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test": "node tools/test.cjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "server": "tsx server/index.ts",
+    "dexcom:check": "node tools/dexcom-check.cjs"
   }
 }

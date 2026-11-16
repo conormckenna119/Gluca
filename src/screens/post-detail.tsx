@@ -67,6 +67,7 @@ function PostConversation() {
             }
           : x,
       ),
+      counters: { ...s.counters, commentsMade: s.counters.commentsMade + 1 },
     }));
     change("");
   };

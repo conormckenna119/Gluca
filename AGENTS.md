@@ -18,6 +18,10 @@ All paths in these docs are relative to that root.
 
 ## Current state in one paragraph
 
+**Stage 3 update (2026-11-16):** authenticated transient sandbox relay plus default-off, development-only `/dexcom-data` viewer, memory-only provider, UTC analytics adapter and shared calendar summaries are implemented. See `docs/DEXCOM_STAGE3.md`. Dashboard/CSV/mock/art are preserved. Web async route loading is disabled to preserve strict CSP in development exports. No raw persistence/background sync. Stage 4 requires a new owner instruction. Historical summaries below remain for context.
+
+**Stage 2 update (2026-11-16):** the paragraph below describes the earlier visual MVP. An existing Node backend now supports authenticated sandbox Gluca accounts, session-bound Dexcom OAuth, encrypted rotating tokens and a default-off Settings connection panel. No glucose sync is enabled. Current setup/evidence: `docs/OAUTH_SETUP.md` (271 tests passed; live consent/native handoff pending). Do not start Stage 3 without the owner's instruction.
+
 Expo SDK 58 / React Native 0.88 / Expo Router / strict TypeScript app with five tabs (Home, My Glucose, Create, Explore, Profile) plus Settings, Import and Post detail. Everything is local: fictional community, synthetic glucose, AsyncStorage, no backend, no accounts. A visual pass restyled the UI and rebuilt the Create screen on a tested artwork engine (`src/art/`) with six templates and exact-size PNG exports. `npm run typecheck` is clean and `npm test` passes (121 tests as of M11). M0 to M6 and M8 (flagged off) are done on web (2026-11-14): every route runs clean in a browser, the Playwright journey passes and the folder is a git repository. **Nothing has been run on a real phone yet** (M7).
 
 ## Rules that never change

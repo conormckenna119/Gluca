@@ -74,7 +74,8 @@ export const defaultPrivacy = (): PrivacySettings => ({
 /** What another person may see of a profile once privacy settings are applied. Built by `publicView` (task 2.4). */
 export type PublicProfile = {
   name: string;
-  shield?: { tier: string; years?: number };
+  /** `certain` is false when the count comes from an approximate or partial date; the label then says "about". */
+  shield?: { tier: string; years?: number; certain?: boolean };
   emblem?: Emblem;
   diabetesType?: DiabetesType;
   cgm?: { brand: CgmBrand; model?: string };

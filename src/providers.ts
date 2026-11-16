@@ -54,7 +54,7 @@ export class PlannedProvider implements GlucoseProvider {
     throw new Error(`${this.id} is planned and is not connected.`);
   }
 }
-export const DexcomGlucoseProvider = () => new PlannedProvider("Dexcom");
+export { DexcomGlucoseProvider } from "./services/dexcom-data";
 export const AppleHealthGlucoseProvider = () =>
   new PlannedProvider("Apple Health");
 export const HealthConnectGlucoseProvider = () =>

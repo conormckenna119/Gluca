@@ -1,5 +1,21 @@
 import React from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import {
+  Pressable,
+  Switch,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import { NameLine } from "../components/identity/name-line";
+import {
+  COMMUNITIES,
+  joinCommunity,
+  leaveCommunity,
+  setCommunityVisible,
+  suggestedFor,
+} from "../domain/communities";
+import { localToday } from "../domain/shield";
+import { demoMember } from "../demo-members";
 import {
   Avatar,
   Card,
@@ -14,7 +30,7 @@ import {
 import { useDemo, people, clubNames } from "../store";
 import { Page } from "../components/page";
 import { Guard } from "../components/guard";
-import { getFlags } from "../flags";
+import { getFlags, isEnabled } from "../flags";
 
 const personLines = [
   "Fictional person. Shares walks and quiet wins.",
@@ -90,14 +106,52 @@ function Toggle({
   );
 }
 
+/** Club visibility switch. Off by default; the label names the club. */
+function VisibleSwitch({
+  club,
+  value,
+  onChange,
+}: {
+  club: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  const c = useColors();
+  return (
+    <View
+      style={{
+        minHeight: 44,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: space.sm,
+      }}
+    >
+      <Switch
+        accessibilityLabel={`Visible on profile: ${club}`}
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ false: c.border, true: c.accent }}
+        thumbColor={c.text}
+      />
+      <T small muted>
+        {value ? "Visible on profile" : "Private: visible only to you"}
+      </T>
+    </View>
+  );
+}
+
 function Entry({
   name,
   line,
   toggle,
+  nameNode,
+  extra,
 }: {
   name: string;
   line: string;
   toggle: React.ReactNode;
+  nameNode?: React.ReactNode;
+  extra?: React.ReactNode;
 }) {
   return (
     <Card>
@@ -106,13 +160,14 @@ function Entry({
       >
         <Avatar name={name} size={48} />
         <View style={{ flex: 1, gap: 2 }}>
-          <T bold>{name}</T>
+          {nameNode ?? <T bold>{name}</T>}
           <T small muted>
             {line}
           </T>
         </View>
       </View>
       <View style={{ alignItems: "flex-start" }}>{toggle}</View>
+      {extra}
     </Card>
   );
 }
@@ -137,7 +192,22 @@ function ExploreBody() {
   const visiblePeople = flags.communityFeed
     ? people.filter((p) => !state.blocked.includes(p))
     : [];
-  const visibleClubs = flags.clubs ? clubNames : [];
+  const identity = isEnabled("identity");
+  const clubList = identity
+    ? COMMUNITIES.map((c) => ({ name: c.name, line: c.blurb }))
+    : clubNames.map((n) => ({
+        name: n,
+        line: clubLines[n] ?? "Fictional demo club.",
+      }));
+  const visibleClubs = flags.clubs ? clubList : [];
+  const suggestions =
+    identity && flags.clubs
+      ? suggestedFor(state.profile, localToday(), state.clubs)
+      : [];
+  const joinedToggle = (n: string, joined: boolean) =>
+    identity
+      ? set((s) => (joined ? leaveCommunity(s, n) : joinCommunity(s, n)))
+      : toggleIn("clubs", n);
   const toggleIn = (key: "following" | "clubs", n: string) =>
     set((s) => ({
       ...s,
@@ -151,29 +221,69 @@ function ExploreBody() {
       title="Explore"
       subtitle="Participation over competition. This week's invitation: encourage another community member."
     >
+      {suggestions.length ? (
+        <Section
+          title="Suggested for you"
+          note="Based only on what you chose to put in your profile. Nothing is joined until you tap Join."
+        >
+          <Grid>
+            {suggestions.map(({ community, reason }) => (
+              <Entry
+                key={community.id}
+                name={community.name}
+                line={`${reason}. ${community.blurb}`}
+                toggle={
+                  <Toggle
+                    on={false}
+                    offLabel="Join"
+                    onLabel="Joined"
+                    a11yOff={`Join ${community.name}`}
+                    a11yOn={`Leave ${community.name}`}
+                    onPress={() => joinedToggle(community.name, false)}
+                  />
+                }
+              />
+            ))}
+          </Grid>
+        </Section>
+      ) : null}
       {visibleClubs.length ? (
         <Section
           title="Clubs"
           note="Fictional demo clubs. Be kind, respect privacy, and avoid treatment advice."
         >
           <Grid>
-            {visibleClubs.map((n) => (
-              <Entry
-                key={n}
-                name={n}
-                line={clubLines[n] ?? "Fictional demo club."}
-                toggle={
-                  <Toggle
-                    on={state.clubs.includes(n)}
-                    offLabel="Join"
-                    onLabel="Joined"
-                    a11yOff={`Join ${n}`}
-                    a11yOn={`Leave ${n}`}
-                    onPress={() => toggleIn("clubs", n)}
-                  />
-                }
-              />
-            ))}
+            {visibleClubs.map(({ name: n, line }) => {
+              const joined = state.clubs.includes(n);
+              return (
+                <Entry
+                  key={n}
+                  name={n}
+                  line={line}
+                  extra={
+                    identity && joined ? (
+                      <VisibleSwitch
+                        club={n}
+                        value={state.clubVisibility[n] === true}
+                        onChange={(v) =>
+                          set((s) => setCommunityVisible(s, n, v))
+                        }
+                      />
+                    ) : null
+                  }
+                  toggle={
+                    <Toggle
+                      on={joined}
+                      offLabel="Join"
+                      onLabel="Joined"
+                      a11yOff={`Join ${n}`}
+                      a11yOn={`Leave ${n}`}
+                      onPress={() => joinedToggle(n, joined)}
+                    />
+                  }
+                />
+              );
+            })}
           </Grid>
         </Section>
       ) : null}
@@ -184,6 +294,11 @@ function ExploreBody() {
               <Entry
                 key={p}
                 name={p}
+                nameNode={
+                  identity ? (
+                    <NameLine name={p} publicProfile={demoMember(p)} />
+                  ) : undefined
+                }
                 line={personLines[people.indexOf(p) % personLines.length]}
                 toggle={
                   <Toggle

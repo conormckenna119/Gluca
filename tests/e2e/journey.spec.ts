@@ -9,15 +9,26 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   await expect(page).toHaveURL(/\/welcome$/);
   const t0 = Date.now();
   await demo.click();
-  await expect(page.getByRole("img", { name: /Preview of your graphic/ })).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: /Preview of your graphic/ }),
+  ).toBeVisible();
   const firstGraphicMs = Date.now() - t0;
-  console.log(`fresh install: welcome visible to graphic visible = ${firstGraphicMs} ms`);
-  testInfo.annotations.push({ type: "welcome-to-graphic-ms", description: String(firstGraphicMs) });
+  console.log(
+    `fresh install: welcome visible to graphic visible = ${firstGraphicMs} ms`,
+  );
+  testInfo.annotations.push({
+    type: "welcome-to-graphic-ms",
+    description: String(firstGraphicMs),
+  });
   expect(firstGraphicMs).toBeLessThan(30000);
   // Export the default graphic straight from Create.
   const firstDownload = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export PNG / Share", exact: true }).click();
-  expect((await firstDownload).suggestedFilename()).toBe("gluca-daily-recap-story.png");
+  await page
+    .getByRole("button", { name: "Export PNG / Share", exact: true })
+    .click();
+  expect((await firstDownload).suggestedFilename()).toBe(
+    "gluca-daily-recap-story.png",
+  );
   await expect(page.getByText(/Nothing was posted/).first()).toBeVisible();
   // Welcome is not shown again once it has been used.
   await page.goto("/");
@@ -25,9 +36,13 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   await expect(
     page.getByText("A walk before work", { exact: true }).first(),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Give kudos, 3", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Give a Boost, 3", exact: true })
+    .click();
   await expect(
-    page.getByRole("button", { name: "Remove kudos, 4", exact: true }).first(),
+    page
+      .getByRole("button", { name: "Remove your Boost, 4", exact: true })
+      .first(),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Comments, 0", exact: true })
@@ -45,7 +60,9 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
     .getByLabel("Date (YYYY-MM-DD, local day)", { exact: true })
     .fill("2026-11-11");
   await page.getByRole("button", { name: "6 hours", exact: true }).click();
-  await expect(page.getByText("Time in range", { exact: true }).first()).toBeVisible();
+  await expect(
+    page.getByText("Time in range", { exact: true }).first(),
+  ).toBeVisible();
   await page
     .getByRole("button", { name: "Create a graphic", exact: true })
     .click();

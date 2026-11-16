@@ -20,6 +20,7 @@ export const DEFAULT_FLAGS = {
   reactionPicker: false,
   accounts: false,
   dexcomApi: false,
+  dexcomDiagnostics: false,
   appleHealth: false,
   glucoseTimeline: false,
   activities: false,
@@ -31,7 +32,8 @@ export type FlagName = keyof typeof DEFAULT_FLAGS;
 export type FlagState = Record<FlagName, boolean>;
 
 const NAMES = Object.keys(DEFAULT_FLAGS) as FlagName[];
-const isFlagName = (s: string): s is FlagName => (NAMES as string[]).includes(s);
+const isFlagName = (s: string): s is FlagName =>
+  (NAMES as string[]).includes(s);
 
 /** Parse "a,b=false,c=true". Unknown names and malformed entries are ignored. */
 export function parseOverrides(raw: string | undefined): Partial<FlagState> {

@@ -1,4 +1,7 @@
 #
+
+Stage 3 update (2026-11-16): `server/dexcom/relay.ts` authenticates transient V3 dataRange/EGV requests; `src/services/dexcom-data.ts` supplies the memory-only provider; `src/glucose-window.ts` validates UTC periods; `src/glucose-periods.ts` wraps shared analytics for UTC days/weeks. `app/dexcom-data.tsx` reexports the development viewer screen. `tests/dexcom-data.test.ts` uses synthetic fixtures; `tools/dexcom-check.cjs` checks readiness without secrets/network. Setup, complete changed-file map and limitations: [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). No permanent glucose storage or normal dashboard data path change.
+
 | 26 | ~~Resolved 2026-11-13 (M6)~~ | 23 | ~~Resolved 2026-11-13 (M6)~~ | 22 | ~~Resolved 2026-11-13 (M5)~~ | 21 | ~~Resolved 2026-11-13 (M5)~~ | 15 | ~~Resolved 2026-11-13 (M6)~~ | 13 | ~~Resolved 2026-11-13 (M5, web only; phones in M7)~~ Project map
 
 Root: `C:\Users\conor\Documents\Codex\2026-11-12\le\outputs\gluca`
@@ -198,3 +201,9 @@ Its `src/templates.ts`, `svg.ts`, `copy.ts`, `formats.ts`, `model.ts`, `analytic
 | 29 | `src/ui.tsx` has no chevron-up icon (the wheel rotates chevron-down) and `Input` has no placeholder prop (the log label field is a local `TextInput`) | `src/ui.tsx` | backlog |
 | 25 | A dev server left running for many hours can serve compressed bundles very slowly (about 10 s per load), timing out the e2e journey. Restart it, or use `E2E_BASE_URL` with a fresh server on another port | dev tooling | note |
 | 26 | With `communityFeed` and `clubs` off, the page header still shows the "Fictional community" pill | `src/components/page.tsx` | M6 |
+
+## Stage 2 map update — 2026-11-16
+
+The earlier no-backend description is historical. server/index.ts starts the existing Node service; server/session.ts handles sandbox account auth, server/limits.ts request throttles, server/static.ts serves dist only, server/routes.ts manages OAuth, and server/dexcom/oauth.ts + client.ts handle server-held encrypted credentials/refresh. server/db.ts has additive account/connection migrations. Earlier glucose ingestion modules remain dormant; data routes return 501.
+
+src/services/dexcom-oauth.ts is the connection-only cookie client; src/components/dexcom-connection.tsx renders the gated Settings panel. It does not enter the useReadings/provider pipeline. playwright.oauth.config.ts and tests/e2e/dexcom-oauth.spec.ts describe a synthetic browser flow; tests/server-stage2.test.ts, server-static.test.ts and dexcom-oauth-client.test.ts add security/contract coverage. docs/OAUTH_SETUP.md is the current setup/evidence guide.

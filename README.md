@@ -1,5 +1,11 @@
 # Gluca
 
+**Stage 3 — Dexcom development data viewer:** the existing backend retrieves authorized sandbox dataRange/EGVs, normalizes them, and returns transient readings to the existing chart/analytics engine. [Windows setup, first retrieval, privacy, file list and limitations](docs/DEXCOM_STAGE3.md). Demo/CSV remain functional. Live verification requires local credentials and consent; mocked tests are separate evidence. No background sync or permanent glucose history is added. Historical Stage 2 notes below are superseded by this update.
+
+Verify from this directory: `npm run typecheck`, `npm test`, `npm run dexcom:check`.
+
+**Stage 2 OAuth update (2026-11-16):** the existing Node backend now supports authenticated sandbox Gluca accounts and encrypted Dexcom sandbox authorization. A default-off Settings panel connects, shows status and disconnects. No glucose is downloaded; demo/CSV remain local. See [Windows OAuth setup](docs/OAUTH_SETUP.md) for callback/tunnel configuration and verification limits. Older milestone descriptions below are historical, not the current backend status.
+
 Local, mobile-first social prototype for people living with diabetes, with a share-first graphic maker at its core. React Native + Expo SDK 58, Expo Router, strict TypeScript, TanStack Query, local AsyncStorage.
 
 > Not a medical device. No dosing, treatment or diagnostic advice. Demo data only: do not import real health data into this prototype (storage is unencrypted).

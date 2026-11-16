@@ -3,6 +3,8 @@ import { defineConfig } from "@playwright/test";
 const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:8081";
 export default defineConfig({
   testDir: "./tests/e2e",
+  // OAuth owns an isolated mock backend and requires its dedicated flag-on export/config.
+  testIgnore: "**/dexcom-oauth.spec.ts",
   // The journey covers the whole app in one test and takes 20 to 25 s on a warm server.
   timeout: 90000,
   use: {

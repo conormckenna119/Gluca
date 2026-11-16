@@ -14,6 +14,8 @@ import { BRAND } from "../src/art/brand";
 import { configureFlags } from "../src/flags";
 import { configureTelemetry, track } from "../src/telemetry";
 import { useArtFonts } from "../src/fonts";
+import { useAchievements } from "../src/hooks/use-achievements";
+import { UnlockToastHost } from "../src/components/achievements/unlock-toast";
 
 // Literal env access: Expo inlines these at bundle time. Telemetry stays "off" unless EXPO_PUBLIC_TELEMETRY=local.
 // Development only, web only: a comma list in localStorage "gluca-dev-flags" is added to the env flags, so a feature
@@ -26,7 +28,9 @@ function devFlags(): string {
     return "";
   }
 }
-configureFlags([process.env.EXPO_PUBLIC_FLAGS, devFlags()].filter(Boolean).join(","));
+configureFlags(
+  [process.env.EXPO_PUBLIC_FLAGS, devFlags()].filter(Boolean).join(","),
+);
 configureTelemetry(process.env.EXPO_PUBLIC_TELEMETRY);
 
 const queryClient = new QueryClient();
@@ -36,6 +40,7 @@ function Nav() {
   const { state, ready } = useDemo();
   const pathname = usePathname();
   const fontsDone = useArtFonts();
+  useAchievements({ evaluate: true });
   const navReady = !!useRootNavigationState()?.key;
   // First run: once saved state has loaded, a person who has not seen the welcome screen is sent there.
   const needsWelcome = ready && !state.seenWelcome && pathname !== "/welcome";
@@ -68,6 +73,7 @@ function Nav() {
           options={{ title: "Settings & privacy" }}
         />
         <Stack.Screen name="import" options={{ title: "Import & export" }} />
+        <Stack.Screen name="trophies" options={{ title: "Medals" }} />
         <Stack.Screen
           name="log"
           options={{
@@ -78,6 +84,7 @@ function Nav() {
           }}
         />
       </Stack>
+      {covered ? null : <UnlockToastHost />}
       {covered ? (
         <View
           pointerEvents="auto"

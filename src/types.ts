@@ -1,10 +1,32 @@
 import type { Profile, PrivacySettings } from "./domain/profile";
 import type { PostReactions } from "./domain/reactions";
-import type { Award, ChallengeCompletion, Counters } from "./domain/achievements";
+import type {
+  Award,
+  ChallengeCompletion,
+  Counters,
+} from "./domain/achievements";
 export type Reading = {
   timestamp: number;
   mgdl: number;
   source: "mock" | "csv" | "dexcom";
+};
+/** Private, memory-only provider metadata. Never attach this object to a social post or telemetry. */
+export type DexcomReading = Reading & {
+  source: "dexcom";
+  environment: "sandbox";
+  sourceId: string;
+  recordId: string;
+  originalValue: number;
+  originalUnit: "mg/dL" | "mmol/L";
+  sourceSystemTime: string;
+  sourceDisplayTime: string | null;
+  trend: string | null;
+  trendRate: number | null;
+  rateUnit: string | null;
+  status: "low" | "high" | null;
+  device: string | null;
+  deviceGeneration: string | null;
+  ingestedAt: number;
 };
 export type Visibility = "private" | "followers" | "public";
 export type Post = {

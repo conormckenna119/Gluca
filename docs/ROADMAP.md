@@ -1,5 +1,7 @@
 # Roadmap and specifications
 
+Stage 3 update (2026-11-16): manual authenticated Dexcom sandbox retrieval, normalization, memory-only provider, development chart and common UTC summaries implemented. Synthetic automated verification is documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md); live verification awaits credentials and consent. No automatic synchronization, new health database, dashboard/Story Studio/social changes. Stage 4 is not authorized.
+
 Root: `C:\Users\conor\Documents\Codex\2026-11-12\le\outputs\gluca`. Read `AGENTS.md` first.
 
 Work the milestones in order unless a milestone says it is independent. Each one is sized for a single focused session. When you finish one, tick it here and add a dated note saying what you verified and what you did not.
@@ -344,3 +346,9 @@ The full specification is the owner's brief of 2026-11-16. M12, M13 and M14 are 
 - DST-correct day boundaries in `src/art/analytics.ts`.
 - Localisation and right-to-left layout.
 - Motion: subtle trace draw-in on the preview.
+
+## Stage 2 — Dexcom sandbox OAuth (2026-11-16)
+
+Implemented authorization only using the existing Node backend. Authenticated sandbox Gluca accounts replace anonymous OAuth sessions; state is browser-bound and single-use; encrypted token ownership, refresh rotation/leases and disconnect races are covered. Settings adds default-off connection controls. Static dist serving supports one-origin callbacks. Glucose endpoints are explicitly disabled (501); no callback-triggered ingestion remains.
+
+Verified: typecheck, 271 automated tests and OAuth-enabled web export. Browser-assisted synthetic preview checked connection states and 375/430/1280 light/dark layouts. Playwright's OAuth worker was blocked by spawn EPERM; live consent and native handoff are not verified. Local credentials and a portal-accepted callback are required; see docs/OAUTH_SETUP.md. Stop before Stage 3.
