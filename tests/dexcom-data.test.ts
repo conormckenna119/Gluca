@@ -283,10 +283,10 @@ test("authenticated relay retrieves historical V3 data, filters partial input, r
     ])
       assert.ok(!text.includes(secret));
     const req = new URL(a.calls.find((c) => c.url.includes("/egvs"))!.url);
-    assert.equal(req.searchParams.get("startDate"), "2025-01-01T00:00:00.000Z");
+    assert.equal(req.searchParams.get("startDate"), "2025-01-01T00:00:00.000");
     assert.equal(
       req.searchParams.get("endDate"),
-      new Date(start + 23 * 3600000 + 1).toISOString(),
+      new Date(start + 23 * 3600000 + 1).toISOString().slice(0,-1),
     );
     assert.ok(
       a.calls

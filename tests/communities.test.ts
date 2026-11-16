@@ -134,3 +134,13 @@ test("join is private, counts once, leave clears visibility", () => {
   assert.equal("Tandem users" in s.clubVisibility, false);
   assert.equal(s.counters.communitiesJoined, 1);
 });
+
+test("newly diagnosed is not suggested from a year-only or uncertain date", () => {
+  const base = { displayName: "x", onboarded: true, interests: [], role: "living" as const, diabetesType: "type1" as const };
+  const today = { year: 2026, month: 11, day: 16 };
+  const names = (d: { year: number; month?: number; approximate?: boolean }) =>
+    suggestedFor({ ...base, diagnosis: d }, today, []).map((s) => s.community.name);
+  assert.ok(names({ year: 2026, month: 6 }).includes("Newly diagnosed T1Ds"));
+  assert.equal(names({ year: 2025 }).includes("Newly diagnosed T1Ds"), false);
+  assert.equal(names({ year: 2026, month: 6, approximate: true }).includes("Newly diagnosed T1Ds"), false);
+});

@@ -1,3 +1,4 @@
+import { isValidBirthday, sanitizeProfile } from "../src/domain/profile";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -159,8 +160,13 @@ test("invalid dates are dropped, never guessed", () => {
   assert.equal(r.profile.diagnosis, undefined);
 });
 
-test("birthday placeholder year is valid for 29 February and never displayed", () => {
-  assert.ok(isValidPartialDate(birthdayFrom(2, 29)));
+test("a birthday has no year, allows 29 February and rejects impossible days", () => {
+  assert.deepEqual(birthdayFrom(2, 29), { month: 2, day: 29 });
+  assert.ok(isValidBirthday(birthdayFrom(2, 29)));
+  assert.equal(isValidBirthday(birthdayFrom(2, 30)), false);
+  assert.equal(isValidBirthday({ month: 13, day: 1 }), false);
+  // A year in saved data is dropped, so no age can be worked out.
+  assert.deepEqual(sanitizeProfile({ birthday: { year: 1990, month: 11, day: 16 } }).birthday, { month: 11, day: 16 });
   assert.equal(formatBirthday(birthdayFrom(11, 16)), "16 November");
 });
 

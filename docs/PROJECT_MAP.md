@@ -85,6 +85,13 @@ Git repository on `main` since 2026-11-13 (baseline commit `a4d3d60`).
 | `docs/DEVICE_TESTS.md` | - | Blank checklist for the owner's real-phone pass (M7) |
 | `src/domain/profile.ts`, `reactions.ts`, `achievements.ts` | - | Pure models and sanitizers for identity and privacy, Boosts and other reaction kinds, achievement definitions and awards |
 | `docs/DEXCOM_INTEGRATION.md` | - | Dexcom V3 facts checked against the official docs on 2026-11-16, each marked verified or not |
+| `src/domain/shield.ts`, `public-view.ts`, `onboarding.ts`, `communities.ts` | - | Shield tiers and completed-years maths; what others may see of a profile; the conditional onboarding flow; community catalogue and suggestions |
+| `src/components/identity/` | - | `Shield`, `EmblemBadge`, `IdentitySheet`, `NameLine`, `PartialDateInput` |
+| `src/achievements/` | - | Engine, registry, life and community rules, challenges, period keys, and the flagged health prototype (`eligibility.ts`, `health.ts`) |
+| `src/components/achievements/`, `src/screens/trophies.tsx`, `src/hooks/use-achievements.ts` | - | Medal artwork, medal sheet, unlock toast, pinned medals, challenge list, the Medals screen, and the hook that awards medals |
+| `src/components/boost-button.tsx`, `src/reaction-copy.ts` | - | The Boost reaction and all of its wording in one place |
+| `src/demo-members.ts` | - | Fictional public profiles for the ten demo people |
+| `src/screens/onboarding.tsx`, `profile-edit.tsx`, `identity-preview.tsx` | - | Optional profile set-up, profile editing, and a development-only gallery of shields and emblems |
 | `src/fonts.ts` | - | Loads Inter with `expo-font` and tells `src/story.ts` which family to use per weight |
 | `src/components/post-card.tsx` | 133 | `PostCard`; one feed post with its actions |
 | `src/components/glucose-chart.tsx` | 51 | `GlucoseChart`; the SVG glucose trace and `areaPath` |

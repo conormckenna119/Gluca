@@ -9,6 +9,7 @@ import {
   type DiabetesType,
   type Emblem,
   type Monitoring,
+  type Birthday,
   type PartialDate,
   type Profile,
 } from "./profile";
@@ -177,20 +178,8 @@ export function formatPartialDate(d: PartialDate): string {
   return d.approximate ? `around ${text}` : text;
 }
 
-/**
- * A birthday only needs a month and a day, but `PartialDate` needs a year. This leap year is a technical
- * placeholder so 29 February is valid. It is never shown or shared.
- */
-export const BIRTHDAY_PLACEHOLDER_YEAR = 2000;
-export const birthdayFrom = (month: number, day: number): PartialDate => ({
-  year: BIRTHDAY_PLACEHOLDER_YEAR,
-  month,
-  day,
-});
-export const formatBirthday = (d: PartialDate): string =>
-  d.month !== undefined && d.day !== undefined
-    ? `${d.day} ${monthName(d.month)}`
-    : "";
+export const birthdayFrom = (month: number, day: number): Birthday => ({ month, day });
+export const formatBirthday = (d: Birthday): string => `${d.day} ${monthName(d.month)}`;
 
 /** Remove answers that belong to steps the draft no longer reaches (for example after changing role). */
 export function pruneDraft(draft: OnboardingDraft): OnboardingDraft {

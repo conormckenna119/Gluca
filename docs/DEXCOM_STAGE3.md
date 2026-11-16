@@ -1,5 +1,7 @@
 # Stage 3 — authenticated, transient Dexcom glucose retrieval
 
+**Live sandbox follow-up, 16 November 2026:** local credentials and an authorized connection are now configured. A backend-only read-only probe reached the official sandbox: dataRange returned HTTP 200; EGV query timestamps ending in `Z` returned 400, while the same UTC timestamps without a zone suffix returned 200 with **277 readings, all normalized successfully**, from **2026-11-15 20:35:02.692 UTC through 2026-11-16 19:35:02.164 UTC**. These are official simulated sandbox records, not the earlier mocked preview. The transport now serializes query timestamps in Dexcom's zone-less UTC format, retaining milliseconds. Current runtime needs the updated backend loaded; normal dashboard/Create remain demo/CSV by Stage 3 scope. Initial missing-configuration notes below are historical.
+
 Implemented 16 November 2026 in the existing Expo application and Node backend. No new dependencies, background synchronization, dashboard/Story Studio integration or social features. Creative presentation remains a Claude handoff note in the viewer; existing design primitives are reused.
 
 ## Current architecture and inspected prerequisites

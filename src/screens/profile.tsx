@@ -26,6 +26,10 @@ import {
 } from "../ui";
 import { useDemo } from "../store";
 import { Page } from "../components/page";
+import {
+  PinnedMedals,
+  ProfileMedalsLink,
+} from "../components/achievements/pinned-medals";
 import { PostCard } from "../components/post-card";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
@@ -170,6 +174,12 @@ export function Profile() {
         </Section>
       ) : null}
       {flags.identity ? <IdentityCards /> : null}
+      {flags.achievements ? (
+        <View style={{ gap: space.md }}>
+          <PinnedMedals awards={state.awards} />
+          <ProfileMedalsLink />
+        </View>
+      ) : null}
       <Section title="More">
         <Group>
           <ListRow

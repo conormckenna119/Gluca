@@ -194,6 +194,12 @@ export async function dexcomFetch(
       !validWindow({ start, end })
     )
       throw new UpstreamRejected();
+    // Dexcom's live sandbox rejects a trailing Z even though these are UTC instants.
+    // Serialize the documented zone-less UTC form, preserving millisecond precision.
+    query = {
+      startDate: new Date(start).toISOString().slice(0, -1),
+      endDate: new Date(end).toISOString().slice(0, -1),
+    };
   } else if (Object.keys(query).length) throw new UpstreamRejected();
   if (
     !deps.config.diagnosticsEnabled ||

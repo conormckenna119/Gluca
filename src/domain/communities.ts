@@ -76,7 +76,9 @@ export const COMMUNITIES: Community[] = [
     blurb: "Fictional community for the first year with type 1.",
     suggestWhen: (p, today) => {
       const y = years(p, today);
-      return living(p) && p.diabetesType === "type1" && y !== undefined && y < 1
+      // Only with at least a month: a year-only or "not sure" date could be nearly two years ago.
+      const known = p.diagnosis?.month !== undefined && !p.diagnosis.approximate;
+      return living(p) && p.diabetesType === "type1" && known && y !== undefined && y < 1
         ? "Because your profile says type 1, diagnosed under a year ago"
         : null;
     },

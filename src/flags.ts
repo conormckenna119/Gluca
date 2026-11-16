@@ -13,7 +13,6 @@ export const DEFAULT_FLAGS = {
   eventLogging: false,
   // Off until each has passed its gate (identity, Boosts, achievements spec, 2026-11-16)
   identity: false,
-  boosts: false,
   achievements: false,
   // Off until a qualified clinical review signs off the rules. Never turn on in a public build before that.
   healthAchievements: false,

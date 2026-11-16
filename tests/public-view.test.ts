@@ -16,7 +16,7 @@ const profile: Profile = {
   role: "living",
   diabetesType: "type1",
   diagnosis: { year: 2010, month: 3, day: 4 },
-  birthday: { year: 1990, month: 11, day: 16 },
+  birthday: { month: 11, day: 16 },
   ageConfirmed: true,
   monitoring: "cgm",
   cgm: { brand: "dexcom", model: "G7" },
@@ -119,8 +119,8 @@ test("birthday shows only on the day, and never the date", () => {
   const v = publicView(profile, p, extras());
   assert.equal(v.birthdayToday, true);
   assert.equal(JSON.stringify(v).includes("1990"), false);
-  const noDay = { ...profile, birthday: { year: 1990, month: 11 } };
-  assert.equal(publicView(noDay, p, extras()).birthdayToday, undefined);
+  const { birthday: _none, ...noBirthday } = profile;
+  assert.equal(publicView(noBirthday, p, extras()).birthdayToday, undefined);
 });
 
 test("prefer_not values are never shown", () => {

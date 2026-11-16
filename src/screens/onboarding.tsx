@@ -27,7 +27,8 @@ import {
   MAX_MODEL_LENGTH,
   MAX_NAME_LENGTH,
   MONITORING,
-  isValidPartialDate,
+  isValidBirthday,
+  type Birthday,
   type PartialDate,
   type Profile,
 } from "../domain/profile";
@@ -96,13 +97,13 @@ export function ModelInput({
   );
 }
 
-/** Month and day only. The year is a technical placeholder and is never shown. */
+/** Month and day only. No year is asked for or stored. */
 export function BirthdayFields({
   value,
   onChange,
 }: {
-  value?: PartialDate;
-  onChange: (v: PartialDate | undefined) => void;
+  value?: Birthday;
+  onChange: (v: Birthday | undefined) => void;
 }) {
   const [m, setM] = useState(value?.month ? String(value.month) : "");
   const [d, setD] = useState(value?.day ? String(value.day) : "");
@@ -115,7 +116,7 @@ export function BirthdayFields({
       return onChange(undefined);
     }
     const date = nm && nd ? birthdayFrom(Number(nm), Number(nd)) : undefined;
-    if (date && isValidPartialDate(date)) {
+    if (date && isValidBirthday(date)) {
       setError(undefined);
       return onChange(date);
     }

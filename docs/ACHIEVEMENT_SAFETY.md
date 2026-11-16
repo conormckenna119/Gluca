@@ -50,7 +50,7 @@ All are private by default, awarded only after the fact, and carry `safetyReview
 
 | Id | Name | Rule (in addition to the gate) | Repeats | Incentive risk | Mitigation |
 | --- | --- | --- | --- | --- | --- |
-| `tir_milestone` | A month to remember | Time in range for the month is 70% or more, for the first time since opting in | Once | Running low to stay under the upper limit | Low-glucose guard; awarded once, so nothing to chase monthly |
+| `tir_milestone` | A month to remember | Time in range for the most recent completed month is 70% or more. Only evaluated while the person is opted in | Once | Running low to stay under the upper limit | Low-glucose guard; awarded once, so nothing to chase monthly |
 | `steadier_month` | A steadier month | Time in range rose by at least 5 percentage points against the previous completed month, and time below 70 and below 54 are both no higher than in that month | At most once a quarter | Over-correcting highs; chasing month-on-month gains | Lows must not rise; quarterly cap; the baseline month must pass the coverage and definition lines too |
 | `fewer_lows` | Fewer lows | The previous month had 4% or more below 70; this month is lower by at least 1 percentage point, below 54 is no higher, and time in range did not fall by more than 5 points | At most once a quarter | Running high to avoid lows | Time in range must hold; awarded on reduction, not on reaching zero |
 

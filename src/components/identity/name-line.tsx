@@ -39,7 +39,8 @@ export function NameLine({
     </Text>
   );
   if (!shield && !emblem) return label;
-  const certain = true; // a shared shield carries only the number the person chose to show
+  // "about N years" when the count came from an approximate or partial date.
+  const certain = shield?.certain !== false;
   return (
     <View
       style={{

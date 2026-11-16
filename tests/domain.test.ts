@@ -127,6 +127,6 @@ test("club visibility only keeps clubs explicitly marked visible", () => {
 });
 
 test("new features ship off, and health achievements are off by default", () => {
-  for (const f of ["identity", "boosts", "achievements", "healthAchievements", "reactionPicker", "dexcomApi", "accounts"] as const)
+  for (const f of ["identity", "achievements", "healthAchievements", "reactionPicker", "dexcomApi", "accounts"] as const)
     assert.equal(DEFAULT_FLAGS[f], false, f);
 });

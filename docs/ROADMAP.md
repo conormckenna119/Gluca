@@ -20,9 +20,9 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M9 | Validation with real people and copy review | not started | M7 |
 | M10 | Backend, accounts, integrations, release | needs owner approval | M9 |
 | M11 | Foundations for identity, Boosts, achievements and Dexcom | done 2026-11-16 | M8 |
-| M12 | Identity shields, onboarding, privacy, Boosts, communities | not started | M11 |
-| M13 | Achievements: engine, life and community medals, trophy cabinet, health prototype (flag off) | not started | M11 |
-| M14 | Dexcom sandbox integration (local backend) | not started; live check needs the owner's credentials | M11 |
+| M12 | Identity shields, onboarding, privacy, Boosts, communities | done on web 2026-11-16; `identity` flag off by default, Boosts live | M11 |
+| M13 | Achievements: engine, life and community medals, trophy cabinet, health prototype (flag off) | done on web 2026-11-16; `achievements` and `healthAchievements` off by default; health rules not clinically reviewed | M11 |
+| M14 | Dexcom sandbox integration (local backend) | taken over by the separate "Stage 2 / Stage 3" work (see `docs/DEXCOM_STAGE3.md`); this track is on hold pending the owner's decision on who owns it | M11 |
 | M15 | Docs and close-out for M12 to M14 | not started | M12, M13, M14 |
 
 M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
@@ -335,6 +335,18 @@ The full specification is the owner's brief of 2026-11-16. M12, M13 and M14 are 
 **M11 done 2026-11-16.** Data model in `src/domain/` (`profile.ts`, `reactions.ts`, `achievements.ts`), new `State` fields with sanitising on load, kudos converted to Boosts in saved state, five new flags (all off), backend architecture recorded in `docs/DECISIONS.md`, Dexcom V3 facts in `docs/DEXCOM_INTEGRATION.md`.
 - Verified: type-check clean; 121 unit tests (12 new: migration, privacy defaults, reaction toggling, partial dates, award sanitising).
 - Not verified: nothing on screen changed, so no screenshots. In the Dexcom notes about 14 facts are marked NOT VERIFIED, including the developer terms on public sharing, PKCE, redirect URI rules and the dataRange response schema.
+
+**M12 done 2026-11-16 (web only).** Shield maths and artwork (`src/domain/shield.ts`, `src/components/identity/`), conditional onboarding and profile editing (`/onboarding`, `/profile-edit`), ten privacy switches in Settings, `publicView` (what others may see), community suggestions and membership visibility on Explore, fictional demo members with shields and emblems, and Boosts replacing kudos everywhere (`src/components/boost-button.tsx`, wording in `src/reaction-copy.ts`).
+- Verified: type-check clean; 295 unit tests; e2e journey passes with Boost names; with `identity` on, Profile, Edit profile, Settings, Explore and Home were walked at 375 dark and 1280 light with a filled-in profile (no console errors, no horizontal scroll); with flags off the new routes redirect to Create and Profile, Explore, Settings and Home show no trace; 54 flag-off screenshots clean; web export succeeds. Screenshots in `docs/screenshots/m12-m13/`.
+- Not verified: the onboarding steps were not clicked through in a browser (the branching is unit-tested; only step 1 was looked at); Edit profile "Remove" actions; the birthday celebration; Boost animation and reduced motion; anything on a phone or with a screen reader. No minimum age is defined, so the age confirmation is a placeholder. Leaving and rejoining a club counts as a new join.
+- Changed in review: a birthday is month and day only (the first version stored a placeholder year).
+
+**M13 done 2026-11-16 (web only).** Engine (`src/achievements/engine.ts`: idempotent awards, pin limit of three, visibility, withdrawal), nine life and community medals and five challenges, the Medals screen (`/trophies`), medal sheet, unlock toast, pinned medals on Profile, sharing through the milestone template with the name only, and the health-milestone prototype (`eligibility.ts`, `health.ts`) implementing `docs/ACHIEVEMENT_SAFETY.md` sections 3 and 4.
+- Verified: unit tests for idempotency, repeat rules, pinning, withdrawal, every life rule, every gate line of the health prototype and a banned-wording scan; with `achievements` on, the Medals screen, a real award (diagnosis anniversary) and its toast were seen at 375 dark and 1280 light; flag off leaves no trace.
+- Not verified: pinning a fourth medal, the challenge confirmation sheet, the medal sheet's visibility switch and share button were not clicked in this pass (the agent that built them reports having checked the sheet and share at 375); reduced motion; health medals on screen (they need the `healthAchievements` flag and the person's opt-in, and were only exercised in unit tests on synthetic readings). **No clinical review has been done.** Range history and severe lows are recorded as "not available" on health awards because the app does not store them.
+- Changed in review: the prototype flag alone no longer exposes health medals; the person's own opt-in is always required.
+
+**M14 on hold 2026-11-16.** This session built config, sessions and OAuth connect/callback, then found separate "Stage 2 / Stage 3" work in the same files with different decisions (sandbox accounts with passphrases, connect as a POST, same-session callback, no glucose stored). That work is recorded in `docs/DEXCOM_STAGE3.md` and `docs/OAUTH_SETUP.md`. Left over from this session and now contradicting Stage 3: `server/dexcom/sync.ts`, `server/dexcom/data-routes.ts` and the `egvs` table. Nothing in `server/` has been touched since. No request has been made to Dexcom by this session.
 
 ---
 

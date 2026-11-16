@@ -10,6 +10,9 @@ export type PartialDate = {
   approximate?: boolean;
 };
 
+/** A birthday without a year. 29 February is allowed. */
+export type Birthday = { month: number; day: number };
+
 export type CommunityRole = "living" | "supporting" | "awareness";
 export type DiabetesType = "type1" | "type2" | "lada" | "mody" | "gestational" | "other" | "prefer_not";
 export type Emblem = "supporter" | "caregiver" | "advocate";
@@ -35,8 +38,8 @@ export type Profile = {
   role?: CommunityRole;
   diabetesType?: DiabetesType;
   diagnosis?: PartialDate;
-  /** Month and day for an optional birthday celebration; the year is only kept if the person gives it. */
-  birthday?: PartialDate;
+  /** Month and day only, for an optional birthday celebration. No year is asked for or stored, so no age can be derived. */
+  birthday?: Birthday;
   /** The person confirmed they meet the minimum age. Kept apart from `birthday` so neither needs the other. */
   ageConfirmed?: boolean;
   monitoring?: Monitoring;
@@ -97,6 +100,12 @@ export function isValidPartialDate(d: unknown, minYear = 1900, maxYear = 2100): 
   if (day !== undefined && (month === undefined || !isInt(day) || day < 1 || day > daysIn(year, month as number))) return false;
   return approximate === undefined || typeof approximate === "boolean";
 }
+/** Month 1-12 and a day that exists in that month in a leap year. Any year in saved data is ignored. */
+export function isValidBirthday(b: unknown): b is Birthday {
+  if (!b || typeof b !== "object") return false;
+  const { month, day } = b as Record<string, unknown>;
+  return isInt(month) && month >= 1 && month <= 12 && isInt(day) && day >= 1 && day <= daysIn(2000, month);
+}
 const cleanDate = (d: unknown): PartialDate | undefined => {
   if (!isValidPartialDate(d)) return undefined;
   const out: PartialDate = { year: d.year };
@@ -126,8 +135,7 @@ export function sanitizeProfile(raw: unknown): Profile {
   if (type) p.diabetesType = type;
   const diagnosis = cleanDate(r.diagnosis);
   if (diagnosis) p.diagnosis = diagnosis;
-  const birthday = cleanDate(r.birthday);
-  if (birthday) p.birthday = birthday;
+  if (isValidBirthday(r.birthday)) p.birthday = { month: r.birthday.month, day: r.birthday.day };
   if (r.ageConfirmed === true) p.ageConfirmed = true;
   const monitoring = oneOf(MONITORING, r.monitoring);
   if (monitoring) p.monitoring = monitoring;

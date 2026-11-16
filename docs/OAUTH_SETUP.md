@@ -1,5 +1,7 @@
 # Stage 2 — Dexcom sandbox OAuth setup
 
+**For Stage 3 glucose retrieval:** follow [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). The connection-only export below does not enable the data viewer. Build with `EXPO_PUBLIC_FLAGS=dexcomApi,dexcomDiagnostics` and `npx expo export --platform web --dev --max-workers 2`, then open `/dexcom-data` and press Refresh Data. Connecting an account alone does not retrieve readings or change the normal dashboard/Create data source.
+
 16 November 2026. Authorization only, in the existing Gluca app/backend. No glucose download or synchronization; no dashboard, Story Studio, achievement, challenge or reaction implementation. Existing demo and CSV behavior stays local.
 
 ## Implementation
