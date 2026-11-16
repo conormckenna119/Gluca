@@ -80,8 +80,7 @@ export function PublishCard({
                 title: templateInfo[o.template].label,
                 caption: (caption || o.caption || o.headline).slice(0, 1000),
                 visibility,
-                kudos: 0,
-                liked: false,
+                reactions: { counts: {}, mine: null },
                 saved: false,
                 comments: [],
                 ...(o.show.tir || o.show.avg

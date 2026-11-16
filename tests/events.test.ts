@@ -24,7 +24,7 @@ import {
   fractionIn,
   hasDuration,
 } from "../src/events";
-import { loadState, DEFAULT_RANGE } from "../src/state";
+import { loadState, DEFAULT_RANGE, emptyState } from "../src/state";
 import type { GlucaEvent, State } from "../src/types";
 
 const ev = (o: Partial<GlucaEvent> = {}): GlucaEvent => ({
@@ -73,19 +73,7 @@ test("sanitizeEvents drops invalid and repeated entries, trims labels, and toler
 });
 
 test("loadState validates saved events", () => {
-  const defaults: State = {
-    posts: [],
-    following: [],
-    clubs: [],
-    blocked: [],
-    reports: [],
-    unit: "mg/dL",
-    range: { ...DEFAULT_RANGE },
-    dark: true,
-    imported: [],
-    seenWelcome: false,
-    events: [],
-  };
+  const defaults: State = emptyState();
   const s = loadState(
     JSON.stringify({
       events: [ev(), { id: "x", kind: "meal", start: "soon", durationMin: 0 }],

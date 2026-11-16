@@ -1,13 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadState, hasImported, removeImported, DEFAULT_RANGE } from "../src/state";
+import { loadState, hasImported, removeImported, DEFAULT_RANGE, emptyState } from "../src/state";
 import type { Reading, State } from "../src/types";
 
-const defaults: State = {
-  posts: [], following: [], clubs: [], blocked: [], reports: [], unit: "mg/dL",
-  range: { ...DEFAULT_RANGE }, dark: true, imported: [], seenWelcome: false,
-  events: [],
-};
+const defaults: State = emptyState();
 const reading: Reading = { timestamp: 1, mgdl: 100, source: "csv" };
 
 test("a brand-new install (nothing saved) has not seen the welcome screen", () => {

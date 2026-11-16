@@ -17,6 +17,11 @@ Work the milestones in order unless a milestone says it is independent. Each one
 | M8 | Event logging on the trace (flagged) | done on web 2026-11-14, flag off by default; phones unverified | M5 |
 | M9 | Validation with real people and copy review | not started | M7 |
 | M10 | Backend, accounts, integrations, release | needs owner approval | M9 |
+| M11 | Foundations for identity, Boosts, achievements and Dexcom | done 2026-11-16 | M8 |
+| M12 | Identity shields, onboarding, privacy, Boosts, communities | not started | M11 |
+| M13 | Achievements: engine, life and community medals, trophy cabinet, health prototype (flag off) | not started | M11 |
+| M14 | Dexcom sandbox integration (local backend) | not started; live check needs the owner's credentials | M11 |
+| M15 | Docs and close-out for M12 to M14 | not started | M12, M13, M14 |
 
 M5 and M6 can run in parallel after M3 and M2. M8 is optional before M9.
 
@@ -318,6 +323,16 @@ src/
 6. Trademark clearance complete before any public listing.
 
 Each item needs its own specification written into this file before work starts.
+
+---
+
+## M11 to M15. Identity, Boosts, achievements, Dexcom (owner's brief of 2026-11-16)
+
+The full specification is the owner's brief of 2026-11-16. M12, M13 and M14 are independent of each other after M11. Health-outcome achievements stay behind `healthAchievements` (off) until a qualified clinical review; Dexcom is sandbox only.
+
+**M11 done 2026-11-16.** Data model in `src/domain/` (`profile.ts`, `reactions.ts`, `achievements.ts`), new `State` fields with sanitising on load, kudos converted to Boosts in saved state, five new flags (all off), backend architecture recorded in `docs/DECISIONS.md`, Dexcom V3 facts in `docs/DEXCOM_INTEGRATION.md`.
+- Verified: type-check clean; 121 unit tests (12 new: migration, privacy defaults, reaction toggling, partial dates, award sanitising).
+- Not verified: nothing on screen changed, so no screenshots. In the Dexcom notes about 14 facts are marked NOT VERIFIED, including the developer terms on public sharing, PKCE, redirect URI rules and the dataRange response schema.
 
 ---
 

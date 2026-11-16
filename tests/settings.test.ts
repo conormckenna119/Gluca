@@ -1,14 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadState, parseRange, rangeToText, DEFAULT_RANGE } from "../src/state";
+import { loadState, parseRange, rangeToText, DEFAULT_RANGE, emptyState } from "../src/state";
 import { storyArtwork, defaultOptions } from "../src/story";
 import type { Reading, State } from "../src/types";
 
-const defaults: State = {
-  posts: [], following: [], clubs: [], blocked: [], reports: [], unit: "mg/dL",
-  range: { ...DEFAULT_RANGE }, dark: true, imported: [], seenWelcome: false,
-  events: [],
-};
+const defaults: State = emptyState();
 
 test("old saved state without range loads with 70/180 and keeps its other fields", () => {
   const old = JSON.stringify({ unit: "mmol/L", dark: false, following: ["Sam Rivera"], posts: [], clubs: [], blocked: [], reports: [], imported: [] });

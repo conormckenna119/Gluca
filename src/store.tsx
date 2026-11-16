@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Post, State } from "./types";
 import { DEFAULT_RANGE, loadState } from "./state";
+import { defaultPrivacy, defaultProfile } from "./domain/profile";
+import { emptyCounters } from "./domain/achievements";
 export const people = [
   "Alex Morgan",
   "Sam Rivera",
@@ -48,8 +50,7 @@ export const seed = (): State => {
         "Celebrating a personal moment, one day at a time.",
       ][i % 3],
       visibility: "public",
-      kudos: 3 + i,
-      liked: false,
+      reactions: { counts: { boost: 3 + i }, mine: null },
       saved: false,
       comments: i % 3 ? ["Thanks for sharing this."] : [],
     })),
@@ -62,7 +63,13 @@ export const seed = (): State => {
     dark: true,
     imported: [],
     seenWelcome: false,
-  events: [],
+    events: [],
+    profile: defaultProfile(),
+    privacy: defaultPrivacy(),
+    awards: [],
+    counters: emptyCounters(),
+    challenges: [],
+    clubVisibility: {},
   };
 };
 const Context = createContext<{

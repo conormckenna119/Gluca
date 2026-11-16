@@ -1,7 +1,10 @@
+import type { Profile, PrivacySettings } from "./domain/profile";
+import type { PostReactions } from "./domain/reactions";
+import type { Award, ChallengeCompletion, Counters } from "./domain/achievements";
 export type Reading = {
   timestamp: number;
   mgdl: number;
-  source: "mock" | "csv";
+  source: "mock" | "csv" | "dexcom";
 };
 export type Visibility = "private" | "followers" | "public";
 export type Post = {
@@ -10,8 +13,8 @@ export type Post = {
   title: string;
   caption: string;
   visibility: Visibility;
-  kudos: number;
-  liked: boolean;
+  /** Boosts and any later reaction kinds. Older saved posts had `kudos` and `liked`; `loadState` converts them. */
+  reactions: PostReactions;
   saved: boolean;
   comments: string[];
   /** Parallel to `comments`; missing on older saved state. */
@@ -40,4 +43,14 @@ export type State = {
   imported: Reading[];
   seenWelcome: boolean; // false only on a brand-new install, until a Welcome action is taken
   events: GlucaEvent[];
+  /** Self-reported identity. Optional fields are absent until the person fills them in. */
+  profile: Profile;
+  /** Visibility and opt-in switches. All off until the person turns one on. */
+  privacy: PrivacySettings;
+  /** Earned achievements, including withdrawn ones (kept for the record, hidden in the interface). */
+  awards: Award[];
+  counters: Counters;
+  challenges: ChallengeCompletion[];
+  /** Club name to "others may see I am a member". A club that is absent is private. */
+  clubVisibility: Record<string, boolean>;
 };

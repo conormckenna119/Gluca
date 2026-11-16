@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { reactionCount, toggleReaction } from "../domain/reactions";
 import { BRAND } from "../art/brand";
 import { View, Share } from "react-native";
 import { router } from "expo-router";
@@ -109,19 +110,15 @@ export function PostCard({
       >
         <IconButton
           icon="heart"
-          selected={post.liked}
-          count={post.kudos}
+          selected={post.reactions.mine === "boost"}
+          count={reactionCount(post.reactions)}
           label={
-            post.liked
-              ? `Remove kudos, ${post.kudos}`
-              : `Give kudos, ${post.kudos}`
+            post.reactions.mine === "boost"
+              ? `Remove kudos, ${reactionCount(post.reactions)}`
+              : `Give kudos, ${reactionCount(post.reactions)}`
           }
           onPress={() =>
-            update((p) => ({
-              ...p,
-              liked: !p.liked,
-              kudos: p.kudos + (p.liked ? -1 : 1),
-            }))
+            update((p) => ({ ...p, reactions: toggleReaction(p.reactions) }))
           }
         />
         {inDetail ? null : (
