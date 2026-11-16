@@ -16,7 +16,17 @@ import { configureTelemetry, track } from "../src/telemetry";
 import { useArtFonts } from "../src/fonts";
 
 // Literal env access: Expo inlines these at bundle time. Telemetry stays "off" unless EXPO_PUBLIC_TELEMETRY=local.
-configureFlags(process.env.EXPO_PUBLIC_FLAGS);
+// Development only, web only: a comma list in localStorage "gluca-dev-flags" is added to the env flags, so a feature
+// can be looked at without restarting the server. Release builds ignore it.
+function devFlags(): string {
+  if (!__DEV__) return "";
+  try {
+    return globalThis.localStorage?.getItem("gluca-dev-flags") ?? "";
+  } catch {
+    return "";
+  }
+}
+configureFlags([process.env.EXPO_PUBLIC_FLAGS, devFlags()].filter(Boolean).join(","));
 configureTelemetry(process.env.EXPO_PUBLIC_TELEMETRY);
 
 const queryClient = new QueryClient();

@@ -140,9 +140,9 @@ export function Button({
 }
 
 export function Input({
-  label, value, onChange, multiline = false,
+  label, value, onChange, multiline = false, placeholder, maxLength,
 }: {
-  label: string; value: string; onChange: (v: string) => void; multiline?: boolean;
+  label: string; value: string; onChange: (v: string) => void; multiline?: boolean; placeholder?: string; maxLength?: number;
 }) {
   const c = useColors();
   return (
@@ -153,6 +153,8 @@ export function Input({
         value={value}
         onChangeText={onChange}
         multiline={multiline}
+        placeholder={placeholder}
+        maxLength={maxLength}
         placeholderTextColor={c.muted}
         style={{
           minHeight: 50, padding: space.md, borderWidth: 1, borderColor: c.border, borderRadius: radius.md,
@@ -185,6 +187,14 @@ const ICONS = {
   alert: "M12 4 L21 19.5 H3 Z M12 10 V14.5 M12 17 H12.1",
   share: "M12 14.5 V3.5 M8 7.5 L12 3.5 L16 7.5 M6 11 V20 H18 V11",
   file: "M7 3.5 H14 L18 7.5 V20.5 H7 Z M14 3.5 V7.5 H18",
+  bolt: "M13 2.5 L5 13.5 H11 L10 21.5 L19 9.5 H13 Z",
+  "chevron-up": "M5.5 14.5 L12 8 L18.5 14.5",
+  medal: "M8.5 3 L12 9 L15.5 3 M12 9 A6 6 0 1 0 12 21 A6 6 0 1 0 12 9 Z M9.5 15.2 L11.3 17 L14.6 13.4",
+  shield: "M12 3 L19.5 6 V11.5 C19.5 16 16.5 19.5 12 21 C7.5 19.5 4.5 16 4.5 11.5 V6 Z",
+  lock: "M6.5 10.5 H17.5 V20 H6.5 Z M8.5 10.5 V7.5 A3.5 3.5 0 0 1 15.5 7.5 V10.5",
+  link: "M10 14 L14 10 M8.5 11.5 L6.5 13.5 A3.2 3.2 0 0 0 11 18 L13 16 M15.5 12.5 L17.5 10.5 A3.2 3.2 0 0 0 13 6 L11 8",
+  refresh: "M19 12 A7 7 0 1 1 16.5 6.6 M19 4 V8 H15",
+  people: "M9 11 A3 3 0 1 0 9 5 A3 3 0 1 0 9 11 Z M3.5 19 C4 16 6 14.5 9 14.5 C12 14.5 14 16 14.5 19 M16 11 A2.6 2.6 0 1 0 15.5 5.9 M17 14.6 C19 15 20.2 16.6 20.5 19",
   user: "M12 12 A4 4 0 1 0 12 4 A4 4 0 1 0 12 12 Z M4.5 20 C5.5 16.5 8.5 15 12 15 C15.5 15 18.5 16.5 19.5 20",
 } as const;
 export type IconName = keyof typeof ICONS;
