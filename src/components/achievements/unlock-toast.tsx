@@ -18,12 +18,16 @@ export function UnlockToastHost() {
   const { enabled } = useAchievements();
   const queue = useUnlockQueue();
   const scale = useRef(new Animated.Value(1)).current;
-  const shine = useRef(new Animated.Value(0)).current;
-  const [reduce, setReduce] = useState(false);
+  const [reduce, setReduce] = useState(true);
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled()
       .then(setReduce)
       .catch(() => {});
+    const listener = AccessibilityInfo.addEventListener(
+      "reduceMotionChanged",
+      setReduce,
+    );
+    return () => listener.remove();
   }, []);
 
   // Health medals are announced only when the person turned notifications on; skipped ones are simply not announced.
@@ -43,31 +47,19 @@ export function UnlockToastHost() {
   }, [enabled, ready, currentId, item]);
 
   useEffect(() => {
+    scale.stopAnimation();
+    scale.setValue(1);
     if (!item || reduce) return;
-    scale.setValue(0.6);
-    shine.setValue(0);
-    Animated.parallel([
-      Animated.timing(scale, {
-        toValue: 1,
-        duration: 600,
-        easing: Easing.out(Easing.back(1.4)),
-        useNativeDriver: true,
-      }),
-      Animated.sequence([
-        Animated.delay(250),
-        Animated.timing(shine, {
-          toValue: 1,
-          duration: 350,
-          useNativeDriver: true,
-        }),
-        Animated.timing(shine, {
-          toValue: 0,
-          duration: 350,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
-  }, [item?.a.id, reduce, scale, shine]);
+    scale.setValue(0.96);
+    const animation = Animated.timing(scale, {
+      toValue: 1,
+      duration: 180,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [item?.a.id, reduce, scale]);
 
   if (!item) return null;
   const { a, d } = item;
@@ -113,22 +105,6 @@ export function UnlockToastHost() {
             size={64}
             decorative
           />
-          <Animated.View
-            pointerEvents="none"
-            style={{
-              position: "absolute",
-              left: 6,
-              top: 30,
-              width: 52,
-              height: 52,
-              borderRadius: 26,
-              backgroundColor: "#FFFFFF",
-              opacity: shine.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 0.35],
-              }),
-            }}
-          />
         </Animated.View>
         <View style={{ flex: 1, gap: space.xs }}>
           <Eyebrow>New medal</Eyebrow>
@@ -140,7 +116,9 @@ export function UnlockToastHost() {
               label="View"
               onPress={() => {
                 dismissUnlock(a.id);
-                router.push("/trophies" as never);
+                router.push(
+                  `/trophies?award=${encodeURIComponent(a.id)}` as never,
+                );
               }}
             />
             <Button

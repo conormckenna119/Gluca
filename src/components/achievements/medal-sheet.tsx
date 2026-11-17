@@ -42,9 +42,7 @@ export function MedalSheet({
   const [message, setMessage] = useState("");
   useEffect(() => setMessage(""), [award?.id]);
   // Read the live copy so switches reflect changes immediately.
-  const live = award
-    ? (a.awards.find((x) => x.id === award.id) ?? award)
-    : null;
+  const live = award ? (a.awards.find((x) => x.id === award.id) ?? null) : null;
   const def = live ? getDef(live.achievementId) : undefined;
   if (!live || !def) return null;
   const shown = live.visibility === "public";
@@ -74,14 +72,38 @@ export function MedalSheet({
         >{`${CATEGORY_LABEL[def.category]} medal · earned ${when(live.awardedAt)}`}</T>
       </View>
       <T>{def.description}</T>
-      <Group>
-        <SwitchRow
-          title="Show on my profile"
-          detail={shown ? "Shown on your profile" : "Only you can see this"}
-          value={shown}
-          onChange={(v) => a.setVisibility(live.id, v ? "public" : "private")}
-        />
-      </Group>
+      <T small muted>
+        {live.relatedEvent === "awareness_event" ||
+        live.relatedEvent === "personal_milestone"
+          ? "Source: user-confirmed activity."
+          : "Source: an action in Gluca. Community actions currently belong to the local demo feed."}
+      </T>
+      {!a.collectionPublic ? (
+        <T small muted>
+          Your collection is private. Turn on Public collection in the cabinet
+          to show visible medals.
+        </T>
+      ) : null}
+      {a.status === "account" ? (
+        <Group>
+          <SwitchRow
+            title="Show on my profile"
+            detail={
+              shown
+                ? "Eligible for your public collection"
+                : "Only you can see this"
+            }
+            value={shown}
+            onChange={(v) => a.setVisibility(live.id, v ? "public" : "private")}
+          />
+        </Group>
+      ) : (
+        <T small muted>
+          Guest medals stay in this session. Sign in before earning medals to
+          keep an account collection.
+        </T>
+      )}
+      {a.error ? <Notice tone="info">{a.error}</Notice> : null}
       {message ? <Notice tone="info">{message}</Notice> : null}
       <Button
         label={live.pinned ? "Unpin from profile" : "Pin to profile"}

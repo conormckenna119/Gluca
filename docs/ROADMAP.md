@@ -1,3 +1,7 @@
+# Stage 8A - scoped achievement delivery
+
+Encrypted account-owned nonmedical awards and Trophy Cabinet implemented; no demo backfill. Exact-date anniversaries, reduced-motion notices, pin/order/privacy and existing Create sharing. Native/production/social-service verification remain open. Stop at Stage 8A; Stage 8B is not authorized. See ACHIEVEMENT_SYSTEM.md for verification.
+
 # Roadmap and specifications
 
 Stage 7C complete (17 November 2026): full rendered UI audit, prioritized findings and five bounded fixes for positioning exit, shared dialog naming/safe-area footers, photo-picker lifecycle, static copy and repeated Create filtering. 368 core tests, 16 normal browser tests and two mocked Dexcom browser journeys pass. Responsive evidence, files, limitations and recommended Stage 8 work are in [UI_UX_AUDIT.md](UI_UX_AUDIT.md). Physical/native/real-keyboard and large-image profiling remain open; advanced editor features, IA changes and Stage 8 are not started. Stop after Stage 7C.

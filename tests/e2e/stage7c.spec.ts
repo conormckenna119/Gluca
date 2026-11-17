@@ -212,7 +212,7 @@ test("review auxiliary existing routes and period insights without changing prod
         ["/import", "Import & export"],
         ["/welcome", "Create your glucose story."],
         ["/log", "Log something"],
-        ["/trophies", "Medals"],
+        ["/trophies", "Trophy Cabinet"],
         ["/dexcom-data", "Dexcom data viewer"],
       ]) {
         await page.goto(route);

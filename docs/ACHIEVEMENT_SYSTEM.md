@@ -1,128 +1,75 @@
-# Achievement system
+# Achievement system - Stage 8A
 
-**Status:** behind feature flags that are off by default: `achievements` (life and community medals) and `healthAchievements` (health milestones), in `src/flags.ts`. Checked on web only on 2026-11-16: type-check, 295 unit tests and a browser walk-through at 375 and 1280 px. Nothing has been run on a phone. No clinical or product review has happened. Health rules are in `docs/ACHIEVEMENT_SAFETY.md`, which this page does not restate.
+The existing registry, Medal SVG artwork, detail sheets, toast and Create milestone renderer are reused. No second achievement system/backend/dependency was added. `src/achievements/events.ts` separates explicit eligibility from UI. The old snapshot evaluator is no longer mounted; historical demo posts/counters/challenges do not grant account medals.
 
-## 1. Three categories
+## Eligibility and event sources
 
-- **Life** and **community**: no glucose data, no opt-in needed, flag `achievements`.
-- **Health**: glucose-based, needs the person's own opt-in (`privacy.healthAchievements`), flag `healthAchievements`. Prototype only.
+The registry exposes ID, name, description, category, medal design (renderer/icon/category), eligibility, required data, repeatability, rule version, default privacy and feature flag.
 
-## 2. Registry entry (`AchievementDef`, `src/domain/achievements.ts`)
+| Medal                 | Qualifying source                                                                                          | Repeats |
+| --------------------- | ---------------------------------------------------------------------------------------------------------- | ------- |
+| First Story           | Successful browser PNG export/download or native photo-library save; opening a share sheet is insufficient | Once    |
+| First Post            | New non-private post explicitly published to the existing local demo feed                                  | Once    |
+| First Activity        | New activity saved through the existing flagged Log                                                        | Once    |
+| Community Boost       | Existing Boost or comment reported by the local UI                                                         | Once    |
+| Dia-versary           | Complete, non-approximate private diagnosis date, on its anniversary day                                   | Yearly  |
+| Awareness             | Explicit awareness-activity confirmation in Personal moments                                               | Once    |
+| Personal Milestone    | Explicit voluntary milestone confirmation                                                                  | Once    |
+| Community Contributor | Three distinct new local posts/comments                                                                    | Once    |
 
-| Field | Meaning |
-| --- | --- |
-| `id`, `name`, `description` | Identity and the text shown |
-| `category` | `health`, `life` or `community` |
-| `icon` | One of eleven medal shapes |
-| `requiredData` | What the rule reads: posts, exports, profile, reactions, communities, challenges, events, glucose, a1c |
-| `period`, `minCoveragePct` | `none`, `week`, `month`, `quarter` or `year`; glucose rules only: least CGM coverage |
-| `defaultVisibility`, `repeatable` | `private` or `public`; `once`, `yearly` or `per_period` |
-| `ruleVersion`, `safetyReview` | Bumped when a rule changes; `not_required`, `pending` or `approved` |
-| `flag`, `needsHealthOptIn`, `disabled` | Flag that must be on; health rule; true stops the rule without a release |
+Community events are client-reported local prototype actions, not externally verified participation or moderated proof of helpfulness. User-confirmed activities are labelled. Supporters can earn relevant medals without Dexcom. The legacy Activity of your choice definition is retained for compatibility but not offered/awarded by this event path.
 
-## 3. Award (`Award`, `src/domain/achievements.ts`)
+## Persistence and privacy
 
-| Field | Meaning |
-| --- | --- |
-| `id` | `userId:achievementId:periodKey`; stops duplicates |
-| `userId`, `achievementId` | Always `me` (this device); the registry id |
-| `awardedAt`, `periodKey` | Time earned in milliseconds; empty for once-only medals, otherwise a calendar key |
-| `ruleVersion` | Rule version when earned |
-| `snapshot` | Optional numbers, private to the person; never on a public medal |
-| `visibility`, `pinned` | `private` or `public`; pinned for the profile |
-| `withdrawn` | Optional `{ at, reason }`; hides the medal everywhere |
+GET/POST /api/achievements reuse the existing authenticated HttpOnly sessions, CSRF Origin/custom-header checks, body limit and write rate limiting. Client-supplied owner, arbitrary awards, dates, glucose and timestamps are not trusted. Additive migration 6 adds a user_achievements row per owner with primary-key/foreign-key constraints. The award/receipt document uses existing AES-256-GCM encryption and owner-specific authenticated context. Missing encryption configuration fails closed.
 
-## 4. Awarding (`src/achievements/engine.ts`)
+BEGIN IMMEDIATE serializes read/modify/write, event deduplication and the three-pin limit across concurrent requests. Award identity remains user/achievement/period; yearly awards retain their year, rule version and opaque related event. Receipts stop accumulating when no longer needed for eligibility. No captions, raw activities, glucose, birthdays or diagnosis dates are copied into awards. No award-level plaintext SQL index is introduced: uniqueness is enforced inside the transactional encrypted owner document.
 
-- Only available rules run: flag on, not `disabled`, and (for health) opted in. Each hit builds an id; if an award with that id exists, nothing is added. Withdrawn awards count, so they are not re-awarded for that period.
-- Period keys use local time: `2026`, `2026-11`, `2026-Q4`, `2026-W47` (ISO week). An earned award is never removed or changed when a rule stops matching.
-- `useAchievements({ evaluate: true })` runs once, in `app/_layout.tsx`.
+Account awards survive reload through the existing backend; browser copies are memory-only and excluded from AsyncStorage. Guest medals are explicitly session-only and never silently imported on sign-in. Legacy prototype awards stay preserved in their original local storage field, excluded from active collections and never uploaded. This old archive is not described as encrypted; new account medals do not enter it.
 
-## 5. Life and community medals (`src/achievements/life.ts`)
+Account transitions clear active awards/details/toasts. Epoch checks discard stale responses and queued work; exports carry their initiating account scope. Provider disconnect does not erase life/community medals. Failed/offline writes report an error without pretending success; Reload collection recovers. No durable offline queue. Native accounts remain gated, so native collections are session-only.
 
-| Id | Name (category) | How it is earned | Repeats |
-| --- | --- | --- | --- |
-| `first_post` | First post (community) | A post whose author is "You" | Once |
-| `first_activity` | First activity marked (life) | An event of kind activity | Once |
-| `first_story` | First story exported (life) | Exports counter is 1 or more | Once |
-| `diagnosis_anniversary` | Diagnosis anniversary (life) | On or after the anniversary in a later year; with no day, the 1st of the month. Year-only dates never earn it | Yearly |
-| `personal_milestone` | Personal milestone (life) | Challenge `personal_milestone` marked done | Once |
-| `awareness_contribution` | Awareness contribution (community) | Challenge `awareness_event` marked done | Once |
-| `community_participation` | Joined a community (community) | One club joined, or the joined counter is 1 or more | Once |
-| `first_support` | First kind word (community) | One Boost given, or one comment made | Once |
-| `activity_accomplishment` | Activity of your choice (life) | Challenge `activity_of_choice` marked done | Once |
+## Windows development
 
-## 6. Challenges (`src/achievements/challenges.ts`)
+From the existing Gluca project root, retain existing backend-only .env encryption/session/Dexcom settings. No additional key/service is required.
 
-| Id | Title | Medal it can unlock |
-| --- | --- | --- |
-| `share_moment` | Share a moment | None |
-| `awareness_event` | Take part in an awareness event | Awareness contribution |
-| `activity_of_choice` | An activity you choose | Activity of your choice |
-| `personal_milestone` | Celebrate a personal milestone | Personal milestone |
-| `helpful_experience` | Share something that helped | None |
+```powershell
+$env:EXPO_PUBLIC_FLAGS='identity,accounts,achievements,dexcomApi,dexcomDiagnostics,dexcomSync'
+$env:EXPO_NO_TELEMETRY='1'
+$env:EXPO_OFFLINE='1'
+npx expo export --platform web --dev --max-workers 2
+npm run server
+```
 
-The person marks a challenge done in the Medals screen. Nothing checks it, there is no deadline, and a second mark changes nothing.
+Restart the existing backend after updating rather than starting a duplicate on port 3000. Open http://localhost:3000/profile -> Trophy Cabinet, or /trophies. Keep healthAchievements off. Add eventLogging only to use the existing optional activity logger; its absence is not an award.
 
-## 7. Pinning, visibility and withdrawal
+```powershell
+npm run typecheck
+npm test
+$env:E2E_BASE_URL='http://localhost:3000'
+npx playwright test tests/e2e/stage8a.spec.ts --workers 1
+```
 
-- Up to three pins (`MAX_PINNED`); a fourth is refused. Every medal starts private, and "Show on my profile" in the medal sheet switches it.
-- Another person sees a medal only when it is public, pinned and not withdrawn. `publicView` lists the award id. No screen shows this to others yet, and `publicMedal` (name, icon, category, year) is unused.
-- `withdrawAward` sets `withdrawn` with a reason and unpins. No screen calls it yet.
+The cabinet browser test starts the same backend on a private temporary port with in-memory SQLite and a fictional account, uses synthetic glucose for a real PNG export, and confirms optional activities. No owner account, credentials or real health data is used. Native device verification, durable offline delivery, social-server verification/moderation and public production release remain future work. No live Dexcom request is necessary for these award rules.
 
-## 8. Sharing (`src/achievement-share.ts`)
+## Verification - 2026-11-17
 
-The Share button opens Create with the milestone template. The text comes from the medal name only: a headline "Medal earned: <name>" (at most 90 characters) and a large line with the name (at most 24). Snapshot numbers, glucose values and dates are never used. Create shows "What's on this image" before saving. Nothing is posted automatically.
+- TypeScript clean; 374 core tests pass, including transactional account API, private/public projection, encrypted persistence, duplicates, pin constraints/order, exact/leap/approximate anniversaries and stale-export account scope.
+- 18 normal browser cases pass across the regression run and targeted retests. The only initial legacy failure expected the old Medals heading; its updated Trophy Cabinet assertion passes. The final cabinet case additionally verifies guest visibility controls.
+- Two separate mocked Dexcom browser journeys pass: OAuth/session isolation/rotation, and historical data through Create to a real PNG. No live Dexcom request was made in this stage.
+- Cabinet and detail sheets exercised at 375/430/1280px in both themes, with actual CSS theme assertions, no horizontal overflow, visible Close controls and emulated reduced motion. Twelve fictional screenshots retained; cabinet variants and mobile detail inspected visually. No physical native test claim.
+- Development web export passes. No lint script/configuration exists in package.json; targeted Prettier check, TypeScript and git diff whitespace checks are used instead. No lint dependency was introduced.
 
-## 9. Unlock message (`src/components/achievements/unlock-toast.tsx`)
+## Modified files
 
-- A card titled "New medal" with View (opens Medals) and Dismiss. One at a time, from a queue, mounted once in `app/_layout.tsx`.
-- Not shown when `achievements` is off, when the app is not ready or the welcome screen covers the tabs, when the award is missing or withdrawn, or when a health medal is due and achievement notifications are off.
-- It is an in-app message only. No system notification is sent.
+- Backend: server/achievements.ts (new), server/db.ts (additive migration), server/routes.ts, server/profiles.ts.
+- Domain/eligibility: src/achievements/events.ts (new), src/achievements/life.ts (rule version 2), src/achievements/registry.ts, src/domain/achievements.ts, src/domain/profile.ts.
+- State/privacy: src/hooks/use-achievements.ts, src/private-persistence.ts, src/store.tsx.
+- Existing event producers: src/screens/create.tsx, src/screens/log.tsx, src/screens/post-detail.tsx, src/components/create/publish-card.tsx, src/components/boost-button.tsx.
+- Cabinet/profile: src/screens/trophies.tsx, src/screens/profile.tsx; existing achievement components challenge-list.tsx, medal-sheet.tsx, pinned-medals.tsx, unlock-toast.tsx. Original Medal artwork, identity shields and Story Studio renderer retained.
+- Tests: tests/achievement-events.test.ts and tests/server-achievements.test.ts (new), tests/achievement-life.test.ts; tests/e2e/stage8a.spec.ts (new), tests/e2e/stage7c.spec.ts (heading expectation only).
+- Docs: README.md, docs/ACHIEVEMENT_SYSTEM.md, docs/ACHIEVEMENT_SAFETY.md, docs/TROPHY_CABINET.md, docs/PROJECT_MAP.md, docs/ROADMAP.md, docs/DECISIONS.md; synthetic evidence docs/screenshots/stage8a. Historical screenshots regenerated by regressions were restored.
 
-## 10. Purpose, possible unintended incentives, privacy, review status
+## Before public production
 
-| Medal | Purpose | Possible unintended incentive | Privacy | Review status |
-| --- | --- | --- | --- | --- |
-| First post | Marks a first share | Pressure to post | Private unless shown | Product review not done |
-| First activity | Marks a first logged activity | Logging activity to earn a mark | No snapshot stored | Product review not done |
-| First story | Marks a first saved image | Making more images than wanted | No image data kept | Product review not done |
-| Diagnosis anniversary | Marks a yearly day the person chose to record | A hard date may feel like a prompt | Uses the diagnosis date on the device; not shared by this medal | Product review not done |
-| Personal milestone | Lets the person mark their own milestone | Treating it as a target | Self-marked | Product review not done |
-| Awareness contribution | Marks taking part in an event | Pressure to attend events | Self-marked; no event data | Product review not done |
-| Joined a community | Marks joining a community | Joining many groups | Membership private until made visible | Product review not done |
-| First kind word | Marks a first kind act | Giving Boosts to earn the mark | Counts only the person's own actions | Product review not done |
-| Activity of your choice | Marks an activity the person chose | Pushing the pace of activity | Self-marked; text says "a pace that suits you" | Product review not done |
-| Health: `tir_milestone`, `steadier_month`, `fewer_lows` | See `docs/ACHIEVEMENT_SAFETY.md` sections 1, 3, 4 and 8 | See section 1 of that file | See section 4 of that file | Clinical review not done; prototype only |
-
-## 11. Disabling an achievement
-
-- To stop one rule: set `disabled: true` on its registry entry. It stops being evaluated and listed. Medals already earned stay.
-- To hide all health milestones: turn off `healthAchievements`. All three health rules use that flag. To hide life and community medals: turn off `achievements`.
-- Full process, including withdrawing awards and bumping `ruleVersion`: `docs/ACHIEVEMENT_SAFETY.md` section 7. Record the decision in `docs/DECISIONS.md`.
-
-## 12. Where the code and tests are
-
-- Model and engine: `src/domain/achievements.ts`, `src/achievements/engine.ts`, `period.ts`, `registry.ts`, `eligibility.ts`
-- Rules: `src/achievements/life.ts`, `health.ts`, `challenges.ts`
-- Hook and screen: `src/hooks/use-achievements.ts`, `src/screens/trophies.tsx`
-- Components: `src/components/achievements/`; share: `src/achievement-share.ts`
-- Tests: `tests/achievements.test.ts`, `tests/achievement-life.test.ts`, `tests/achievement-health.test.ts`, `tests/achievement-share.test.ts`
-
-## 13. Where code and documents differ
-
-- `docs/ACHIEVEMENT_SAFETY.md` section 4 says `tir_milestone` applies "for the first time since opting in". `build()` in `health.ts` does not check when opt-in happened. It awards on the first settled month that qualifies.
-- A month-only diagnosis date waits for the month to pass in the shield, but the anniversary medal counts from the 1st of that month.
-
-## 14. Implemented, experimental, tested, needs review
-
-| Part | Status | Tested by | Needs |
-| --- | --- | --- | --- |
-| Registry, engine, pinning limit, visibility | Implemented behind `achievements` | `tests/achievements.test.ts` | Product review |
-| Life and community medals (nine) | Implemented behind `achievements` | `tests/achievement-life.test.ts` | Product review |
-| Challenges (five, self-marked) | Implemented behind `achievements` | `tests/achievement-life.test.ts` | Product review |
-| Medals screen and medal sheet | Implemented behind `achievements` | Not unit tested | Check on a phone |
-| Share to Create | Implemented behind `achievements` | `tests/achievement-share.test.ts` | Check on a phone |
-| Unlock message | Implemented behind `achievements` | Not unit tested | Check on a phone |
-| Withdrawal | Engine only; no screen calls it | `tests/achievements.test.ts` | Decide whether to add a screen |
-| Health milestones and eligibility gate | Experimental behind `healthAchievements` and opt-in | `tests/achievement-health.test.ts` | Clinical review (not done) |
+Complete existing production authentication/recovery/deletion and age/privacy policies, enforce HTTPS/secure cookies, restrict database and encryption-key permissions, establish encrypted backup/rotation/retention processes, and replace client-reported local-community events with trusted social-service receipts when that service exists. Add device and accessibility verification before native release. Design opt-in durable offline persistence separately. Keep all medical-outcome awards disabled pending qualified clinical review and separate authorization. Stage 8B was not started.

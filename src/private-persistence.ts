@@ -3,8 +3,9 @@ import type { State } from "./types";
 export function persistableState(
   state: State,
   legacyProfile?: Pick<State, "profile" | "privacy">,
+  legacyAwards: State["awards"] = [],
 ) {
-  return { ...state, imported: [], ...legacyProfile };
+  return { ...state, imported: [], awards: legacyAwards, ...legacyProfile };
 }
 export function removeLegacyPlaintextHistory(raw: string) {
   try {

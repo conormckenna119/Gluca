@@ -25,6 +25,7 @@ import {
   ListRow,
   Pill,
   Section,
+  Sheet,
   Stat,
   T,
   space,
@@ -36,6 +37,8 @@ import {
   ProfileMedalsLink,
 } from "../components/achievements/pinned-medals";
 import { PostCard } from "../components/post-card";
+import { Medal } from "../components/achievements/medal";
+import { useAchievements } from "../hooks/use-achievements";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
 import { AccountEntry } from "../components/account-entry";
@@ -47,13 +50,14 @@ import {
 /** What others see, built from the same function everything else uses, so the person sees exactly that. */
 function useOwnPublicView() {
   const { state } = useDemo();
+  const cabinet = useAchievements();
   const today = localToday();
   return {
     today,
     view: publicView(state.profile, state.privacy, {
       clubs: state.clubs,
       clubVisibility: state.clubVisibility,
-      awards: state.awards,
+      awards: cabinet.collectionPublic ? state.awards : [],
       today,
     }),
   };
@@ -188,6 +192,12 @@ function OwnProfile() {
           </T>
         </View>
       )}
+      {flags.achievements ? (
+        <View style={{ gap: space.md }}>
+          <PinnedMedals awards={state.awards} />
+          <ProfileMedalsLink />
+        </View>
+      ) : null}
       <View style={{ flexDirection: "row", gap: space.lg }}>
         <Stat value={String(mine.length)} label="Posts" />
         <Stat value={String(state.following.length)} label="Following" />
@@ -223,12 +233,6 @@ function OwnProfile() {
           ))}
         </Section>
       ) : null}
-      {flags.achievements ? (
-        <View style={{ gap: space.md }}>
-          <PinnedMedals awards={state.awards} />
-          <ProfileMedalsLink />
-        </View>
-      ) : null}
       <AccountEntry />
       <Section title="More">
         <Group>
@@ -251,6 +255,9 @@ function OwnProfile() {
 }
 
 function MemberProfile({ username }: { username: string }) {
+  const [medal, setMedal] = React.useState<
+    NonNullable<PublicProfile["medals"]>[number] | null
+  >(null);
   const [data, D] = React.useState<PublicProfile | null>(null),
     [error, E] = React.useState("");
   React.useEffect(() => {
@@ -295,6 +302,45 @@ function MemberProfile({ username }: { username: string }) {
       {data ? (
         <Card>
           <UserIdentity expanded profile={data} />
+          {getFlags().achievements && data.medals?.length ? (
+            <Section title="Trophy Cabinet">
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: space.md,
+                }}
+              >
+                {data.medals.map((m, i) => (
+                  <Pressable
+                    key={`${m.name}-${i}`}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${m.name} medal, ${m.year}${m.pinned ? ", pinned" : ""}`}
+                    onPress={() => setMedal(m)}
+                    style={{
+                      minWidth: 88,
+                      minHeight: 44,
+                      alignItems: "center",
+                      maxWidth: 104,
+                      gap: space.xs,
+                    }}
+                  >
+                    <Medal
+                      name={m.name}
+                      icon={m.icon}
+                      category={m.category}
+                      earnedAt={new Date(m.year, 0, 1).getTime()}
+                      size={56}
+                      decorative
+                    />
+                    <T small align="center">
+                      {m.name}
+                    </T>
+                  </Pressable>
+                ))}
+              </View>
+            </Section>
+          ) : null}
           <T small muted>
             Self-reported identity. Shields and emblems do not grant access to
             private glucose data.
@@ -303,6 +349,21 @@ function MemberProfile({ username }: { username: string }) {
       ) : (
         <T>{error || "Loading public profile…"}</T>
       )}
+      <Sheet
+        visible={!!medal}
+        onClose={() => setMedal(null)}
+        title={medal?.name ?? "Medal"}
+      >
+        {medal ? (
+          <>
+            <T>{`Earned in ${medal.year}`}</T>
+            <T muted>
+              This person chose to share this medal. It represents
+              participation, not medical expertise or a health outcome.
+            </T>
+          </>
+        ) : null}
+      </Sheet>
       <Button label="Your profile" onPress={() => router.replace("/profile")} />
     </Page>
   );

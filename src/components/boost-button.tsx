@@ -1,3 +1,4 @@
+import { recordAchievementEvent } from "../achievements/events";
 import React, { useEffect, useRef, useState } from "react";
 import {
   AccessibilityInfo,
@@ -82,6 +83,7 @@ export function BoostButton({ post }: { post: Post }) {
     });
     if (timer.current) clearTimeout(timer.current);
     if (nowGiven) {
+      recordAchievementEvent("support_given", `boost:${post.id}`);
       pulse();
       setLine(gaveLine(post.author));
       timer.current = setTimeout(() => setLine(""), 3000);

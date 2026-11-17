@@ -46,7 +46,7 @@ export function ChallengeList() {
       <Sheet
         visible={!!open}
         onClose={() => setOpen(null)}
-        title={open?.title ?? "Challenge"}
+        title={open?.title ?? "Personal milestone"}
         footer={
           <>
             <Button
@@ -63,7 +63,8 @@ export function ChallengeList() {
       >
         <T>{open?.howToComplete}</T>
         <T small muted>
-          It is up to you. Nothing is checked, and there is no deadline.
+          This is a user-confirmed activity. It stays private until you choose
+          to share it.
         </T>
       </Sheet>
     </View>

@@ -54,6 +54,9 @@ const MIGRATIONS: string[] = [
     payload_enc TEXT NOT NULL,
     revision INTEGER NOT NULL DEFAULT 1,
     updated_at INTEGER NOT NULL);`,
+  // 6: account-owned encrypted awards/event receipt ledger. No glucose history.
+  `CREATE TABLE user_achievements (
+    user_id TEXT PRIMARY KEY REFERENCES users(id), payload_enc TEXT NOT NULL);`,
 ];
 
 export function migrate(db: DatabaseSync): void {

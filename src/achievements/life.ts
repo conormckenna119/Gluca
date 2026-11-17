@@ -18,7 +18,7 @@ const base: Pick<
   period: "none",
   defaultVisibility: "private",
   repeatable: "once",
-  ruleVersion: 1,
+  ruleVersion: 2,
   safetyReview: "not_required",
   flag: "achievements",
   needsHealthOptIn: false,
@@ -32,33 +32,34 @@ const challengeDone = (c: RuleContext, id: string) =>
 
 export const FIRST_POST = mk({
   id: "first_post",
-  name: "First post",
-  description: "You shared your first post with the community.",
+  name: "First Post",
+  description:
+    "You published your first non-private post to the local demo feed.",
   category: "community",
   icon: "post",
   requiredData: ["posts"],
 });
 export const FIRST_ACTIVITY = mk({
   id: "first_activity",
-  name: "First activity marked",
-  description: "You marked your first activity.",
+  name: "First Activity",
+  description: "You saved your first activity in Gluca.",
   category: "life",
   icon: "activity",
   requiredData: ["events"],
 });
 export const FIRST_STORY = mk({
   id: "first_story",
-  name: "First story exported",
-  description: "You made and saved your first story image.",
+  name: "First Story",
+  description: "You exported your first story image.",
   category: "life",
   icon: "story",
   requiredData: ["exports"],
 });
 export const DIAGNOSIS_ANNIVERSARY = mk({
   id: "diagnosis_anniversary",
-  name: "Diagnosis anniversary",
+  name: "Dia-versary",
   description:
-    "A day to mark in your own way, once a year, if you chose to add your diagnosis date.",
+    "Your anniversary, when a complete, non-approximate diagnosis date supports it.",
   category: "life",
   icon: "anniversary",
   requiredData: ["profile"],
@@ -67,7 +68,7 @@ export const DIAGNOSIS_ANNIVERSARY = mk({
 });
 export const PERSONAL_MILESTONE = mk({
   id: "personal_milestone",
-  name: "Personal milestone",
+  name: "Personal Milestone",
   description: "You added a personal milestone.",
   category: "life",
   icon: "milestone",
@@ -75,24 +76,25 @@ export const PERSONAL_MILESTONE = mk({
 });
 export const AWARENESS_CONTRIBUTION = mk({
   id: "awareness_contribution",
-  name: "Awareness contribution",
-  description: "You took part in a diabetes awareness event.",
+  name: "Awareness",
+  description: "You confirmed taking part in a diabetes awareness activity.",
   category: "community",
   icon: "awareness",
   requiredData: ["challenges"],
 });
 export const COMMUNITY_PARTICIPATION = mk({
   id: "community_participation",
-  name: "Joined a community",
-  description: "You joined a community of people like you.",
+  name: "Community Contributor",
+  description:
+    "You contributed three posts or comments to the local community.",
   category: "community",
   icon: "community",
-  requiredData: ["communities"],
+  requiredData: ["posts", "reactions"],
 });
 export const FIRST_SUPPORT = mk({
   id: "first_support",
-  name: "First kind word",
-  description: "You cheered someone on or left them a comment.",
+  name: "Community Boost",
+  description: "You gave a Boost or left a comment in the local community.",
   category: "community",
   icon: "support",
   requiredData: ["reactions"],
@@ -106,16 +108,24 @@ export const ACTIVITY_ACCOMPLISHMENT = mk({
   requiredData: ["challenges"],
 });
 
-/** Awarded on or after this year's anniversary, in the local calendar. Never for a year-only date. */
+/** Exact anniversary day in the backend local calendar. Never infer unknown precision. */
 export function anniversaryHits(
-  diagnosis: { year: number; month?: number; day?: number } | undefined,
+  diagnosis:
+    | { year: number; month?: number; day?: number; approximate?: boolean }
+    | undefined,
   now: number,
 ): RuleResult[] {
-  if (!diagnosis || diagnosis.month === undefined) return [];
-  const y = new Date(now).getFullYear();
+  if (!diagnosis || !diagnosis.month || !diagnosis.day || diagnosis.approximate)
+    return [];
+  const today = new Date(now),
+    y = today.getFullYear();
   if (y <= diagnosis.year) return [];
-  const start = new Date(y, diagnosis.month - 1, diagnosis.day ?? 1).getTime();
-  return now >= start ? [{ periodKey: periodKey("year", now) }] : [];
+  // JS maps Feb 29 to March 1 in non-leap years, matching the shield policy.
+  const anniversary = new Date(y, diagnosis.month - 1, diagnosis.day);
+  return today.getMonth() === anniversary.getMonth() &&
+    today.getDate() === anniversary.getDate()
+    ? [{ periodKey: periodKey("year", now) }]
+    : [];
 }
 
 export const LIFE_RULES: Rule[] = [
@@ -163,4 +173,7 @@ export const LIFE_RULES: Rule[] = [
 /** Every rule the engine knows. Health rules join this list only after a safety review. */
 // Health rules are included here but only exist for a person when the `healthAchievements` flag is on and they
 // opted in (see availableRules in engine.ts and docs/ACHIEVEMENT_SAFETY.md).
-export const ALL_RULES: Rule[] = [...LIFE_RULES, ...HEALTH_RULES];
+export const ALL_RULES: Rule[] = [
+  ...LIFE_RULES,
+  ...HEALTH_RULES.map((r) => ({ ...r, def: { ...r.def, disabled: true } })),
+];

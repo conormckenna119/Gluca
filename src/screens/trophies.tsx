@@ -1,8 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Pressable, View } from "react-native";
-import { Redirect } from "expo-router";
+import { Redirect, useLocalSearchParams } from "expo-router";
 import {
   EmptyState,
+  Button,
+  Notice,
+  SwitchRow,
   Eyebrow,
   Section,
   T,
@@ -26,8 +29,21 @@ const GROUPS: { key: AchievementCategory; title: string }[] = [
 
 export function Trophies() {
   const c = useColors();
+  const params = useLocalSearchParams<{ award?: string }>();
+  const handled = useRef("");
   const a = useAchievements();
+  const [arranging, setArranging] = useState(false);
+  const [showUpcoming, setShowUpcoming] = useState(false);
   const [open, setOpen] = useState<Award | null>(null);
+  useEffect(() => {
+    if (params.award && handled.current !== params.award) {
+      const found = a.awards.find((x) => x.id === params.award);
+      if (found) {
+        handled.current = params.award;
+        setOpen(found);
+      }
+    }
+  }, [params.award, a.awards]);
   const earnedIds = useMemo(
     () => new Set(a.awards.map((x) => x.achievementId)),
     [a.awards],
@@ -39,9 +55,38 @@ export function Trophies() {
   const sorted = [...a.awards].sort((x, y) => y.awardedAt - x.awardedAt);
   return (
     <Page
-      title="Medals"
-      subtitle="Small marks for things you chose to do. There is no score, and nothing here is ever taken away."
+      title="Trophy Cabinet"
+      subtitle="Life moments and community contributions. Yours to keep private or share."
     >
+      {a.status === "guest" ? (
+        <Notice tone="info">
+          Guest collection � kept in memory for this session. Sign in before
+          earning medals to keep them with your account.
+        </Notice>
+      ) : null}
+      {a.status === "checking" ? (
+        <T small muted>
+          Loading your collection�
+        </T>
+      ) : null}
+      {a.error ? (
+        <>
+          <Notice tone="info">{a.error}</Notice>
+          <Button label="Reload collection" onPress={a.retry} />
+        </>
+      ) : null}
+      {a.status === "account" ? (
+        <SwitchRow
+          title="Public collection"
+          detail="Only medals you choose to show are included. Pinning alone does not share them."
+          value={a.collectionPublic}
+          onChange={a.setCollectionPublic}
+        />
+      ) : a.status === "guest" ? (
+        <T small muted>
+          Sign in to manage public collection visibility.
+        </T>
+      ) : null}
       {sorted.length ? (
         GROUPS.map((g) => {
           const items = sorted.filter(
@@ -104,13 +149,66 @@ export function Trophies() {
         <EmptyState
           icon="medal"
           title="No medals yet"
-          body="Medals appear on their own as you make graphics, take part and join in. There is no rush."
+          body="Export a story or confirm a personal milestone to begin your collection."
         />
       )}
-      {toEarn.length ? (
+      {a.awards.some((x) => x.pinned) ? (
+        <Button
+          label={arranging ? "Done arranging" : "Arrange pinned medals"}
+          onPress={() => setArranging((v) => !v)}
+        />
+      ) : null}
+      {arranging && a.awards.some((x) => x.pinned) ? (
+        <Section
+          title="Pinned medals"
+          note="Up to three, in the order shown on your profile."
+        >
+          {a.awards
+            .filter((x) => x.pinned)
+            .map((x, i, pins) => (
+              <View key={x.id} style={{ gap: space.xs }}>
+                <T bold>{getDef(x.achievementId)?.name}</T>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: space.sm,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {i > 0 ? (
+                    <Button
+                      label={`Move ${getDef(x.achievementId)?.name} earlier`}
+                      onPress={() => {
+                        const ids = pins.map((p) => p.id);
+                        [ids[i - 1], ids[i]] = [ids[i], ids[i - 1]];
+                        a.reorder(ids);
+                      }}
+                    />
+                  ) : null}
+                  {i < pins.length - 1 ? (
+                    <Button
+                      label={`Move ${getDef(x.achievementId)?.name} later`}
+                      onPress={() => {
+                        const ids = pins.map((p) => p.id);
+                        [ids[i], ids[i + 1]] = [ids[i + 1], ids[i]];
+                        a.reorder(ids);
+                      }}
+                    />
+                  ) : null}
+                </View>
+              </View>
+            ))}
+        </Section>
+      ) : null}
+      <SwitchRow
+        title="Show upcoming medals"
+        value={showUpcoming}
+        onChange={setShowUpcoming}
+      />
+      {showUpcoming && toEarn.length ? (
         <Section
           title="Ways to earn"
-          note="Whenever it suits you. Nothing is counted or timed."
+          note="Optional ideas. Participation is not a competition."
         >
           <View style={{ gap: space.md }}>
             {toEarn.map((d) => (
@@ -149,8 +247,8 @@ export function Trophies() {
         </Section>
       ) : null}
       <Section
-        title="Challenges"
-        note="Mark one as done when you have done it, in your own way."
+        title="Personal moments"
+        note="Confirm an activity you have completed. No details or evidence are uploaded."
       >
         <ChallengeList />
       </Section>

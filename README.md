@@ -1,3 +1,7 @@
+# Stage 8A - Trophy Cabinet
+
+Enable achievements with identity/accounts, rebuild the existing web export and restart the same backend. Profile -> Trophy Cabinet: eight explicit nonmedical event awards, three ordered pins, privacy controls and optional Create sharing. No demo-history backfill. [Setup and sources](docs/ACHIEVEMENT_SYSTEM.md), [cabinet](docs/TROPHY_CABINET.md), [safety](docs/ACHIEVEMENT_SAFETY.md). Native/production/social verification remain gated. Stop after Stage 8A.
+
 # Gluca
 
 **Stage 7C — UI/UX audit:** 11 rendered routes reviewed at mobile/desktop sizes in light/dark. Five scoped fixes improve overlay selection exit, shared dialogs, photo-picker feedback/lifecycle, static copy and Create filtering. [Prioritized findings, files, evidence, tests and Stage 8 recommendations](docs/UI_UX_AUDIT.md). 368 core tests, 16 normal browser tests and two isolated mocked Dexcom journeys pass. Native device/real keyboard/screen-reader and live Dexcom checks remain separate gates. Refresh the existing development web build; no account, data migration or new dependency is required.

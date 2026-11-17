@@ -10,6 +10,9 @@ import {
 import { publicView } from "../src/domain/public-view";
 import { localToday, completedYears } from "../src/domain/shield";
 import { limit } from "./limits";
+import { loadCabinet } from "./achievements";
+import { publicMedal } from "../src/achievements/engine";
+import { getDef } from "../src/achievements/registry";
 type Row = { payload_enc: string; revision: number };
 function key(ctx: Ctx) {
   if (!ctx.deps.tokenKey)
@@ -141,16 +144,29 @@ function publicProfile(ctx: Ctx) {
   const p = JSON.parse(
     decrypt(r.payload_enc, key(ctx), `profile:v1:${r.user_id}`),
   );
-  sendJson(
-    ctx.res,
-    200,
-    publicView(sanitizeProfile(p.profile), sanitizePrivacy(p.privacy), {
+  const cabinet = loadCabinet(ctx, r.user_id);
+  const medals = cabinet.public
+    ? cabinet.awards
+        .filter(
+          (a) =>
+            a.visibility === "public" &&
+            !a.withdrawn &&
+            getDef(a.achievementId)?.category !== "health",
+        )
+        .flatMap((a) => {
+          const def = getDef(a.achievementId);
+          return def ? [{ ...publicMedal(a, def), pinned: a.pinned }] : [];
+        })
+    : [];
+  sendJson(ctx.res, 200, {
+    ...publicView(sanitizeProfile(p.profile), sanitizePrivacy(p.privacy), {
       today: localToday(new Date(ctx.deps.now())),
       clubs: [],
       clubVisibility: {},
       awards: [],
     }),
-  );
+    ...(cabinet.public ? { medals } : {}),
+  });
 }
 export const profileRoutes: Route[] = [
   {

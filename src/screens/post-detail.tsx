@@ -1,3 +1,4 @@
+import { recordAchievementEvent } from "../achievements/events";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -71,6 +72,7 @@ function PostConversation() {
       ),
       counters: { ...s.counters, commentsMade: s.counters.commentsMade + 1 },
     }));
+    recordAchievementEvent("comment_added");
     change("");
   };
   return (

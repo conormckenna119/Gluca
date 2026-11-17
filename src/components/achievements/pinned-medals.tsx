@@ -53,7 +53,11 @@ export function PinnedMedals({
 }
 
 /** Button that opens the medal cabinet. */
-export function ProfileMedalsLink({ label = "Medals" }: { label?: string }) {
+export function ProfileMedalsLink({
+  label = "Trophy Cabinet",
+}: {
+  label?: string;
+}) {
   return (
     <Button label={label} onPress={() => router.push("/trophies" as never)} />
   );

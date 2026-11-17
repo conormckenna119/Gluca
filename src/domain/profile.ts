@@ -146,6 +146,7 @@ export const defaultPrivacy = (): PrivacySettings => ({
 
 /** What another person may see of a profile once privacy settings are applied. Built by `publicView` (task 2.4). */
 export type PublicProfile = {
+  medals?: (import("../achievements/engine").PublicMedal & {pinned:boolean})[];
   name: string;
   username?: string;
   bio?: string;

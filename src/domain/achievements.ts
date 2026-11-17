@@ -57,6 +57,8 @@ export type Award = {
   snapshot?: Record<string, string | number>;
   visibility: AwardVisibility;
   pinned: boolean;
+  /** Opaque local action identifier; never included in public medals. */
+  relatedEvent?: string;
   /** Present when the award was withdrawn because its data was wrong. Withdrawn awards are hidden everywhere. */
   withdrawn?: { at: number; reason: string };
 };

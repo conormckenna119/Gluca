@@ -127,6 +127,7 @@ export function DemoStore({ children }: { children: React.ReactNode }) {
   });
   const revision = useRef(0),
     epoch = useRef(0);
+  const legacyAwards = useRef<State["awards"]>([]);
   const [profileVersion, versionSet] = useState(0);
   const [, calendarTick] = useState(0);
   useEffect(() => {
@@ -208,7 +209,11 @@ export function DemoStore({ children }: { children: React.ReactNode }) {
             ...s,
             imported: [],
             ...(e === "lock" && reason === "account"
-              ? { profile: defaultProfile(), privacy: defaultPrivacy() }
+              ? {
+                  profile: defaultProfile(),
+                  privacy: defaultPrivacy(),
+                  awards: [],
+                }
               : {}),
           }));
         } else void reloadProfile();
@@ -222,7 +227,8 @@ export function DemoStore({ children }: { children: React.ReactNode }) {
           const cleaned = removeLegacyPlaintextHistory(raw);
           const loaded = loadState(cleaned.raw, seed());
           legacy.current = { profile: loaded.profile, privacy: loaded.privacy };
-          setState(loaded);
+          legacyAwards.current = loaded.awards;
+          setState({ ...loaded, awards: [] });
           if (cleaned.removed) {
             setPrivacyNotice(
               "For privacy, an older plaintext glucose cache was cleared. Re-import your CSV for this session; your original file was not changed.",
@@ -241,7 +247,9 @@ export function DemoStore({ children }: { children: React.ReactNode }) {
     if (ready)
       AsyncStorage.setItem(
         "gluca-demo-v1",
-        JSON.stringify(persistableState(state, legacy.current)),
+        JSON.stringify(
+          persistableState(state, legacy.current, legacyAwards.current),
+        ),
       ).catch(() => setError("Changes could not be saved to this device."));
   }, [state, ready]);
   return (

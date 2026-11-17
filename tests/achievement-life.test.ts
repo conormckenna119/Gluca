@@ -104,7 +104,7 @@ test("diagnosis anniversary uses the local calendar and never invents dates", ()
     anniversaryHits({ year: 2015, month: 11, day: 17 }, nov16).length,
     0,
   );
-  assert.equal(anniversaryHits({ year: 2015, month: 11 }, nov16).length, 1); // month has started
+  assert.equal(anniversaryHits({ year: 2015, month: 11 }, nov16).length, 0); // month alone does not establish an anniversary
   assert.equal(anniversaryHits({ year: 2015, month: 12 }, nov16).length, 0);
   assert.equal(anniversaryHits({ year: 2015 }, nov16).length, 0); // year only: never
   assert.equal(
@@ -120,7 +120,7 @@ test("diagnosis anniversary uses the local calendar and never invents dates", ()
     ...blank(),
     profile: {
       ...blank().profile,
-      diagnosis: { year: 2015, month: 3, day: 2 },
+      diagnosis: { year: 2015, month: 11, day: 16 },
     },
   };
   const first = evaluateAwards(ALL_RULES, { state: s, now: nov16, flags });
@@ -128,7 +128,7 @@ test("diagnosis anniversary uses the local calendar and never invents dates", ()
   assert.equal(first.added[0].periodKey, "2026");
   const next = evaluateAwards(ALL_RULES, {
     state: { ...s, awards: first.awards },
-    now: new Date(2027, 5, 1).getTime(),
+    now: new Date(2027, 10, 16).getTime(),
     flags,
   });
   assert.deepEqual(

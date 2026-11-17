@@ -1,3 +1,7 @@
+# Stage 8A decisions - 2026-11-17
+
+Reuse existing registry, backend encryption/sessions and Create milestone renderer. Store transactional encrypted owner documents instead of exposing diagnosis-derived medal metadata in plaintext columns. Guest awards ephemeral; legacy prototype medals preserved separately, never uploaded/imported. Public collection requires two opt-ins. Runtime medical awards disabled regardless of development flag. No dependency, extra backend, new reactions/activity system or Dexcom feature.
+
 # Decisions
 
 ## Stage 7C — 17 November 2026

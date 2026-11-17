@@ -1,3 +1,7 @@
+# Stage 8A - explicit account medals
+
+Existing registry/Medal/sheets/toasts/Create reused. New src/achievements/events.ts owns event eligibility and pin/order/privacy. server/achievements.ts adds authenticated encrypted owner persistence via migration 6. Existing Create/publish/comment/Boost/Log success handlers emit minimal receipts. Public profile allowlist requires collection plus individual visibility. Tests: achievement-events, server-achievements, e2e/stage8a. Guides: ACHIEVEMENT_SYSTEM.md, ACHIEVEMENT_SAFETY.md, TROPHY_CABINET.md.
+
 #
 
 ## Stage 7C — scoped UI audit

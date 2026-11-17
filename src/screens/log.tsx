@@ -1,3 +1,4 @@
+import { recordAchievementEvent } from "../achievements/events";
 import React, { useMemo, useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import Svg, { Line, Path, Rect, Text as SvgText } from "react-native-svg";
@@ -236,7 +237,12 @@ function LogForm() {
       set((s) =>
         updateEvent(s, existing.id, { ...fields, label: text || undefined }),
       );
-    else set((s) => addEvent(s, { id: newEventId(), ...fields }));
+    else {
+      const eventId = newEventId();
+      set((s) => addEvent(s, { id: eventId, ...fields }));
+      if (kind === "activity")
+        recordAchievementEvent("activity_logged", eventId);
+    }
     router.back();
   };
   const remove = () => {

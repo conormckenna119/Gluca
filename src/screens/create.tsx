@@ -1,3 +1,7 @@
+import {
+  recordAchievementEvent,
+  captureAchievementScope,
+} from "../achievements/events";
 import React, { useRef, useState } from "react";
 import { BRAND } from "../art/brand";
 import { View, Platform, useWindowDimensions } from "react-native";
@@ -110,7 +114,7 @@ export function Create() {
         return {
           ...next,
           ...(text.headline
-            ? { tone: "custom" as const, headline: text.headline }
+            ? { tone: "custom" as const, headline: text.headline, caption: "" }
             : {}),
           ...(text.big ? { milestoneBig: text.big } : {}),
         };
@@ -181,6 +185,7 @@ export function Create() {
   const patch = (p: Partial<StoryOptions>) => O((prev) => ({ ...prev, ...p }));
 
   const doExport = async (save = false) => {
+    const awardScope = captureAchievementScope();
     if (isDexcom && (feed.busy || !data.length || feed.day !== feed.loadedDay))
       return;
     B(true);
@@ -211,6 +216,8 @@ export function Create() {
         `gluca-${slug(o.template)}-${o.transparent ? "transparent-" : ""}${o.format.toLowerCase()}.png`,
         composition.photoUri ?? undefined,
       );
+      if (Platform.OS === "web" || save)
+        recordAchievementEvent("story_exported", undefined, awardScope);
       if (!isDexcom) track("export_succeeded", evt);
       if (!isDexcom)
         set((s) => ({

@@ -1,23 +1,21 @@
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useDemo } from "../store";
-import { getFlags, isEnabled } from "../flags";
+import { isEnabled } from "../flags";
+import type { AwardVisibility } from "../domain/achievements";
+import { LIFE_RULES } from "../achievements/life";
+import { Platform, AppState } from "react-native";
+import { onSessionEvent } from "../services/session-events";
 import {
-  MAX_PINNED,
-  type AchievementDef,
-  type Award,
-  type AwardVisibility,
-} from "../domain/achievements";
-import {
-  availableRules,
-  evaluateAwards,
-  pinAward,
-  setAwardVisibility,
-  unpinAward,
-  visibleAwards,
-} from "../achievements/engine";
-import { ALL_RULES } from "../achievements/life";
-import { getDef } from "../achievements/registry";
-import { CHALLENGES, completeChallenge } from "../achievements/challenges";
+  applyEvent,
+  editCabinet,
+  emptyCabinet,
+  onAchievementEvent,
+  recordAchievementEvent,
+  type Cabinet,
+  type CabinetEdit,
+  type AchievementEvent,
+} from "../achievements/events";
+import { CHALLENGES } from "../achievements/challenges";
 
 // Newly earned awards waiting for the unlock toast. Module-level so one host in the root layout can show them.
 let queue: string[] = [];
@@ -41,6 +39,85 @@ export const dismissUnlock = (id: string) => {
 export const useUnlockQueue = () =>
   useSyncExternalStore(subscribe, snapshot, snapshot);
 
+type CabinetStatus = "checking" | "account" | "guest" | "unavailable";
+let cabinetState: { data: Cabinet; status: CabinetStatus; error: string } = {
+  data: emptyCabinet(),
+  status: "checking",
+  error: "",
+};
+const cabinetListeners = new Set<() => void>();
+const subscribeCabinet = (fn: () => void) => {
+  cabinetListeners.add(fn);
+  return () => {
+    cabinetListeners.delete(fn);
+  };
+};
+let cabinetEpoch = 0;
+let pending = Promise.resolve();
+let retryCabinet = () => {};
+function publishCabinet(data: Cabinet, status: CabinetStatus, error: string) {
+  cabinetState = { data, status, error };
+  cabinetListeners.forEach((fn) => fn());
+}
+type Command = { event: AchievementEvent } | { edit: CabinetEdit };
+async function cabinetRequest(body?: Command): Promise<Cabinet | null> {
+  const r = await fetch("/api/achievements", {
+    method: body ? "POST" : "GET",
+    credentials: "include",
+    cache: "no-store",
+    redirect: "error",
+    signal: AbortSignal.timeout(15000),
+    headers: { "Content-Type": "application/json", "X-Gluca-Request": "1" },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+  if (r.status === 401) {
+    if (body) {
+      cabinetEpoch++;
+      queue = [];
+      emit();
+      publishCabinet(
+        emptyCabinet(),
+        "unavailable",
+        "Sign in again to access your collection.",
+      );
+    }
+    return null;
+  }
+  if (!r.ok)
+    throw new Error(
+      "Medal update could not be saved. Check your connection or pin limit.",
+    );
+  return r.json();
+}
+function transact(command: Command) {
+  const epoch = cabinetEpoch,
+    status = cabinetState.status;
+  if (status !== "guest" && status !== "account") return Promise.resolve();
+  pending = pending.then(async () => {
+    if (epoch !== cabinetEpoch) return;
+    try {
+      const before = cabinetState.data;
+      const next =
+        status === "account"
+          ? await cabinetRequest(command)
+          : "event" in command
+            ? applyEvent(before, command.event, "guest", Date.now())
+            : editCabinet(before, command.edit);
+      if (epoch !== cabinetEpoch || !next) return;
+      publishCabinet(next, status, "");
+      enqueueUnlocks(
+        next.awards
+          .filter((a) => !before.awards.some((b) => b.id === a.id))
+          .map((a) => a.id),
+      );
+    } catch (e) {
+      if (epoch === cabinetEpoch)
+        publishCabinet(cabinetState.data, status, (e as Error).message);
+    }
+  });
+  return pending;
+}
+
 export type PinOutcome = { ok: boolean; reason?: string };
 
 /**
@@ -48,95 +125,139 @@ export type PinOutcome = { ok: boolean; reason?: string };
  * earned medals when the relevant state changes. It only ever adds awards.
  */
 export function useAchievements(opts: { evaluate?: boolean } = {}) {
-  const { state, set, ready } = useDemo();
+  const { set, ready, state } = useDemo();
   const on = isEnabled("achievements");
-  const {
-    posts,
-    events,
-    counters,
-    challenges,
-    clubs,
-    profile,
-    privacy,
-    awards,
-  } = state;
-
+  const record = useSyncExternalStore(
+    subscribeCabinet,
+    () => cabinetState,
+    () => cabinetState,
+  );
   useEffect(() => {
     if (!opts.evaluate || !on || !ready) return;
-    const { added } = evaluateAwards(ALL_RULES, {
-      state,
-      now: Date.now(),
-      flags: getFlags(),
-    });
-    if (!added.length) return;
-    set((s) => {
-      const have = new Set(s.awards.map((a) => a.id));
-      const fresh = added.filter((a) => !have.has(a.id));
-      return fresh.length ? { ...s, awards: [...s.awards, ...fresh] } : s;
-    });
-    enqueueUnlocks(added.map((a) => a.id));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    opts.evaluate,
-    on,
-    ready,
-    posts,
-    events,
-    counters,
-    challenges,
-    clubs,
-    profile,
-    privacy.healthAchievements,
-  ]);
-
-  const earned = useMemo(() => (on ? visibleAwards(awards) : []), [on, awards]);
-  const defs = useMemo(
-    () => availableRules(ALL_RULES, getFlags(), privacy).map((r) => r.def),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [privacy, on],
-  );
-
-  const pin = useCallback(
-    (id: string): PinOutcome => {
-      const r = pinAward(state.awards, id);
-      if (r.reason) {
-        const names = visibleAwards(state.awards)
-          .filter((a) => a.pinned)
-          .map((a) => getDef(a.achievementId)?.name ?? "A medal");
-        return {
-          ok: false,
-          reason: `Your profile already shows ${MAX_PINNED} medals: ${names.join(", ")}. Unpin one first.`,
-        };
+    let alive = true;
+    const reset = () => {
+      cabinetEpoch++;
+      queue = [];
+      emit();
+      publishCabinet(emptyCabinet(), "checking", "");
+    };
+    const load = async () => {
+      reset();
+      const epoch = cabinetEpoch;
+      try {
+        const result = Platform.OS === "web" ? await cabinetRequest() : null;
+        if (!alive || epoch !== cabinetEpoch) return;
+        publishCabinet(
+          result ?? emptyCabinet(),
+          result ? "account" : "guest",
+          "",
+        );
+        recordAchievementEvent("anniversary_checked");
+      } catch {
+        if (alive && epoch === cabinetEpoch)
+          publishCabinet(
+            emptyCabinet(),
+            "unavailable",
+            "Medal service unavailable. Retry when connected.",
+          );
       }
-      set((s) => ({ ...s, awards: pinAward(s.awards, id).awards }));
-      return { ok: true };
-    },
-    [state.awards, set],
-  );
-  const unpin = useCallback(
-    (id: string) => set((s) => ({ ...s, awards: unpinAward(s.awards, id) })),
-    [set],
-  );
-  const setVisibility = useCallback(
-    (id: string, v: AwardVisibility) =>
-      set((s) => ({ ...s, awards: setAwardVisibility(s.awards, id, v) })),
-    [set],
-  );
-  const complete = useCallback(
-    (id: string) =>
-      set((s) => ({ ...s, ...completeChallenge(s, id, Date.now()) })),
-    [set],
-  );
-
+    };
+    void load();
+    retryCabinet = () => {
+      void load();
+    };
+    const stop = onSessionEvent((event, _remote, reason) => {
+      if (reason !== "account") return;
+      if (event === "check") void load();
+      else reset();
+    });
+    const stopEvents = onAchievementEvent((event) => {
+      void transact({ event });
+    });
+    return () => {
+      alive = false;
+      retryCabinet = () => {};
+      cabinetEpoch++;
+      stop();
+      stopEvents();
+    };
+  }, [opts.evaluate, on, ready]);
+  useEffect(() => {
+    if (opts.evaluate) set((s) => ({ ...s, awards: record.data.awards }));
+  }, [opts.evaluate, record.data.awards, set]);
+  useEffect(() => {
+    if (!opts.evaluate || !on || record.status !== "account") return;
+    const check = () => recordAchievementEvent("anniversary_checked");
+    check();
+    const listener = AppState.addEventListener("change", (s) => {
+      if (s === "active") check();
+    });
+    return () => listener.remove();
+  }, [opts.evaluate, on, record.status, state.profile.diagnosis]);
+  const pin = (id: string): PinOutcome => {
+    try {
+      editCabinet(record.data, { type: "pin", id, value: true });
+    } catch (e) {
+      return { ok: false, reason: (e as Error).message };
+    }
+    void transact({ edit: { type: "pin", id, value: true } });
+    return { ok: true };
+  };
   return {
     enabled: on,
-    awards: earned as Award[],
-    defs: defs as AchievementDef[],
-    challenges: CHALLENGES,
-    completed: state.challenges,
+    awards: on ? record.data.awards : [],
+    defs: LIFE_RULES.filter(
+      (r) => !r.def.disabled && r.def.id !== "activity_accomplishment",
+    ).map((r) => r.def),
+    status: record.status,
+    error: record.error,
+    retry: () => retryCabinet(),
+    collectionPublic: record.data.public,
+    challenges: CHALLENGES.filter(
+      (c) => c.id === "awareness_event" || c.id === "personal_milestone",
+    ),
+    completed: record.data.events.flatMap((e) =>
+      e.kind === "awareness_confirmed"
+        ? [
+            {
+              id: "awareness_event",
+              completedAt:
+                record.data.awards.find(
+                  (a) => a.achievementId === "awareness_contribution",
+                )?.awardedAt ?? 0,
+            },
+          ]
+        : e.kind === "milestone_confirmed"
+          ? [
+              {
+                id: "personal_milestone",
+                completedAt:
+                  record.data.awards.find(
+                    (a) => a.achievementId === "personal_milestone",
+                  )?.awardedAt ?? 0,
+              },
+            ]
+          : [],
+    ),
     pin,
-    unpin,
-    setVisibility,
-    completeChallenge: complete,
+    unpin: (id: string) =>
+      void transact({ edit: { type: "pin", id, value: false } }),
+    setVisibility: (id: string, v: AwardVisibility) =>
+      void transact({
+        edit: { type: "visibility", id, value: v === "public" },
+      }),
+    setCollectionPublic: (value: boolean) =>
+      void transact({ edit: { type: "public", value } }),
+    reorder: (ids: string[]) =>
+      void transact({ edit: { type: "reorder", ids } }),
+    completeChallenge: (id: string) => {
+      if (id === "awareness_event" || id === "personal_milestone")
+        recordAchievementEvent(
+          id === "awareness_event"
+            ? "awareness_confirmed"
+            : "milestone_confirmed",
+          id,
+        );
+    },
   };
 }

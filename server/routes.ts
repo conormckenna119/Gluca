@@ -1,6 +1,7 @@
 import { HttpError, redirect, sendJson, type Ctx, type Route } from "./http";
 import { sessionRoutes } from "./session";
 import { profileRoutes } from "./profiles";
+import { achievementRoutes } from "./achievements";
 import {
   buildAuthorizeUrl,
   consumeState,
@@ -138,6 +139,7 @@ export const routes: Route[] = [
   },
   ...sessionRoutes,
   ...profileRoutes,
+  ...achievementRoutes,
   { method: "POST", path: "/api/dexcom/connect", handler: connect },
   {
     method: "GET",

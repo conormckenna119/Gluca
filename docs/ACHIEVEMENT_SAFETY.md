@@ -1,3 +1,13 @@
+# Stage 8A safety decision - 2026-11-17
+
+This supersedes historical prototype gating below. All health definitions in the runtime registry are explicitly disabled, even if healthAchievements and profile opt-in are enabled. No Stage 8A event creates a medical-outcome award. Qualified clinical review and separately authorized development are required to change this. No lowest glucose/A1C, insulin/food restriction, perfect days, in-range streaks or medical competitions.
+
+Only the eight nonmedical events in ACHIEVEMENT_SYSTEM.md are active. They represent optional participation, not expertise or treatment success. Supporters need no Dexcom account. Dia-versary requires an exact, non-approximate date and the actual anniversary day. Month/year and year-only dates never invent a day. February 29 is observed March 1 in non-leap years, matching shields. The backend local calendar is currently authoritative; user-selected timezones/policy remain future work. No retrospective anniversary backlog.
+
+Collections and awards default private. Explicit sharing excludes private source details. No negative reminders, health progress indicators or auto-posts. Local community receipts are not external participation verification. Glucose/profile privacy is unchanged. Historical medical specifications below describe disabled prototypes, not enabled product behavior.
+
+---
+
 # Achievement safety
 
 Written 2026-11-16. Status: **prototype rules, not clinically reviewed.** Nothing in this file has been checked by a clinician. Health achievements stay behind the `healthAchievements` flag (off) until a qualified clinical reviewer signs each rule off here.
@@ -21,10 +31,10 @@ These are refused outright, whatever the flag state:
 
 ## 2. Two kinds of achievement
 
-| Kind | Depends on glucose? | Default | Status |
-| --- | --- | --- | --- |
-| Life and community (first post, first export, diagnosis anniversary, challenges, first Boost given …) | No | Private; the person may show each medal | Built behind `achievements`; no clinical review needed |
-| Health milestones | Yes | Private; opt-in; retrospective only | Prototype behind `healthAchievements`; **needs clinical review** |
+| Kind                                                                                                  | Depends on glucose? | Default                                 | Status                                                           |
+| ----------------------------------------------------------------------------------------------------- | ------------------- | --------------------------------------- | ---------------------------------------------------------------- |
+| Life and community (first post, first export, diagnosis anniversary, challenges, first Boost given …) | No                  | Private; the person may show each medal | Built behind `achievements`; no clinical review needed           |
+| Health milestones                                                                                     | Yes                 | Private; opt-in; retrospective only     | Prototype behind `healthAchievements`; **needs clinical review** |
 
 Supporters and people without diabetes can earn every life and community medal.
 
@@ -48,21 +58,21 @@ Passing the gate means "this period can be considered for a medal". It does not 
 
 All are private by default, awarded only after the fact, and carry `safetyReview: "pending"`.
 
-| Id | Name | Rule (in addition to the gate) | Repeats | Incentive risk | Mitigation |
-| --- | --- | --- | --- | --- | --- |
-| `tir_milestone` | A month to remember | Time in range for the most recent completed month is 70% or more. Only evaluated while the person is opted in | Once | Running low to stay under the upper limit | Low-glucose guard; awarded once, so nothing to chase monthly |
-| `steadier_month` | A steadier month | Time in range rose by at least 5 percentage points against the previous completed month, and time below 70 and below 54 are both no higher than in that month | At most once a quarter | Over-correcting highs; chasing month-on-month gains | Lows must not rise; quarterly cap; the baseline month must pass the coverage and definition lines too |
-| `fewer_lows` | Fewer lows | The previous month had 4% or more below 70; this month is lower by at least 1 percentage point, below 54 is no higher, and time in range did not fall by more than 5 points | At most once a quarter | Running high to avoid lows | Time in range must hold; awarded on reduction, not on reaching zero |
+| Id               | Name                | Rule (in addition to the gate)                                                                                                                                              | Repeats                | Incentive risk                                      | Mitigation                                                                                            |
+| ---------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `tir_milestone`  | A month to remember | Time in range for the most recent completed month is 70% or more. Only evaluated while the person is opted in                                                               | Once                   | Running low to stay under the upper limit           | Low-glucose guard; awarded once, so nothing to chase monthly                                          |
+| `steadier_month` | A steadier month    | Time in range rose by at least 5 percentage points against the previous completed month, and time below 70 and below 54 are both no higher than in that month               | At most once a quarter | Over-correcting highs; chasing month-on-month gains | Lows must not rise; quarterly cap; the baseline month must pass the coverage and definition lines too |
+| `fewer_lows`     | Fewer lows          | The previous month had 4% or more below 70; this month is lower by at least 1 percentage point, below 54 is no higher, and time in range did not fall by more than 5 points | At most once a quarter | Running high to avoid lows                          | Time in range must hold; awarded on reduction, not on reaching zero                                   |
 
 Wording never uses "record", "best" or "beat". The medal's private detail may show the two percentages; the public medal and any shared image show the name only, unless the person explicitly adds numbers in Story Studio and sees them in "What's on this image".
 
 ## 5. Specified but not built
 
-| Idea | Why it waits |
-| --- | --- |
-| Reached a personally set A1C goal | Needs a way to enter a laboratory result with its date and source, and a reviewed rule for which goals are acceptable. A lab A1C and a self-reported A1C must be labelled as such. GMI or any estimated A1C is never shown or counted as a measured A1C. Lower-and-lower A1C milestones will not be built |
-| Kept a personal glucose goal over several months | Close to a streak. Needs a design that does not punish a break, and clinical review |
-| Individualized targets (children, pregnancy, care-team targets) | Needs clinical input on which settings are safe to let a person choose and how to compare periods |
+| Idea                                                            | Why it waits                                                                                                                                                                                                                                                                                              |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reached a personally set A1C goal                               | Needs a way to enter a laboratory result with its date and source, and a reviewed rule for which goals are acceptable. A lab A1C and a self-reported A1C must be labelled as such. GMI or any estimated A1C is never shown or counted as a measured A1C. Lower-and-lower A1C milestones will not be built |
+| Kept a personal glucose goal over several months                | Close to a streak. Needs a design that does not punish a break, and clinical review                                                                                                                                                                                                                       |
+| Individualized targets (children, pregnancy, care-team targets) | Needs clinical input on which settings are safe to let a person choose and how to compare periods                                                                                                                                                                                                         |
 
 ## 6. Notifications and presentation
 
@@ -81,12 +91,12 @@ Wording never uses "record", "best" or "beat". The medal's private detail may sh
 
 ## 8. Review status
 
-| Item | Built | Automated tests | Clinical review | Product review |
-| --- | --- | --- | --- | --- |
-| Eligibility gate (section 3) | See `docs/ROADMAP.md` M13 | See M13 | **Not done** | Not done |
-| `tir_milestone`, `steadier_month`, `fewer_lows` | See M13 | See M13 | **Not done** | Not done |
-| Life and community medals | See M13 | See M13 | Not needed | Not done |
-| A1C goal, sustained goal, individualized targets | No | No | Not done | Not done |
+| Item                                             | Built                     | Automated tests | Clinical review | Product review |
+| ------------------------------------------------ | ------------------------- | --------------- | --------------- | -------------- |
+| Eligibility gate (section 3)                     | See `docs/ROADMAP.md` M13 | See M13         | **Not done**    | Not done       |
+| `tir_milestone`, `steadier_month`, `fewer_lows`  | See M13                   | See M13         | **Not done**    | Not done       |
+| Life and community medals                        | See M13                   | See M13         | Not needed      | Not done       |
+| A1C goal, sustained goal, individualized targets | No                        | No              | Not done        | Not done       |
 
 ## 9. References
 

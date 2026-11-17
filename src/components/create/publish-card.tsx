@@ -1,3 +1,4 @@
+import { recordAchievementEvent } from "../../achievements/events";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
@@ -97,6 +98,8 @@ export function PublishCard({
                   : {}),
               };
               set((st) => ({ ...st, posts: [p, ...st.posts] }));
+              if (visibility !== "private")
+                recordAchievementEvent("post_published", p.id);
               setPreview(false);
               router.push("/");
             }}
