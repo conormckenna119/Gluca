@@ -156,12 +156,17 @@ test("successful exchange stores encrypted tokens and redirects without leaking"
     const s = await a.call("GET", "/api/dexcom/status", { cookie });
     assert.equal(s.json.connected, true);
     assert.deepEqual(Object.keys(s.json).sort(), [
+      "cacheScope",
+      "cacheValidUntil",
       "connected",
+      "connectionRevision",
       "environment",
       "mode",
       "needsReconnect",
       "temporaryError",
     ]);
+    assert.match(s.json.cacheScope, /^[a-f0-9]{64}$/);
+    assert.equal(s.json.cacheValidUntil, a.clock.now + 900000);
     assert.ok(
       !s.text.includes(FAKE.access) &&
         !s.text.includes(FAKE.refresh) &&

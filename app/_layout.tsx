@@ -16,6 +16,7 @@ import { configureTelemetry, track } from "../src/telemetry";
 import { useArtFonts } from "../src/fonts";
 import { useAchievements } from "../src/hooks/use-achievements";
 import { UnlockToastHost } from "../src/components/achievements/unlock-toast";
+import { GlucoseDataProvider } from "../src/glucose-context";
 
 // Literal env access: Expo inlines these at bundle time. Telemetry stays "off" unless EXPO_PUBLIC_TELEMETRY=local.
 // Development only, web only: a comma list in localStorage "gluca-dev-flags" is added to the env flags, so a feature
@@ -76,10 +77,7 @@ function Nav() {
         <Stack.Screen name="trophies" options={{ title: "Medals" }} />
         <Stack.Screen name="onboarding" options={{ title: "Your profile" }} />
         <Stack.Screen name="account" options={{ title: "Account" }} />
-        <Stack.Screen
-          name="profile-edit"
-          options={{ title: "Edit profile" }}
-        />
+        <Stack.Screen name="profile-edit" options={{ title: "Edit profile" }} />
         <Stack.Screen
           name="log"
           options={{
@@ -113,7 +111,9 @@ export default function Layout() {
   return (
     <QueryClientProvider client={queryClient}>
       <DemoStore>
-        <Nav />
+        <GlucoseDataProvider>
+          <Nav />
+        </GlucoseDataProvider>
       </DemoStore>
     </QueryClientProvider>
   );

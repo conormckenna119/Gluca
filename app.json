@@ -16,6 +16,7 @@
       "supportsTablet": true
     },
     "android": {
+      "allowBackup": false,
       "adaptiveIcon": {
         "backgroundColor": "#101412",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -38,6 +39,8 @@
         }
       ],
       "expo-font",
+      ["expo-sqlite", { "useSQLCipher": true }],
+      "expo-secure-store",
       [
         "expo-image-picker",
         {

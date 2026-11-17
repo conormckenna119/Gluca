@@ -11,6 +11,7 @@ import { ensureFreshConnection, loadConnection } from "./dexcom/client";
 import { RateLimited, ReconnectRequired, Unavailable } from "./dexcom/errors";
 import { limit } from "./limits";
 import { availableRangeRoute, readingsRoute } from "./dexcom/relay";
+import { connectionStatus } from "./dexcom/status";
 function requireMode(ctx: Ctx) {
   if (ctx.deps.mode !== "dexcom")
     throw new HttpError(
@@ -68,25 +69,7 @@ async function callback(ctx: Ctx) {
 }
 async function status(ctx: Ctx) {
   limit(ctx.deps, ctx.req, "status", 180);
-  let temporaryError = false;
-  if (
-    ctx.deps.mode === "dexcom" &&
-    loadConnection(ctx.deps, ctx.session!.userId)?.status === "connected"
-  ) {
-    try {
-      await ensureFreshConnection(ctx.deps, ctx.session!.userId);
-    } catch (e) {
-      if (!(e instanceof ReconnectRequired)) temporaryError = true;
-    }
-  }
-  const row = loadConnection(ctx.deps, ctx.session!.userId);
-  sendJson(ctx.res, 200, {
-    mode: ctx.deps.mode,
-    environment: "sandbox",
-    connected: row?.status === "connected",
-    needsReconnect: row?.status === "needs_reconnect",
-    temporaryError,
-  });
+  sendJson(ctx.res, 200, await connectionStatus(ctx.deps, ctx.session!));
 }
 async function refresh(ctx: Ctx) {
   requireMode(ctx);

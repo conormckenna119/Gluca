@@ -1,10 +1,15 @@
 // Connection management only. No Dexcom bearer token or secret ever enters this client.
+import { sessionEvent } from "./session-events";
 export type ConnectionStatus = {
   mode: "mock" | "dexcom";
   environment: "sandbox";
   connected: boolean;
   needsReconnect: boolean;
   temporaryError: boolean;
+  cacheScope?: string | null;
+  cacheValidUntil?: number | null;
+  retryAfterSeconds?: number;
+  connectionRevision?: string | null;
 };
 export class ConnectionError extends Error {
   constructor(public code: string) {
@@ -17,6 +22,15 @@ export function createOAuthClient(base = "", fetcher: typeof fetch = fetch) {
     method = "GET",
     body?: unknown,
   ): Promise<T> {
+    const mutation =
+      method === "POST" &&
+      [
+        "/api/session",
+        "/api/accounts",
+        "/api/session/logout",
+        "/api/dexcom/disconnect",
+      ].includes(route);
+    if (mutation) sessionEvent("lock");
     const res = await fetcher(`${base}${route}`, {
       method,
       credentials: "include",
@@ -44,7 +58,10 @@ export function createOAuthClient(base = "", fetcher: typeof fetch = fetch) {
       } catch {}
       throw new ConnectionError(code);
     }
-    return (await res.json()) as T;
+    const result = (await res.json()) as T;
+    if (mutation && ["/api/session", "/api/accounts"].includes(route))
+      sessionEvent("check");
+    return result;
   }
   return {
     session: () => request<{ session: boolean }>("/api/session"),

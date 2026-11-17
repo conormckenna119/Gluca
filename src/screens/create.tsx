@@ -32,6 +32,7 @@ import { PublishCard } from "../components/create/publish-card";
 import { rangeToText } from "../state";
 import { useCreateReadings } from "../hooks/use-create-readings";
 import { utcDayWindow } from "../create-source";
+import { GlucoseSyncStatus } from "../components/glucose-sync-status";
 import { getFlags, isEnabled } from "../flags";
 import { track, exportFormatId, exportFailReason } from "../telemetry";
 const slug = (s: string) => s.replace(/_/g, "-");
@@ -69,6 +70,11 @@ export function Create() {
   const [picked, setPicked] = useState<number | null>(null);
   const [busy, B] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  React.useEffect(() => {
+    setPhotoUri(null);
+    setResult({ kind: "idle" });
+    setPicked(null);
+  }, [feed.sessionVersion]);
   const art = useRef<React.ElementRef<typeof View>>(null);
   // Welcome opens Create with ?template=milestone; apply it when the param arrives.
   const {
@@ -227,6 +233,7 @@ export function Create() {
             : "Synthetic glucose"
       }
     >
+      <GlucoseSyncStatus />
       <Card>
         <T bold>Glucose Story · Share My Day</T>
         <T small muted>
@@ -295,8 +302,9 @@ export function Create() {
             />
             <T small>
               {data.length} Dexcom readings loaded
-              {feed.loadedDay ? ` for ${feed.loadedDay} UTC` : ""}. Select a
-              date and load it before exporting. Data stays in memory.
+              {feed.loadedDay ? ` for ${feed.loadedDay} UTC` : ""}. The preview
+              uses the loaded day. To use another period, select its date and
+              load it. Data stays in this open app.
             </T>
             {feed.error ? (
               <View accessibilityRole="alert">

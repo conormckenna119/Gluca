@@ -25,6 +25,7 @@ import { summarize, segments } from "../analytics";
 import { periodSummaries, utcChartTicks } from "../glucose-periods";
 import { yScale } from "../chart-scale";
 import { GlucoseChart } from "../components/glucose-chart";
+import { onSessionEvent } from "../services/session-events";
 
 const utc = (t: number) =>
   new Date(t).toISOString().replace("T", " ").replace(".000Z", " UTC");
@@ -55,6 +56,13 @@ export default function DexcomData() {
     setBusy(false);
     setError("");
   }, [provider]);
+  useEffect(
+    () =>
+      onSessionEvent((e) => {
+        if (e !== "check") clear();
+      }),
+    [clear],
+  );
   useFocusEffect(
     useCallback(() => {
       if (!allowed) return;

@@ -1,5 +1,14 @@
 #
 
+## Stage 5 data flow and files
+
+`app/_layout.tsx` wraps existing store/navigation with `src/glucose-context.tsx`. One `GlucoseSync` (`src/glucose-sync.ts`) uses `src/services/glucose-sync-transport.ts` → existing authenticated relay/token vault. `server/dexcom/status.ts` shares status/session/connection cache metadata between routes and live verification. EGVs remain transient on the server.
+
+Cache contract/memory merge: `src/glucose-cache.ts`. Web factory: `src/private-glucose-cache.ts` (ephemeral). Native factory: `src/private-glucose-cache.native.ts` (SQLCipher/SecureStore key); transaction core: `src/encrypted-glucose-cache.ts`. Native handoff/device verification stays gated. Invalidation: `src/services/session-events.ts`. Persistence exclusion/legacy CSV cleanup: `src/private-persistence.ts`, consumed by store.tsx and displayed through components/page.tsx.
+
+`src/components/glucose-sync-status.tsx` is reused by dashboard/Create/Settings. Hooks use-readings/use-create-readings consume shared history without persisted private query caches. CSV/demo remain available. Private Dexcom readings never enter the social store. `server/dexcom/sync-verification.ts` extends the existing live command with --sync. New tests: glucose-sync, glucose-cache, private-persistence, session-events, server-cache-scope. [Sync/security details](GLUCOSE_SYNC.md).
+
+
 Stage 4 update (2026-11-16): `src/create-source.ts` shares provider/day selection and story verification; `src/hooks/use-create-readings.ts` owns explicit Create sources and transient Dexcom rows. Existing `src/screens/create.tsx`, `src/story.ts`, `src/art/model.ts` and `templates.ts` reuse templates/analytics/export with UTC sandbox provenance. `server/dexcom/devices.ts` validates minimal private G7 evidence; `sandbox-verification.ts` drives the explicit live check through existing relay code. `tools/test-dexcom-sandbox.cjs` runs `npm run test:dexcom:sandbox`, writing only a derived graphic into ignored `.dexcom-verification/`. Unit tests: `tests/dexcom-create.test.ts`; separate mock browser test/config: `tests/e2e/dexcom-create.spec.ts`, `playwright.dexcom-create.config.ts`. [Live results and repeat instructions](DEXCOM_SANDBOX_TEST_RESULTS.md).
 
 Stage 3 update (2026-11-16): `server/dexcom/relay.ts` authenticates transient V3 dataRange/EGV requests; `src/services/dexcom-data.ts` supplies the memory-only provider; `src/glucose-window.ts` validates UTC periods; `src/glucose-periods.ts` wraps shared analytics for UTC days/weeks. `app/dexcom-data.tsx` reexports the development viewer screen. `tests/dexcom-data.test.ts` uses synthetic fixtures; `tools/dexcom-check.cjs` checks readiness without secrets/network. Setup, complete changed-file map and limitations: [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). No permanent glucose storage or normal dashboard data path change.

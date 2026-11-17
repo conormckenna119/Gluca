@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Platform, View } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, router } from "expo-router";
 import { Button, Card, Input, Notice, Section, T, row } from "../ui";
+import { sessionEvent } from "../services/session-events";
 import {
   createOAuthClient,
   connectionLabel,
@@ -23,29 +24,37 @@ export function DexcomConnection() {
     S(session.session);
     Status(session.session ? await client.status() : null);
   }
-  useEffect(() => {
-    if (Platform.OS !== "web") return;
-    let alive = true;
-    const update = () =>
-      client
-        .session()
-        .then(async (s) => {
-          if (!alive) return;
-          S(s.session);
-          Status(s.session ? await client.status() : null);
-        })
-        .catch((e) => {
-          if (alive) M(connectionMessage(e));
-        });
-    void update();
-    const interval = setInterval(() => void update(), 60000);
-    return () => {
-      alive = false;
-      clearInterval(interval);
-    };
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "web") return;
+      let alive = true;
+      const update = () =>
+        client
+          .session()
+          .then(async (s) => {
+            if (!alive) return;
+            S(s.session);
+            Status(s.session ? await client.status() : null);
+            if (alive)
+              M((previous) =>
+                previous.startsWith("The connection service is unavailable") ||
+                previous.startsWith("Authorization returned")
+                  ? ""
+                  : previous,
+              );
+          })
+          .catch((e) => {
+            if (alive) M(connectionMessage(e));
+          });
+      void update();
+      return () => {
+        alive = false;
+      };
+    }, []),
+  );
   useEffect(() => {
     if (!dexcom) return;
+    if (dexcom === "connected") sessionEvent("check");
     M(
       dexcom === "denied"
         ? "Dexcom authorization was declined."

@@ -1,5 +1,16 @@
 # Decisions
 
+## Stage 5 — 16 November 2026
+
+- Owner authorized automatic foreground sync, storage/privacy controls and shared dashboard/Create. No public deployment or new social features.
+- Web uses ephemeral memory rather than plaintext IndexedDB or a key stored beside ciphertext. Session-bound cache namespaces and short authoritative leases favor account isolation over indefinite offline access.
+- Raw CSV import becomes session-only; legacy persisted raw readings are removed with a visible reimport notice, preserving source files/preferences/explicit posts.
+- Native storage uses SDK-compatible expo-sqlite (~58.0.17, SQLCipher for large datasets), expo-secure-store (~58.0.3, key only), expo-crypto (~58.0.8, random key). Installed using Expo-compatible package versions. No unofficial Dexcom SDK/second backend. SQLCipher missing → fail closed. Android backups disabled. Native OAuth/device encryption still gated.
+- Five-minute freshness, 24-hour correction overlap, first seven UTC dates and 30-day retention plus one selected historical period are bounded defaults, configurable in SyncConfig. No endless polling/full-account repeated download.
+- Logout/disconnect/delete cancel private work, clear active caches and signal other tabs with metadata only. Existing explicit export/post snapshots remain user controlled. No auto-publish.
+- Public production and optional encrypted cloud backup remain separate future approvals. Creative status-card polish can be revisited by Claude; preserve explicit source, delay, ephemeral-cache and export-consent semantics. Current advisory audit requires review before deployment.
+
+
 Stage 4 decisions (2026-11-16): add an explicit Create source choice without changing the dashboard hook or persisting Dexcom rows. Use absolute UTC instants and historical UTC calendar dates for sandbox artwork to avoid DST folding; keep legacy demo/CSV time behavior. Extend existing artwork provenance with a non-removable sandbox simulation note, retaining every template and the existing export path. Keep device access confined to the backend's explicit verification command; devices require no date query. The live command reuses the protected account-owned connection and never logs subjects/tokens/individual readings. Rendered local verification artifacts are Git-ignored. No dependencies added. Creative styling remains a future Claude task; source controls use existing primitives.
 
 Stage 3 decisions (2026-11-16): reuse the existing authenticated Node/SQLite token backend; return raw glucose transiently without SQL/device persistence. Keep the provider isolated from demo/CSV state and existing achievement hooks. Use the existing pure analytics engine with an explicit UTC adapter for diagnostics and honest full-calendar coverage denominators. No dependencies added. Configure Expo Router web `asyncRoutes: false`: development split chunks otherwise use eval and are rejected by the existing strict CSP. Synchronous web route bundling preserves CSP without enabling unsafe-eval; tradeoff is a larger initial route bundle. Public diagnostics remain blocked by build/server gates. Creative presentation is deferred to Claude. Details: [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md).

@@ -1,5 +1,8 @@
 # Roadmap and specifications
 
+Stage 5 complete for the development web sandbox (2026-11-16): foreground automatic/incremental sync, shared dashboard/Create cache, account/session isolation, delete/logout/disconnect handling and SQLCipher native adapter implemented. Web cache is ephemeral; native OAuth/physical encryption, hosting and real-user production remain gated. 340 tests/typecheck pass; real sandbox initial/overlap retrieved 1,678 readings and Create used the shared dataset. See [GLUCOSE_SYNC.md](GLUCOSE_SYNC.md). This scoped owner request supersedes earlier sync deferrals. No further stage is automatically authorized.
+
+
 Stage 4 complete (2026-11-16): live G7 authorization reused and ownership/state evidence verified; official dataRange/devices/EGVs returned 200; 288 historical records normalized; existing Create rendered a sandbox-labeled story and actually exported a verified 1080×1920 PNG. Demo/CSV retained. Typecheck and 314 unit tests passed; actual browser UI verified where Playwright worker spawning is blocked. See [test report](DEXCOM_SANDBOX_TEST_RESULTS.md). Production, background scheduling and further social/medical work are not part of this milestone.
 
 Stage 3 update (2026-11-16): manual authenticated Dexcom sandbox retrieval, normalization, memory-only provider, development chart and common UTC summaries implemented. Synthetic automated verification is documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md); live verification awaits credentials and consent. No automatic synchronization, new health database, dashboard/Story Studio/social changes. Stage 4 is not authorized.

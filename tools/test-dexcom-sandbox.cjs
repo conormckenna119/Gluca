@@ -80,6 +80,7 @@ async function main() {
       accounts[0].user_id,
       option("--day"),
     );
+    const synchronization=process.argv.includes('--sync')?await require('../server/dexcom/sync-verification.ts').verifySynchronization(app.deps,accounts[0].user_id):undefined;
     const stateEvidence = !!db
       .prepare(
         "SELECT 1 FROM oauth_states o JOIN sessions s ON s.id_hash=o.session_id_hash WHERE s.user_id=? AND o.used_at IS NOT NULL LIMIT 1",
@@ -92,6 +93,7 @@ async function main() {
       JSON.stringify(
         {
           ...verified.summary,
+          synchronization,
           oauth: {
             existingAuthorizationReused: true,
             authenticatedOwner: true,

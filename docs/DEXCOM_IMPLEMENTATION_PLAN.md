@@ -1,5 +1,30 @@
 # Gluca — Dexcom integration implementation plan
 
+## Stage 5 update — 16 November 2026
+
+The owner's staged requests supersede the original proposed numbering below. Stage 4 live G7 sandbox/PNG verification succeeded. Stage 5 implements automatic foreground incremental sync and shared dashboard/Create cache within the existing application/backend. Full details: [GLUCOSE_SYNC.md](GLUCOSE_SYNC.md), [DEXCOM_SECURITY.md](DEXCOM_SECURITY.md).
+
+Reused: official authenticated transient relay, backend encrypted OAuth vault/rotation, normalization, UTC analytics, chart/templates/PNG export and CSV/mock providers. Added: glucose-sync/cache/context modules, native SQLCipher adapter, shared status/privacy controls, session invalidation events and backend status helper. No second backend, permanent server glucose history or polling service.
+
+Web uses ephemeral memory until a reviewed encryption/unlock/recovery design exists. Raw CSV history is also excluded from persisted demo state, including notice-based legacy cleanup. IndexedDB alone is insufficient protection. Native SQLCipher/SecureStore-key adapter is implemented but physical-device encryption/native OAuth remain gated. Future encrypted cloud backup is opt-in and unbuilt.
+
+Current callback: `http://localhost:3000/api/dexcom/callback`. HTTPS testing must use the actual assigned tunnel origin consistently in backend configuration and Dexcom portal registration; no address/deployment is invented.
+
+### Five-stage checklist
+
+- [x] Stage 1: architecture inspection and minimal reuse plan.
+- [x] Stage 2: session-bound sandbox OAuth and protected rotating backend tokens.
+- [x] Stage 3: transient official range/EGV retrieval, normalization and analytics compatibility.
+- [x] Stage 4: real sandbox G7 retrieval through Create and actual labeled PNG export.
+- [x] Stage 5: foreground incremental sync, ephemeral web cache, encrypted native adapter contract, dashboard/Create integration, isolation/deletion/backoff tests and documentation.
+
+Live Stage 5 initial/overlap: 1,678 readings; fresh check skipped EGV retrieval; Create selected 2026-11-16. Automated suite: 340 pass, clean typecheck and development export. Native SQL tests simulate cipher support; phone/production readiness is not established.
+
+Public release still requires verified identity/recovery, Dexcom production approval/terms, stable HTTPS hosting, private vault ACLs/key rotation/backups, native handoff/device verification and dependency/security review. Creative polish stays with Claude. STOP after Stage 5.
+
+## Historical architecture proposal and prior evidence
+
+
 **Stage 4 complete (16 November 2026):** explicit in-memory Create source selection, UTC historical-day artwork, mandatory sandbox provenance and a real G7 sandbox verification command are implemented. Live dataRange/devices/EGV responses and an actual 1080×1920 browser PNG export passed. See [DEXCOM_SANDBOX_TEST_RESULTS.md](DEXCOM_SANDBOX_TEST_RESULTS.md). Historical Stage 1/2/3 observations below remain for context; durable health storage, production access and background sync remain deferred.
 
 **Stage 3 update (16 November 2026):** owner authorized a transient in-memory provider and development viewer, documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). Stage 2 account/session/OAuth/token infrastructure is reused. Durable local storage and cloud sync in the historical plan below are deferred by Stage 3's memory-only requirement. Live backend verification now retrieves 277 official simulated sandbox readings after a UTC query-format correction; 297 automated tests pass. Restart an older running backend to load the fix. Stage 4 is not started. Missing-configuration observations in the original review below are historical.

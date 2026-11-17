@@ -24,6 +24,7 @@ import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
 import { hasImported, removeImported, REMOVED_IMPORT_MESSAGE } from "../state";
 import { DexcomConnection } from "../components/dexcom-connection";
+import { GlucoseSyncStatus } from "../components/glucose-sync-status";
 
 type Pending = null | "import" | "reset";
 
@@ -212,6 +213,7 @@ export function Settings() {
       subtitle={`${flags.dexcomApi ? "Demo and CSV data stay on this device. Sandbox authorization uses a protected backend." : "Everything here stays on this device."} ${BRAND.name} is not a medical device and gives no medical advice.`}
     >
       {flags.dexcomApi ? <DexcomConnection /> : null}
+      <GlucoseSyncStatus />
       {__DEV__ && flags.dexcomApi && flags.dexcomDiagnostics ? (
         <Button
           label="Dexcom development data viewer"
@@ -257,7 +259,7 @@ export function Settings() {
             title="Stays on this device"
             detail={
               flags.dexcomApi
-                ? "CSV files stay on this device. Dexcom sandbox authorization and encrypted tokens use the connection backend. The optional development viewer retrieves simulated readings into memory only. No advertising tracker is configured. Local demo storage is unencrypted; use synthetic files only."
+                ? "CSV readings and the browser's Dexcom cache stay in this open app's memory. Reloading clears raw history. Encrypted Dexcom tokens use the protected backend. Logout or disconnect clears private session caches; explicit exported files and published snapshots are kept. No advertising tracker is configured."
                 : "Glucose files are read on this device and never uploaded. The connection service is off and no advertising tracker is configured. Imported readings sit in unencrypted local demo storage, so use synthetic files only in this prototype."
             }
           />
@@ -393,7 +395,7 @@ export function Settings() {
       <ConfirmSheet
         visible={pending === "reset"}
         title="Reset local demo data?"
-        body="This deletes your posts, imported readings and preferences (theme, units and target range) from this local demo. Nothing else is stored, and nothing was ever sent anywhere. This can't be undone."
+        body="This deletes local demo posts, imported readings and preferences (theme, units and target range). Manage the separate Dexcom connection and private glucose cache using the controls above. This can't be undone."
         confirmLabel="Confirm local reset"
         onCancel={() => setPending(null)}
         onConfirm={() => {

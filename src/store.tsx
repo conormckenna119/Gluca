@@ -4,6 +4,11 @@ import { Post, State } from "./types";
 import { DEFAULT_RANGE, loadState } from "./state";
 import { defaultPrivacy, defaultProfile } from "./domain/profile";
 import { emptyCounters } from "./domain/achievements";
+import {
+  persistableState,
+  removeLegacyPlaintextHistory,
+} from "./private-persistence";
+import { onSessionEvent } from "./services/session-events";
 export const people = [
   "Alex Morgan",
   "Sam Rivera",
@@ -77,27 +82,54 @@ const Context = createContext<{
   set: (fn: (s: State) => State) => void;
   ready: boolean;
   storageError: string;
-}>({ state: seed(), set: () => {}, ready: false, storageError: "" });
+  privacyNotice: string;
+}>({
+  state: seed(),
+  set: () => {},
+  ready: false,
+  storageError: "",
+  privacyNotice: "",
+});
 export function DemoStore({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState(seed);
   const [ready, setReady] = useState(false);
   const [storageError, setError] = useState("");
+  const [privacyNotice, setPrivacyNotice] = useState("");
+  useEffect(
+    () =>
+      onSessionEvent((e) => {
+        if (e !== "check") setState((s) => ({ ...s, imported: [] }));
+      }),
+    [],
+  );
   useEffect(() => {
     AsyncStorage.getItem("gluca-demo-v1")
       .then((raw) => {
-        if (raw) setState(loadState(raw, seed()));
+        if (raw) {
+          const cleaned = removeLegacyPlaintextHistory(raw);
+          setState(loadState(cleaned.raw, seed()));
+          if (cleaned.removed) {
+            setPrivacyNotice(
+              "For privacy, an older plaintext glucose cache was cleared. Re-import your CSV for this session; your original file was not changed.",
+            );
+            return AsyncStorage.setItem("gluca-demo-v1", cleaned.raw);
+          }
+        }
       })
       .catch(() => setError("Local storage could not be loaded."))
       .finally(() => setReady(true));
   }, []);
   useEffect(() => {
     if (ready)
-      AsyncStorage.setItem("gluca-demo-v1", JSON.stringify(state)).catch(() =>
-        setError("Changes could not be saved to this device."),
-      );
+      AsyncStorage.setItem(
+        "gluca-demo-v1",
+        JSON.stringify(persistableState(state)),
+      ).catch(() => setError("Changes could not be saved to this device."));
   }, [state, ready]);
   return (
-    <Context.Provider value={{ state, set: setState, ready, storageError }}>
+    <Context.Provider
+      value={{ state, set: setState, ready, storageError, privacyNotice }}
+    >
       {children}
     </Context.Provider>
   );

@@ -20,6 +20,7 @@ export const DEFAULT_FLAGS = {
   accounts: false,
   dexcomApi: false,
   dexcomDiagnostics: false,
+  dexcomSync: false,
   appleHealth: false,
   glucoseTimeline: false,
   activities: false,

@@ -18,7 +18,7 @@ export function Page({
   glucoseLabel?: string;
 }) {
   const c = useColors();
-  const { ready, storageError, state } = useDemo();
+  const { ready, storageError, state, privacyNotice } = useDemo();
   const flags = getFlags();
   // The community label is only true while fictional people or clubs can appear somewhere in the app.
   const community = flags.communityFeed || flags.clubs;
@@ -51,6 +51,7 @@ export function Page({
         </View>
       </View>
       {storageError ? <T>{storageError}</T> : null}
+      {privacyNotice ? <T small>{privacyNotice}</T> : null}
       {ready ? children : <T muted>Loading your local demo…</T>}
     </ScrollView>
   );

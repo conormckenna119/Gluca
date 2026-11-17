@@ -336,7 +336,7 @@ function ImportFlow() {
                 setError("");
                 setResult(null);
                 setDone(
-                  `${n} readings are now stored on this device. My Glucose and Create use them.`,
+                  `${n} readings are now available in this open session. My Glucose and Create can use them. Closing or reloading clears this raw CSV cache.`,
                 );
                 // Arrived from the welcome screen: go straight to a graphic.
                 if (from === "welcome") router.replace("/create");
@@ -361,7 +361,7 @@ function ImportFlow() {
             <ListRow
               destructive
               title="Remove imported data"
-              detail={`${state.imported.length} imported readings are stored on this device.`}
+              detail={`${state.imported.length} imported readings are kept in this open session's memory only.`}
               onPress={() => setConfirmRemove(true)}
             />
           ) : (

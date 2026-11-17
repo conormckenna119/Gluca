@@ -14,10 +14,17 @@ import {
 import { useDemo } from "../store";
 import type { Reading } from "../types";
 import type { AvailableGlucoseRange } from "../glucose-window";
+import { useSynchronizedGlucose } from "../glucose-context";
+import { preferredStoryDay } from "../glucose-sync";
+import { utcDayWindow } from "../create-source";
+import { onSessionEvent } from "../services/session-events";
 /** Create-specific explicit choice. Health rows never enter DemoStore, localStorage, query keys or telemetry. */
-export function useCreateReadings() {
+function useManualCreateReadings(enabled = true) {
   const { state } = useDemo();
-  const mock = useMemo(() => new MockGlucoseProvider(), []),
+  const mock = useMemo(
+      () => new MockGlucoseProvider(enabled ? undefined : []),
+      [enabled],
+    ),
     dexcom = useMemo(() => new DexcomGlucoseProvider(), []);
   const [source, setSource] = useState<CreateSource>(
     state.imported.length ? "csv" : "demo",
@@ -49,15 +56,22 @@ export function useCreateReadings() {
     },
     [clear],
   );
+  useEffect(
+    () =>
+      onSessionEvent((e) => {
+        if (e !== "check") clear();
+      }),
+    [clear],
+  );
   useEffect(() => {
-    if (source === "dexcom") return;
+    if (!enabled || source === "dexcom") return;
     const generation = ++epoch.current;
     const provider =
       source === "csv" ? new CsvGlucoseProvider(state.imported) : mock;
     void provider.getReadings(0, Date.now() + 86400000).then((rows) => {
       if (generation === epoch.current) setData(rows);
     });
-  }, [source, state.imported, mock]);
+  }, [source, state.imported, mock, enabled]);
   const load = useCallback(
     async (requested?: string) => {
       const generation = ++epoch.current;
@@ -104,8 +118,8 @@ export function useCreateReadings() {
   );
   // Selection is the explicit user action which retrieves the initial historical day.
   useEffect(() => {
-    if (source === "dexcom") void load();
-  }, [source, load]);
+    if (enabled && source === "dexcom") void load();
+  }, [source, load, enabled]);
   useFocusEffect(
     useCallback(
       () => () => {
@@ -133,5 +147,76 @@ export function useCreateReadings() {
     busy,
     error,
     load,
+    sessionVersion: 0,
   };
+}
+
+export function useCreateReadings() {
+  const shared = useSynchronizedGlucose();
+  const manual = useManualCreateReadings(!shared.enabled);
+  const [draft, setDraft] = useState<string | null>(null),
+    [chosen, setChosen] = useState<string | null>(null),
+    [localError, setLocalError] = useState("");
+  const suggested = useMemo(
+    () =>
+      preferredStoryDay(
+        shared.data,
+        Date.now(),
+        shared.engine?.config.minimumDayCoverage,
+      ),
+    [shared.data, shared.engine],
+  );
+  useEffect(() => {
+    setChosen(null);
+    setDraft(null);
+    setLocalError("");
+  }, [shared.state.identityVersion]);
+  const selected = chosen ?? suggested;
+  const rows = useMemo(() => {
+    if (shared.source !== "dexcom") return shared.data;
+    try {
+      const w = utcDayWindow(selected);
+      return shared.data.filter(
+        (r) => r.timestamp >= w.start && r.timestamp < w.end,
+      );
+    } catch {
+      return [];
+    }
+  }, [shared.data, shared.source, selected]);
+  const load = async (day?: string) => {
+    if (!shared.engine) return;
+    try {
+      const d = day ?? suggested;
+      const w = utcDayWindow(d);
+      setLocalError("");
+      await shared.engine.ensureWindow(w);
+      setChosen(d);
+      setDraft(d);
+    } catch {
+      setLocalError("Choose a valid historical UTC date.");
+    }
+  };
+  return shared.enabled
+    ? {
+        source: shared.source,
+        select: (s: CreateSource) => {
+          shared.select(s);
+          setChosen(null);
+          setDraft(null);
+          setLocalError("");
+        },
+        data: rows,
+        range: shared.state.data?.available ?? null,
+        day: draft ?? selected,
+        loadedDay: selected,
+        setDay: (d: string) => {
+          setDraft(d);
+          setLocalError("");
+        },
+        busy: shared.state.busy,
+        error: localError,
+        load,
+        sessionVersion: shared.state.identityVersion,
+      }
+    : manual;
 }
