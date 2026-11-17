@@ -1,4 +1,14 @@
-# Stage 7A.5 — focused UI refinement
+# UI refinement
+
+## Stage 7C — completed audit and five scoped improvements
+
+The [full UI/UX audit](UI_UX_AUDIT.md) contains the prioritized findings table, changed files, before/after evidence, repeat commands, remaining issues and Stage 8 priorities. Checked 11 routes at 375/430/1280px in both themes; no document horizontal overflow was found in the 66 before or 66 after observations.
+
+Implemented only: tap/Escape exit from overlay positioning without losing transforms; named shared sheets with centralized footer safe-area padding; pending/concurrency/unmount protection for photo picking; concise static copy; and memoized selected-period filtering during drag renders. Existing editor gestures/templates, Stage 7B artwork, public profile privacy and Dexcom backend/sync architecture are preserved. An old mocked Create test fixture was updated to its real ephemeral origin and explicit manual-provider flags.
+
+Validation: 368 core tests, the 16-case browser regression run, an additional auxiliary-route audit and two separate mocked OAuth/Dexcom-to-Create browser journeys pass. Typecheck, targeted Prettier and diff checks pass. ESLint is not configured; no ESLint pass is claimed. Native devices, real OS keyboard/screen readers, large-image memory and new live Dexcom consent/retrieval were not verified. Advanced independent elements/snapping and a broad redesign remain deferred. Stop after Stage 7C.
+
+## Stage 7A.5 — historical focused refinement
 
 17 November 2026. Existing project only. No dependency, backend, OAuth, sync/cache, glucose calculation, social system, profile schema or migration change. Working Stage 7A layering/navigation reused. Creative ornaments/redesign remain deferred to Claude.
 

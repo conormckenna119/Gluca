@@ -1,6 +1,5 @@
 import React from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button, T, space } from "../../ui";
 import type { Emblem } from "../../domain/profile";
 import {
@@ -35,7 +34,6 @@ export function IdentitySheet({
   target: IdentityTarget | null;
   onClose: () => void;
 }) {
-  const insets = useSafeAreaInsets();
   if (!target) return null;
   const isShield = target.kind === "shield";
   const title = isShield
@@ -51,11 +49,7 @@ export function IdentitySheet({
       visible
       onClose={onClose}
       title={title}
-      footer={
-        <View style={{ paddingBottom: insets.bottom }}>
-          <Button label="Done" onPress={onClose} />
-        </View>
-      }
+      footer={<Button label="Done" onPress={onClose} />}
     >
       <View style={{ alignItems: "center", gap: space.sm }}>
         {isShield ? (

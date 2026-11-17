@@ -25,8 +25,8 @@ export function OverlayControls({
     <Card>
       <T bold>Overlay layout</T>
       <T small muted>
-        Drag to move. Pinch or use the corner handles to resize. Edges outside
-        the canvas are cropped.
+        Tap again or press Escape to finish positioning. Drag to move; pinch or
+        use corner handles to resize. Edges outside the canvas are cropped.
       </T>
       <View style={row}>
         <Button

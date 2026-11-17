@@ -1,5 +1,14 @@
 # Decisions
 
+## Stage 7C — 17 November 2026
+
+- Record prioritized findings before edits; implement only five small/medium application changes. Retain the existing five tabs and map dashboard/insights to My Glucose rather than inventing routes or redesigning the app.
+- Finish overlay positioning with tap-again/web Escape; distinguish taps from drag/resize/pinch. Keep normalized transforms/export composition independent and unchanged.
+- Reuse SDK Modal focus/Escape handling. Name the dialog and share footer inset handling in Sheet; remove the identity-only duplicate. No new modal framework or physical-device accessibility claim.
+- Guard photo-picker concurrency/unmounts and scope its control to the existing session version. Keep photos local and full-resolution for now; bounded resize/orientation/large-image profiling is Stage 8 work.
+- Change static product copy only. Memoize existing period filtering without changing medical calculations. No new analytics, persistence, credentials, synchronization or backend feature.
+- Repair the old mocked Create fixture's origin/flags without relaxing production security. Report mocked journeys separately from live Dexcom verification. No ESLint configuration is invented; run existing formatter/compiler/tests and disclose the gap.
+
 ## Stage 7B — 17 November 2026
 
 - Retain existing colour milestones and internal `tier`/legacy mark metadata; render one flat shield silhouette/outline with centered digits and identical dimensions. Remove ornaments, metallic effects and uncertainty symbols. User-visible wording says shield/style/years, never status.

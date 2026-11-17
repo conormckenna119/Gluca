@@ -1,0 +1,1235 @@
+[
+  {
+    "route": "/",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 52
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 375,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 430,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 52
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 375,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 430,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/glucose",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/create",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/explore",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/onboarding",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "route": "/profile-edit",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/settings",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/account",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 50
+      }
+    ]
+  },
+  {
+    "route": "/identity-preview",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      }
+    ]
+  },
+  {
+    "route": "/post/seed-0",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "fonts": [
+      {
+        "font": "system-ui, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+        "height": 24
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 36
+      },
+      {
+        "font": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+        "height": 26
+      }
+    ]
+  },
+  {
+    "modal": {
+      "dialogs": 1,
+      "active": "Close Customize"
+    }
+  },
+  {
+    "escapeCloses": false
+  }
+]

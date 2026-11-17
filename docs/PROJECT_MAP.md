@@ -1,5 +1,9 @@
 #
 
+## Stage 7C — scoped UI audit
+
+`docs/UI_UX_AUDIT.md` records the prioritized review and 66 before/66 after route-layout checks. Existing Create web/native interaction adapters support tap-again exit (web Escape too), with drag/pinch suppression; `photo-background.tsx` guards pending/unmounted results and Create scopes it by session version. Create memoizes its existing selected-period filter. Shared `ui.tsx` Sheet owns its dialog label/footer inset; IdentitySheet removes duplicate padding without changing shield artwork. Explore, empty comments and the connection panel receive static copy edits. New `tests/e2e/stage7c.spec.ts` covers the audit/exit/photo/modal cases; the old mocked Create fixture uses a matching local origin and explicit manual flags. No new backend, data model or dependency.
+
 ## Stage 7B — identity refinement
 
 Existing `components/identity/Shield`, `EmblemBadge`, `NameLine`, `IdentitySheet` and `UserIdentity`/`AuthorIdentity` own all updated rendering. Flat shields retain stored colour IDs and date math; `domain/shield.ts` adds date-value-free precision explanations and neutral labels. Emblems reuse `domain/emblems.ts`. Shared identity metadata places existing fictional/owner markers beneath names in post-card/post-detail. Profile's owner-only shield card reuses the detail sheet; public projections/schema/backend are unchanged. `application-shell.tsx` pops details before selecting the existing tab to avoid revealing retained onboarding after profile edits. New tests: `shield-refinement.test.ts`, `e2e/stage7b.spec.ts`; [report and synthetic screenshots](IDENTITY_UI_REFINEMENT.md).

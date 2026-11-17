@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, Pressable, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 import { useDemo } from "./store";
 import { BRAND } from "./art/brand";
@@ -414,8 +415,9 @@ export function Sheet({
   visible: boolean; onClose: () => void; title: string; children: React.ReactNode; footer?: React.ReactNode;
 }) {
   const c = useColors();
+  const insets = useSafeAreaInsets();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal accessibilityLabel={title} visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
         <Pressable accessibilityLabel={`Close ${title}`} accessibilityRole="button" onPress={onClose} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: c.bg, opacity: 0.72 }} />
         <View
@@ -437,7 +439,7 @@ export function Sheet({
           <ScrollView contentContainerStyle={{ padding: space.xl - 4, paddingTop: space.sm, gap: space.lg }} keyboardShouldPersistTaps="handled">
             {children}
           </ScrollView>
-          {footer ? <View style={{ padding: space.lg, borderTopWidth: 1, borderTopColor: c.border, gap: space.sm }}>{footer}</View> : null}
+          {footer ? <View style={{ padding: space.lg, paddingBottom: space.lg + insets.bottom, borderTopWidth: 1, borderTopColor: c.border, gap: space.sm }}>{footer}</View> : null}
         </View>
       </View>
     </Modal>

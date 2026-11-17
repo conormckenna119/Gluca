@@ -140,7 +140,7 @@ function PostConversation() {
           <EmptyState
             icon="comment"
             title="No comments yet"
-            body="Be the first to say something kind."
+            body="Add a comment to this conversation."
           />
         )}
       </View>

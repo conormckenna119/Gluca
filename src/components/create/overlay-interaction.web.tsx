@@ -25,6 +25,7 @@ export function OverlayInteraction({
   onChange,
 }: OverlayInteractionProps) {
   const c = useColors();
+  const moved = useRef(false);
   const points = useRef(new Map<number, { x: number; y: number }>());
   const start = useRef({ value, x: 0, y: 0, distance: 0, resize: false });
   const latest = useRef(value);
@@ -79,8 +80,16 @@ export function OverlayInteraction({
         cursor: selected ? "move" : "pointer",
         outlineOffset: 2,
       }}
-      onClick={onSelect}
+      onClick={() => {
+        if (!moved.current) onSelect();
+        moved.current = false;
+      }}
       onKeyDown={(e) => {
+        if (e.key === "Escape" && selected) {
+          e.preventDefault();
+          onSelect();
+          return;
+        }
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onSelect();
@@ -101,6 +110,7 @@ export function OverlayInteraction({
       }}
       onPointerDown={(e) => {
         if (!selected) return;
+        if (!points.current.size) moved.current = false;
         e.preventDefault();
         e.currentTarget.setPointerCapture(e.pointerId);
         points.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -112,6 +122,8 @@ export function OverlayInteraction({
         const s = start.current,
           p = centroid(),
           d = distance();
+        if (points.current.size > 1 || Math.hypot(p.x - s.x, p.y - s.y) > 5)
+          moved.current = true;
         if (points.current.size > 1 && s.distance > 0)
           onChange(scaleOverlay(s.value, d / s.distance));
         else if (s.resize) {

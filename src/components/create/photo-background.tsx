@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { BRAND } from "../../art/brand";
 import { Image, Platform, View } from "react-native";
 import { Button, Notice, T, radius, space, useColors } from "../../ui";
@@ -12,8 +12,20 @@ export function PhotoBackground({
 }) {
   const c = useColors();
   const [error, setError] = useState<string | null>(null);
+  const [picking, setPicking] = useState(false);
+  const alive = useRef(true),
+    pending = useRef(false);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   const pick = async () => {
+    if (pending.current) return;
+    pending.current = true;
+    setPicking(true);
     setError(null);
     try {
       const picker = await import("expo-image-picker");
@@ -21,9 +33,10 @@ export function PhotoBackground({
       if (Platform.OS === "android" || Platform.OS === "ios") {
         const perm = await picker.getMediaLibraryPermissionsAsync(false);
         if (!perm.granted && perm.canAskAgain === false) {
-          setError(
-            `${BRAND.name} can't open your photos. Allow photo access for ${BRAND.name} in your device settings, then try again.`,
-          );
+          if (alive.current)
+            setError(
+              `${BRAND.name} can't open your photos. Allow photo access for ${BRAND.name} in your device settings, then try again.`,
+            );
           return;
         }
       }
@@ -33,14 +46,18 @@ export function PhotoBackground({
         allowsMultipleSelection: false,
         quality: 1,
       });
-      if (result.canceled) return;
+      if (!alive.current || result.canceled) return;
       const uri = result.assets?.[0]?.uri;
       if (uri) onChange(uri);
       else setError("That photo could not be read. Try a different one.");
     } catch {
-      setError(
-        "The photo library could not be opened. Check that photo access is allowed, then try again.",
-      );
+      if (alive.current)
+        setError(
+          "The photo library could not be opened. Check that photo access is allowed, then try again.",
+        );
+    } finally {
+      pending.current = false;
+      if (alive.current) setPicking(false);
     }
   };
 
@@ -68,9 +85,14 @@ export function PhotoBackground({
               gap: space.sm,
             }}
           >
-            <Button label="Change photo" onPress={pick} />
+            <Button
+              label={picking ? "Opening photos…" : "Change photo"}
+              disabled={picking}
+              onPress={pick}
+            />
             <Button
               label="Remove photo"
+              disabled={picking}
               kind="ghost"
               onPress={() => {
                 setError(null);
@@ -81,7 +103,11 @@ export function PhotoBackground({
         </View>
       ) : (
         <View style={{ alignItems: "flex-start" }}>
-          <Button label="Add a photo behind it" onPress={pick} />
+          <Button
+            label={picking ? "Opening photos…" : "Add a photo behind it"}
+            disabled={picking}
+            onPress={pick}
+          />
         </View>
       )}
       <T small muted>

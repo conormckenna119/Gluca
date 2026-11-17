@@ -44,6 +44,13 @@ test("mock sandbox OAuth browser journey, isolation, rotation and responsive con
         });
       },
     );
+    // This fixture owns authorization only; its backend intentionally has no glucose diagnostics.
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "gluca-dev-flags",
+        "dexcomApi,dexcomDiagnostics=false,dexcomSync=false,identity=false,accounts=false",
+      ),
+    );
     await page.goto(a.base);
     await page
       .getByRole("button", { name: "Try demo data", exact: true })
@@ -84,7 +91,8 @@ test("mock sandbox OAuth browser journey, isolation, rotation and responsive con
       .getByRole("button", { name: "Check connection", exact: true })
       .click();
     await expect(page.getByText("Connected", { exact: true })).toBeVisible();
-    expect(a.calls.length).toBe(2);
+    // Connected was already visible before the refresh request finished.
+    await expect.poll(() => a.calls.length).toBe(2);
     const leaked = await page.evaluate(
       ({ access, refresh }) =>
         Object.values(localStorage).some(
@@ -106,6 +114,9 @@ test("mock sandbox OAuth browser journey, isolation, rotation and responsive con
         await expect(
           page.getByText("Connected", { exact: true }),
         ).toBeVisible();
+        await page
+          .getByText("Connected", { exact: true })
+          .scrollIntoViewIfNeeded();
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= window.innerWidth,

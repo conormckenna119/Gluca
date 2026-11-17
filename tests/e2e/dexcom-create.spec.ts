@@ -42,6 +42,10 @@ test("MOCK PASS: authenticated Dexcom provider → historical Create preview →
             ),
           ),
   );
+  // Use the test server's actual origin, as the OAuth browser test does.
+  // A fabricated Origin header can prevent module assets from loading in the browser.
+  a.app.deps.config.appBaseUrl = a.base;
+  a.app.deps.config.redirectUri = `${a.base}/api/dexcom/callback`;
   try {
     const cookie = await a.login();
     const begin = await a.call("POST", "/api/dexcom/connect", {
@@ -61,18 +65,22 @@ test("MOCK PASS: authenticated Dexcom provider → historical Create preview →
       ).status,
     ).toBe(302);
     const split = cookie.indexOf("=");
-    await page
-      .context()
-      .addCookies([
-        {
-          name: cookie.slice(0, split),
-          value: cookie.slice(split + 1),
-          url: a.base,
-          httpOnly: true,
-          sameSite: "Lax",
-        },
-      ]);
-    await page.setExtraHTTPHeaders({ Origin: FAKE.appBase });
+    await page.context().addCookies([
+      {
+        name: cookie.slice(0, split),
+        value: cookie.slice(split + 1),
+        url: a.base,
+        httpOnly: true,
+        sameSite: "Lax",
+      },
+    ]);
+    // This fixture verifies the manual provider path independently of foreground sync.
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "gluca-dev-flags",
+        "dexcomApi,dexcomDiagnostics,dexcomSync=false,identity=false,accounts=false",
+      ),
+    );
     await page.addInitScript(() =>
       localStorage.setItem(
         "gluca-demo-v1",

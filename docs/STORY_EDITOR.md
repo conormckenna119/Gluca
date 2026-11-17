@@ -1,5 +1,7 @@
 # Story editor — Stage 7A.5
 
+Stage 7C usability update: tap a selected overlay again (or press Escape on web) to finish positioning and restore scrolling without reaching controls below the preview. Drag/resize/pinch movement does not deselect the group. Photo controls show a pending state, prevent concurrent picks and ignore results after their template/account context is replaced. Selected-period rows are memoized independently of transform changes. [Audit and verification](UI_UX_AUDIT.md).
+
 Open **Create → Demo data (or your selected provider) → Transparent overlay**. Tap the preview or **Edit overlay**. Drag to move, pinch on touch browsers/native or drag a desktop corner handle to resize. Size/opacity sliders, four movement buttons and Reset layout provide alternatives. Desktop arrows move by 0.5% of the canvas; Shift + arrow moves by 2%. **Done positioning** restores normal scrolling over the preview. Other controls and primary navigation remain usable while positioning.
 
 ## Scene and coordinates

@@ -25,8 +25,9 @@ export function OverlayInteraction({
 }: OverlayInteractionProps) {
   const c = useColors(),
     start = useRef({ value, distance: 0, dx: 0, dy: 0 });
-  const latest = useRef({ value, selected, onChange, width, height });
-  latest.current = { value, selected, onChange, width, height };
+  const multi = useRef(false);
+  const latest = useRef({ value, selected, onChange, onSelect, width, height });
+  latest.current = { value, selected, onChange, onSelect, width, height };
   const distance = (touches: readonly { pageX: number; pageY: number }[]) =>
     touches.length > 1
       ? Math.hypot(
@@ -40,6 +41,7 @@ export function OverlayInteraction({
         onStartShouldSetPanResponder: () => latest.current.selected,
         onMoveShouldSetPanResponder: () => latest.current.selected,
         onPanResponderGrant: (e) => {
+          multi.current = e.nativeEvent.touches.length > 1;
           start.current = {
             value: latest.current.value,
             distance: distance(e.nativeEvent.touches),
@@ -51,6 +53,7 @@ export function OverlayInteraction({
           const d = distance(e.nativeEvent.touches),
             s = start.current;
           if (d) {
+            multi.current = true;
             if (!s.distance) {
               start.current = {
                 value: latest.current.value,
@@ -76,6 +79,10 @@ export function OverlayInteraction({
                 (g.dy - s.dy) / latest.current.height,
               ),
             );
+        },
+        onPanResponderRelease: (_e, g) => {
+          if (!multi.current && Math.hypot(g.dx, g.dy) < 5)
+            latest.current.onSelect();
         },
         onPanResponderTerminationRequest: () => false,
       }),

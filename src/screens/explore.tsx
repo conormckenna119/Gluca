@@ -216,10 +216,7 @@ function ExploreBody() {
     }));
 
   return (
-    <Page
-      title="Explore"
-      subtitle="Participation over competition. This week's invitation: encourage another community member."
-    >
+    <Page title="Explore" subtitle="Discover people and communities.">
       {suggestions.length ? (
         <Section
           title="Suggested for you"

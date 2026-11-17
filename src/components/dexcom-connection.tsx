@@ -90,9 +90,9 @@ export function DexcomConnection() {
       <Card>
         <T bold>{connectionLabel(status)}</T>
         <T small muted>
-          Connect to a simulated Dexcom account. This panel manages
-          authorization; the optional development data viewer retrieves readings
-          in memory. Your demo and CSV readings stay unchanged.
+          Authorize a simulated Dexcom account. This sandbox connection is
+          separate from the device selected in your profile. Demo and CSV data
+          remain available.
         </T>
         {!signedIn ? (
           <>

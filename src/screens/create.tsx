@@ -145,7 +145,10 @@ export function Create() {
   else dayStart.setHours(0, 0, 0, 0);
   const end = dayStart.getTime() + 86400000;
   const start = dayStart.getTime() - (o.period === "week" ? 6 : 0) * 86400000;
-  const rows = data.filter((r) => r.timestamp >= start && r.timestamp < end);
+  const rows = React.useMemo(
+    () => data.filter((r) => r.timestamp >= start && r.timestamp < end),
+    [data, start, end],
+  );
   const [w, h] = formats[o.format];
   const noData = !data.length;
 
@@ -355,7 +358,7 @@ export function Create() {
                 ? {
                     value: overlay,
                     selected: positioning,
-                    onSelect: () => setPositioning(true),
+                    onSelect: () => setPositioning((p) => !p),
                     onChange: setOverlay,
                   }
                 : undefined
@@ -395,7 +398,11 @@ export function Create() {
             onSelect={() => setPositioning((p) => !p)}
             onChange={setOverlay}
           />
-          <PhotoBackground photoUri={photoUri} onChange={setPhotoUri} />
+          <PhotoBackground
+            key={feed.sessionVersion}
+            photoUri={photoUri}
+            onChange={setPhotoUri}
+          />
         </>
       ) : null}
 
