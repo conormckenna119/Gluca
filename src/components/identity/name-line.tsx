@@ -42,15 +42,17 @@ export function NameLine({
     </Text>
   );
   if (!shield && !emblem) return label;
-  // "about N years" when the count came from an approximate or partial date.
+  // Precision is explained by the accessible label and detail sheet, never drawn in the icon.
   const certain = shield?.certain !== false;
   return (
     <View
+      testID="identity-name-line"
       style={{
         flexDirection: "row",
         alignItems: "center",
         flexWrap: "nowrap",
         minWidth: 0,
+        maxWidth: "100%",
         columnGap: space.xs,
       }}
     >
@@ -70,6 +72,7 @@ export function NameLine({
             })
           }
           style={{
+            flexShrink: 0,
             minWidth: 44,
             minHeight: 44,
             alignItems: "center",
@@ -91,6 +94,7 @@ export function NameLine({
           accessibilityLabel={`${EMBLEM_LABEL[emblem]}. Opens an explanation.`}
           onPress={() => setTarget({ kind: "emblem", emblem })}
           style={{
+            flexShrink: 0,
             minWidth: 44,
             minHeight: 44,
             alignItems: "center",

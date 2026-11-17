@@ -1,7 +1,11 @@
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { PublicProfile } from "../domain/profile";
+import {
+  IdentitySheet,
+  type IdentityTarget,
+} from "../components/identity/identity-sheet";
 import { Shield } from "../components/identity/shield";
 import { publicView } from "../domain/public-view";
 import {
@@ -10,6 +14,7 @@ import {
   nextAnniversary,
   shieldFor,
   shieldLabel,
+  shieldPrecisionNote,
 } from "../domain/shield";
 import {
   Avatar,
@@ -79,6 +84,7 @@ function IdentityHeader() {
 }
 
 function IdentityCards() {
+  const [target, setTarget] = React.useState<IdentityTarget | null>(null);
   const { state } = useDemo();
   const { today } = useOwnPublicView();
   const info = shieldFor(state.profile.diagnosis, today);
@@ -109,17 +115,40 @@ function IdentityCards() {
               gap: space.md,
             }}
           >
-            <Shield
-              tier={info.tier.id}
-              years={info.years}
-              certain={info.certain}
-              size={56}
-            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="View your shield details"
+              onPress={() =>
+                setTarget({
+                  kind: "shield",
+                  tier: info.tier.id,
+                  years: info.years,
+                  certain: info.certain,
+                  diagnosis: state.profile.diagnosis,
+                })
+              }
+              style={{
+                minWidth: 44,
+                minHeight: 44,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Shield
+                tier={info.tier.id}
+                years={info.years}
+                certain={info.certain}
+                size={56}
+              />
+            </Pressable>
             <View style={{ flex: 1, gap: 2 }}>
               <T heading>Your shield</T>
               <T muted>{shieldLabel(info.tier, info.years, info.certain)}</T>
             </View>
           </View>
+          <T small muted>
+            {shieldPrecisionNote(state.profile.diagnosis, info.certain)}
+          </T>
           {next ? (
             <T small muted>{`Next anniversary: ${formatLocalDate(next)}`}</T>
           ) : null}
@@ -130,6 +159,7 @@ function IdentityCards() {
           </T>
         </Card>
       ) : null}
+      <IdentitySheet target={target} onClose={() => setTarget(null)} />
       <Group>
         <ListRow
           title="Edit profile"

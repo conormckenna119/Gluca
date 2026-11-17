@@ -84,7 +84,7 @@ function ExperiencePreview({ profile }: { profile: Profile }) {
         size={64}
       />
       <View style={{ flex: 1 }}>
-        <T bold>Your experience, your choice</T>
+        <T bold>Your shield</T>
         <T small>{shieldLabel(info.tier, info.years, info.certain)}</T>
       </View>
     </Animated.View>
@@ -241,8 +241,8 @@ function OnboardingEditor() {
             />
             <ExperiencePreview profile={p} />
             <SwitchRow
-              title="Show my experience shield publicly"
-              detail="Lived experience, never expertise or a competitive rank."
+              title="Show my shield publicly"
+              detail="Optional. You can hide your shield at any time."
               value={v.showShield}
               onChange={(showShield) =>
                 V({ ...v, showShield, showShieldNumber: showShield })
@@ -455,13 +455,13 @@ function OnboardingEditor() {
             />
             {living ? (
               <SwitchRow
-                title="Show experience shield"
+                title="Show my shield"
                 value={v.showShield}
                 onChange={(showShield) => V({ ...v, showShield })}
               />
             ) : (
               <SwitchRow
-                title="Show supporter emblem"
+                title="Show my emblem"
                 value={v.showEmblem}
                 onChange={(showEmblem) => V({ ...v, showEmblem })}
               />

@@ -1,4 +1,6 @@
-# Stage 6B — account onboarding and profiles
+# Account onboarding and profiles
+
+Stage 7B updates the shared identity artwork and visible wording: flat numeric shields without ornaments/uncertainty symbols, coordinated heart/hand/ribbon emblems, “Show my shield” / “Show my emblem” controls and precision explanations in details. The Stage 6B flow/storage below remain. [Current identity guide](IDENTITY_SHIELDS.md).
 
 This stage extends the existing application, registration, identity flag, profile model, date mathematics, SVG shields/emblems, privacy switches and fictional feed. It does not add another identity provider, community backend, achievements or reactions. The existing Node session/account system remains development-only; production recovery, verified identity and an explicit minimum-age policy are still release gates.
 
@@ -19,7 +21,7 @@ Use the existing backend-only `.env` configuration. No new secret is required: p
 - Account: `http://localhost:3000/account`. Existing registration/login are preserved; registration offers onboarding after creating the account. Passphrases are distinct from Dexcom credentials.
 - Onboarding: `http://localhost:3000/onboarding`, also **Profile → Set up your profile** for returning accounts without completed onboarding. Optional questions never block account creation.
 - Editing: `http://localhost:3000/profile-edit`, **Profile → Edit profile**. Change values, then **Save profile and privacy**. Settings' existing privacy controls have the same explicit save action.
-- Gallery: `http://localhost:3000/identity-preview`, all ten tiers, emblems and compact examples. Only the existing identity flag is needed for identity UI; keep account/Dexcom flags according to the workflow being tested. Other feature flags remain off.
+- Gallery: `http://localhost:3000/identity-preview`, all ten shield styles, emblems and compact examples. Only the existing identity flag is needed for identity UI; keep account/Dexcom flags according to the workflow being tested. Other feature flags remain off.
 - Saved public profile: **Profile → View saved public profile**, or `/profile?username=<chosen-public-handle>`. This read-only view uses the protected public projection endpoint. Unsaved/unknown handles show a clear not-found state; guests are asked to sign in.
 
 ## Flow

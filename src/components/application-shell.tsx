@@ -48,18 +48,20 @@ export function ApplicationShell({
       router.navigate(href);
       return;
     }
-    // Same targeted NAVIGATE action used by Expo's built-in tab bar, preserving each route key and params.
-    navigation.dispatch({
-      type: "NAVIGATE",
-      target: target.key,
-      payload: { name, params: target.params },
-    });
+    // Pop detail routes first. NAVIGATE can focus/pop their parent stack itself;
+    // popping afterward with the old count could remove the tab group and
+    // reveal an earlier onboarding screen with a stale profile preview.
     if (target.pop.count)
       navigation.dispatch({
         type: "POP",
         target: target.pop.key,
         payload: { count: target.pop.count },
       });
+    navigation.dispatch({
+      type: "NAVIGATE",
+      target: target.key,
+      payload: { name, params: target.params },
+    });
   };
   useEffect(() => {
     if (Platform.OS !== "web" || typeof window === "undefined") return;

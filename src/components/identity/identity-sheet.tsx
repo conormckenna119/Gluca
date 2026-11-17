@@ -1,11 +1,12 @@
 import React from "react";
 import { View } from "react-native";
-import { Button, Notice, T, space } from "../../ui";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button, T, space } from "../../ui";
 import type { Emblem } from "../../domain/profile";
 import {
   formatLocalDate,
   nextAnniversary,
-  shieldLabel,
+  shieldPrecisionNote,
   tierById,
   localToday,
 } from "../../domain/shield";
@@ -34,10 +35,11 @@ export function IdentitySheet({
   target: IdentityTarget | null;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   if (!target) return null;
   const isShield = target.kind === "shield";
   const title = isShield
-    ? "Diabetes experience shield"
+    ? "Years with diabetes"
     : EMBLEM_TABLE[target.emblem].label;
   const next =
     isShield && target.diagnosis
@@ -49,7 +51,11 @@ export function IdentitySheet({
       visible
       onClose={onClose}
       title={title}
-      footer={<Button label="Done" onPress={onClose} />}
+      footer={
+        <View style={{ paddingBottom: insets.bottom }}>
+          <Button label="Done" onPress={onClose} />
+        </View>
+      }
     >
       <View style={{ alignItems: "center", gap: space.sm }}>
         {isShield ? (
@@ -65,40 +71,38 @@ export function IdentitySheet({
         )}
         {isShield ? (
           <T bold>
-            {shieldLabel(
-              target.tier,
-              target.years,
-              target.certain ?? true,
-              target.showNumber !== false,
-            )}
+            {target.showNumber !== false && target.years !== undefined
+              ? `${target.years} ${target.years === 1 ? "year" : "years"} with diabetes`
+              : "Years kept private"}
           </T>
         ) : null}
       </View>
       {isShield ? (
         <>
+          <T bold>Shield style · {tier?.label ?? "Unknown"}</T>
           <T>
-            The shield marks time since diagnosis, shown as a{" "}
-            {tier ? tier.label : ""} tier with its own inner shape.
-            {target.years !== undefined && target.certain === false
-              ? " The count is approximate because the diagnosis date is not exact."
-              : ""}
+            A personal way to share time with diabetes. Everyone’s experience is
+            different.
+          </T>
+          <T muted>
+            {shieldPrecisionNote(target.diagnosis, target.certain ?? true)}
           </T>
           {next ? (
-            <T muted>The count next changes on {formatLocalDate(next)}.</T>
+            <T muted>Next anniversary: {formatLocalDate(next)}.</T>
           ) : null}
         </>
       ) : (
         <T>{EMBLEM_TABLE[target.emblem].description}</T>
       )}
       <T muted>
-        It is self-reported and optional. Nobody checks it, and it can be hidden
-        any time in Settings.
+        Self-reported and optional. Hide your shield or emblem in Profile
+        settings at any time.
       </T>
-      <Notice tone="info">
-        {isShield
-          ? "Time since diagnosis is not a ranking. It says nothing about skill, success or how much anyone's words are worth."
-          : `${EMBLEM_NOTE} It is not a ranking.`}
-      </Notice>
+      {!isShield ? (
+        <T small muted>
+          {EMBLEM_NOTE}
+        </T>
+      ) : null}
     </Sheet>
   );
 }

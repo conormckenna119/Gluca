@@ -20,7 +20,7 @@ export const EMBLEM_TABLE: Record<Emblem, EmblemInfo> = {
     line: "Friends and loved ones",
     description:
       "This person chose it to say they support someone who lives with diabetes.",
-    a11y: "Supporter emblem, a heart inside a shield",
+    a11y: "Supporter emblem, a heart",
   },
   caregiver: {
     id: "caregiver",
@@ -28,7 +28,7 @@ export const EMBLEM_TABLE: Record<Emblem, EmblemInfo> = {
     line: "Parents and caregivers",
     description:
       "This person chose it to say they care for someone who lives with diabetes.",
-    a11y: "Caregiver emblem, a heart under a roof",
+    a11y: "Caregiver emblem, a helping hand and heart",
   },
   advocate: {
     id: "advocate",
@@ -36,7 +36,7 @@ export const EMBLEM_TABLE: Record<Emblem, EmblemInfo> = {
     line: "Awareness and education",
     description:
       "This person chose it to say they speak up for people who live with diabetes.",
-    a11y: "Advocate emblem, a megaphone",
+    a11y: "Advocate emblem, an awareness ribbon",
   },
 };
 

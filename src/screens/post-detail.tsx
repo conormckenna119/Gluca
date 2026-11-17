@@ -107,17 +107,28 @@ function PostConversation() {
                       }}
                     >
                       {isEnabled("identity") ? (
-                        <AuthorIdentity name={who} />
+                        <AuthorIdentity
+                          name={who}
+                          metadata={
+                            who === "You" ? (
+                              <Pill tone="accent">You</Pill>
+                            ) : (
+                              <Pill>Fictional</Pill>
+                            )
+                          }
+                        />
                       ) : (
                         <T small bold>
                           {who}
                         </T>
                       )}
-                      {who === "You" ? (
-                        <Pill tone="accent">You</Pill>
-                      ) : (
-                        <Pill>Fictional</Pill>
-                      )}
+                      {!isEnabled("identity") ? (
+                        who === "You" ? (
+                          <Pill tone="accent">You</Pill>
+                        ) : (
+                          <Pill>Fictional</Pill>
+                        )
+                      ) : null}
                     </View>
                     <T>{text}</T>
                   </View>

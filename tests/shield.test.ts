@@ -217,21 +217,21 @@ test("localToday uses the local calendar day near midnight", () => {
 test("labels: with, without and uncertain number", () => {
   assert.equal(
     shieldLabel("sapphire", 20),
-    "Diabetes experience shield, sapphire tier, 20 years",
+    "Years with diabetes, sapphire shield style, 20 years",
   );
   assert.equal(
     shieldLabel("amethyst", 17, false),
-    "Diabetes experience shield, amethyst tier, about 17 years",
+    "Years with diabetes, amethyst shield style, 17 years, limited date precision",
   );
   assert.equal(
     shieldLabel("silver", 1),
-    "Diabetes experience shield, silver tier, 1 year",
+    "Years with diabetes, silver shield style, 1 year",
   );
   assert.equal(
     shieldLabel("sapphire", 20, true, false),
-    "Diabetes experience shield, sapphire tier",
+    "Years with diabetes, sapphire shield style",
   );
-  assert.equal(shieldLabel("gold"), "Diabetes experience shield, gold tier");
+  assert.equal(shieldLabel("gold"), "Years with diabetes, gold shield style");
   for (const w of [
     "better",
     "superior",

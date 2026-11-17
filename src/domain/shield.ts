@@ -5,7 +5,7 @@ import { isValidPartialDate, type PartialDate } from "./profile";
 
 export type LocalDate = { year: number; month: number; day: number };
 
-/** Glyph ids the component draws inside the shield, so every tier differs without colour. */
+/** Legacy ornament metadata retained for compatibility; the simplified shield no longer renders these marks. */
 export type ShieldGlyph =
   | "dot"
   | "ring"
@@ -161,10 +161,26 @@ export function shieldLabel(
   showNumber = true,
 ): string {
   const t = typeof tier === "string" ? tierById(tier) : tier;
-  const base = `Diabetes experience shield, ${t ? t.label : "unknown"} tier`;
+  const base = `Years with diabetes, ${t ? t.label : "unknown"} shield style`;
   if (!showNumber || years === undefined) return base;
   const n = `${years} ${years === 1 ? "year" : "years"}`;
-  return certain ? `${base}, ${n}` : `${base}, about ${n}`;
+  return certain ? `${base}, ${n}` : `${base}, ${n}, limited date precision`;
+}
+
+/** Explains uncertainty without exposing any private date value in public identity UI. */
+export function shieldPrecisionNote(
+  diagnosis?: PartialDate,
+  certain = true,
+): string {
+  if (diagnosis?.approximate)
+    return "Your diagnosis date is marked as an estimate, so the count is an estimate too. No exact anniversary is assumed.";
+  if (diagnosis && diagnosis.month === undefined)
+    return "Only a diagnosis year is known. The count is conservative and updates at the start of the next calendar year; no anniversary date is assumed.";
+  if (diagnosis && diagnosis.day === undefined)
+    return "Only a diagnosis month and year are known. The count increases after the whole anniversary month has passed; no day is assumed.";
+  return certain
+    ? "Completed years based on a self-reported diagnosis date."
+    : "The diagnosis date is partial or estimated. Missing date parts are never filled in; partial dates use a conservative count and estimated dates give an estimated count.";
 }
 
 const MONTHS = [

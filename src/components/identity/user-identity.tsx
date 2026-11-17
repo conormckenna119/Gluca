@@ -1,6 +1,6 @@
 import React from "react";
-import { Image, View } from "react-native";
-import { Avatar, T, space } from "../../ui";
+import { Image, Text, View } from "react-native";
+import { Avatar, T, space, useColors } from "../../ui";
 import { NameLine } from "./name-line";
 import type { PublicProfile } from "../../domain/profile";
 import { useDemo } from "../../store";
@@ -24,19 +24,25 @@ export function UserIdentity({
   profile,
   expanded = false,
   photo = true,
+  metadata,
 }: {
   profile: PublicProfile;
   expanded?: boolean;
   photo?: boolean;
+  metadata?: React.ReactNode;
 }) {
   const size = expanded ? 76 : 36;
+  const c = useColors();
   return (
     <View
+      testID="user-identity"
       style={{
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: metadata ? "flex-start" : "center",
         gap: space.sm,
         minWidth: 0,
+        maxWidth: "100%",
+        width: expanded ? "100%" : undefined,
         flex: expanded ? undefined : 1,
       }}
     >
@@ -54,10 +60,15 @@ export function UserIdentity({
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <NameLine name={profile.name} publicProfile={profile} />
         {profile.username ? (
-          <T small muted>
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ color: c.muted, fontSize: 13.5, lineHeight: 19 }}
+          >
             @{profile.username}
-          </T>
+          </Text>
         ) : null}
+        {metadata}
         {expanded && profile.bio ? <T>{profile.bio}</T> : null}
         {expanded && profile.diabetesType ? (
           <T small muted>
@@ -85,9 +96,17 @@ export function UserIdentity({
 export function AuthorIdentity({
   name,
   photo = true,
+  metadata,
 }: {
   name: string;
   photo?: boolean;
+  metadata?: React.ReactNode;
 }) {
-  return <UserIdentity profile={useUserIdentity(name)} photo={photo} />;
+  return (
+    <UserIdentity
+      profile={useUserIdentity(name)}
+      photo={photo}
+      metadata={metadata}
+    />
+  );
 }

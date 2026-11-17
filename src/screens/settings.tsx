@@ -118,7 +118,7 @@ function ProfilePrivacy() {
       <Group>
         {sw(
           "showShield",
-          "Show diabetes experience shield",
+          "Show my shield",
           "Anyone who sees your name will see a shield. It never shows your diagnosis date.",
           has.diagnosis,
         )}
@@ -131,7 +131,7 @@ function ProfilePrivacy() {
         )}
         {sw(
           "showEmblem",
-          "Show supporter emblem",
+          "Show my emblem",
           "Anyone who sees your name will see your emblem.",
           has.emblem,
         )}

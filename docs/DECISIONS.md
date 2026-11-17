@@ -1,5 +1,14 @@
 # Decisions
 
+## Stage 7B — 17 November 2026
+
+- Retain existing colour milestones and internal `tier`/legacy mark metadata; render one flat shield silhouette/outline with centered digits and identical dimensions. Remove ornaments, metallic effects and uncertainty symbols. User-visible wording says shield/style/years, never status.
+- Keep completed-year/date precision mathematics unchanged. Explain partial/estimated dates in shared details/accessibility labels. Public projections still exclude all diagnosis date values; no public year/month permission is invented. Exact next anniversaries use owner-only dates. Visibility defaults/number privacy and backend storage are unchanged.
+- Coordinate supporter/caregiver/advocate through one rounded frame and heart/helping-hand/awareness-ribbon symbols. No hierarchy, Dexcom dependency or access delegation. No new package or image asset.
+- Keep one reusable identity renderer, bounded names/handles and 44px badge targets. Place existing post/comment markers in its optional metadata row to prevent crowded mobile author names. Preserve Fictional/You, time and visibility information.
+- Reproduced profile-return double-pop when onboarding preceded the tab group: pop detail routes before targeted tab selection. Preserve navigator keys and editor state; cover this path plus existing navigation/Create behavior in browser regressions.
+- Browser visual checks do not replace native device, safe-area, large-font or screen-reader verification. No deployment, new achievement/challenge system or additional stage is authorized.
+
 ## Stage 7A.5 — 17 November 2026
 
 - Use one pure normalized center/uniform scale/opacity model, applied to SVG before both preview and export. Keep original solid layouts; retain session placement/photo when returning to transparency. Existing export canvas paints photo first. No new dependency: Pointer Events and native PanResponder/range adapters are sufficient.

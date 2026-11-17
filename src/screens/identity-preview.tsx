@@ -21,6 +21,11 @@ const FEED = [
     shield: { tier: "legacy", years: 52 },
     emblem: "advocate" as const,
   },
+  {
+    name: "Alexandra With A Long Community Name",
+    shield: { tier: "bronze", years: 9, certain: false },
+    emblem: "supporter" as const,
+  },
   { name: "Plain Name" },
 ];
 
@@ -31,9 +36,9 @@ export function IdentityPreview() {
   return (
     <Page
       title="Identity preview"
-      subtitle="Development only. Shields and emblems are self-reported, optional and not a ranking."
+      subtitle="Development only. Optional, self-reported identity markers."
     >
-      <Section title="Every tier">
+      <Section title="Shield styles">
         <Card>
           <View style={{ gap: space.lg }}>
             {SHIELD_TIERS.map((t, i) => (
@@ -56,7 +61,7 @@ export function IdentityPreview() {
       </Section>
       <Section
         title="Sizes"
-        note="Each tier at 20, 28 and 44 px, with a number."
+        note="Each style at 20, 28 and 44 px, with a number."
       >
         <Card>
           <View style={{ gap: space.sm }}>

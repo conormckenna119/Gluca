@@ -62,27 +62,56 @@ export function PostCard({
         style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
       >
         {!isEnabled("identity") ? <Avatar name={post.author} /> : null}
-        <View style={{ flex: 1, gap: 2 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: space.sm,
-              flexWrap: "wrap",
-            }}
-          >
-            {isEnabled("identity") ? (
-              <AuthorIdentity name={post.author} />
-            ) : (
-              <T bold>{post.author}</T>
-            )}
-            {mine ? <Pill tone="accent">You</Pill> : <Pill>Fictional</Pill>}
-          </View>
-          <T small muted>
-            {post.createdAt ? relativeTime(post.createdAt, Date.now()) : ""}
-            {post.createdAt && mine ? " · " : ""}
-            {mine ? `Visible to: ${post.visibility}` : ""}
-          </T>
+        <View style={{ flex: 1, gap: 2, minWidth: 0 }}>
+          {isEnabled("identity") ? (
+            <View style={{ flexDirection: "row", minWidth: 0 }}>
+              <AuthorIdentity
+                name={post.author}
+                metadata={
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      gap: space.sm,
+                    }}
+                  >
+                    {mine ? (
+                      <Pill tone="accent">You</Pill>
+                    ) : (
+                      <Pill>Fictional</Pill>
+                    )}
+                    <T small muted>
+                      {post.createdAt
+                        ? relativeTime(post.createdAt, Date.now())
+                        : ""}
+                      {post.createdAt && mine ? " · " : ""}
+                      {mine ? `Visible to: ${post.visibility}` : ""}
+                    </T>
+                  </View>
+                }
+              />
+            </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: space.sm,
+                  flexWrap: "wrap",
+                }}
+              >
+                <T bold>{post.author}</T>
+                {mine ? <Pill tone="accent">You</Pill> : <Pill>Fictional</Pill>}
+              </View>
+              <T small muted>
+                {post.createdAt ? relativeTime(post.createdAt, Date.now()) : ""}
+                {post.createdAt && mine ? " · " : ""}
+                {mine ? `Visible to: ${post.visibility}` : ""}
+              </T>
+            </>
+          )}
         </View>
         <IconButton
           icon="settings"

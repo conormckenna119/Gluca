@@ -369,9 +369,9 @@ function ProfileEditor() {
             key={k}
             title={
               {
-                showShield: "Show experience shield",
+                showShield: "Show my shield",
                 showShieldNumber: "Show completed years",
-                showEmblem: "Show supporter emblem",
+                showEmblem: "Show my emblem",
                 showBirthday: "Celebrate my birthday",
                 showDiabetesType: "Show diabetes type",
                 showCgm: "Show CGM device",

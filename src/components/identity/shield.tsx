@@ -1,23 +1,9 @@
-import React, { useId } from "react";
+import React from "react";
 import { View } from "react-native";
-import Svg, {
-  Circle,
-  Path,
-  Rect,
-  Defs,
-  LinearGradient,
-  Stop,
-  Text as SvgText,
-} from "react-native-svg";
-import {
-  shieldLabel,
-  tierById,
-  type ShieldGlyph,
-  type ShieldTierId,
-} from "../../domain/shield";
+import Svg, { Path, Text as SvgText } from "react-native-svg";
+import { shieldLabel, tierById, type ShieldTierId } from "../../domain/shield";
 
-// Identity colours. These say nothing about glucose and avoid pure red and pure green.
-// Each tier also has its own inner glyph, so colour is never the only signal.
+// Existing identity colours, never glucose grades. Size and outline are identical for every style.
 const TIER_COLORS: Record<
   ShieldTierId,
   { fill: string; edge: string; ink: string }
@@ -34,158 +20,8 @@ const TIER_COLORS: Record<
   legacy: { fill: "#2A2A31", edge: "#E8B93C", ink: "#F0C650" },
 };
 
-// Tiers with a second, solid rim: platinum is told from silver by it, legacy gets a ring that
-// stays visible on the dark theme background.
-const DOUBLE_RIM: ShieldTierId[] = ["platinum", "legacy"];
-
 const BODY = "M24 2 L44 9 V28 C44 42 35 51 24 54 C13 51 4 42 4 28 V9 Z";
-const INNER =
-  "M24 6 L40 11.6 V28 C40 39.5 32.8 47.4 24 50.2 C15.2 47.4 8 39.5 8 28 V11.6 Z";
-
-function Glyph({
-  id,
-  x,
-  y,
-  r,
-  color,
-}: {
-  id: ShieldGlyph;
-  x: number;
-  y: number;
-  r: number;
-  color: string;
-}) {
-  const p = (pts: [number, number][]) =>
-    pts
-      .map(
-        ([a, b], i) =>
-          `${i ? "L" : "M"}${(x + a * r).toFixed(2)} ${(y + b * r).toFixed(2)}`,
-      )
-      .join(" ") + " Z";
-  switch (id) {
-    case "dot":
-      return <Circle cx={x} cy={y} r={r * 0.55} fill={color} />;
-    case "ring":
-      return (
-        <Circle
-          cx={x}
-          cy={y}
-          r={r * 0.7}
-          fill="none"
-          stroke={color}
-          strokeWidth={r * 0.35}
-        />
-      );
-    case "bar":
-      return (
-        <Rect
-          x={x - r}
-          y={y - r * 0.3}
-          width={r * 2}
-          height={r * 0.6}
-          rx={r * 0.15}
-          fill={color}
-        />
-      );
-    case "chevron":
-      return (
-        <Path
-          d={`M${x - r} ${y + r * 0.5} L${x} ${y - r * 0.5} L${x + r} ${y + r * 0.5}`}
-          fill="none"
-          stroke={color}
-          strokeWidth={r * 0.45}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      );
-    case "diamond":
-      return (
-        <Path
-          d={p([
-            [0, -1],
-            [0.8, 0],
-            [0, 1],
-            [-0.8, 0],
-          ])}
-          fill={color}
-        />
-      );
-    case "triangle":
-      return (
-        <Path
-          d={p([
-            [0, -0.95],
-            [1, 0.75],
-            [-1, 0.75],
-          ])}
-          fill={color}
-        />
-      );
-    case "square":
-      return (
-        <Rect
-          x={x - r * 0.75}
-          y={y - r * 0.75}
-          width={r * 1.5}
-          height={r * 1.5}
-          fill={color}
-        />
-      );
-    case "spark":
-      return (
-        <Path
-          d={p([
-            [0, -1],
-            [0.28, -0.28],
-            [1, 0],
-            [0.28, 0.28],
-            [0, 1],
-            [-0.28, 0.28],
-            [-1, 0],
-            [-0.28, -0.28],
-          ])}
-          fill={color}
-        />
-      );
-    case "hexagon":
-      return (
-        <Path
-          d={p([
-            [0.5, -0.87],
-            [1, 0],
-            [0.5, 0.87],
-            [-0.5, 0.87],
-            [-1, 0],
-            [-0.5, -0.87],
-          ])}
-          fill="none"
-          stroke={color}
-          strokeWidth={r * 0.4}
-          strokeLinejoin="round"
-        />
-      );
-    case "star":
-      return (
-        <Path
-          d={p([
-            [0, -1],
-            [0.24, -0.33],
-            [0.95, -0.31],
-            [0.38, 0.12],
-            [0.59, 0.81],
-            [0, 0.4],
-            [-0.59, 0.81],
-            [-0.38, 0.12],
-            [-0.95, -0.31],
-            [-0.24, -0.33],
-          ])}
-          fill={color}
-        />
-      );
-  }
-}
-
-/** Original shield for time since diagnosis. The number, when shown, sits inside; uncertainty is told in the label and sheet. */
+/** A quiet, numeric identity marker. Precision belongs in its accessible label/detail sheet. */
 export function Shield({
   tier,
   years,
@@ -201,77 +37,33 @@ export function Shield({
   certain?: boolean;
   label?: string;
 }) {
-  const t = tierById(tier) ?? tierById("teal")!;
-  const col = TIER_COLORS[t.id];
-  const metalId = "shield" + useId().replace(/[^a-zA-Z0-9]/g, "");
-  const number = showNumber && years !== undefined;
-  const a11y = label ?? shieldLabel(t, years, certain, number);
-  const text = `${certain ? "" : "≈"}${years ?? ""}`;
-  // Under 24 px the inner shape is dropped and the number takes the middle, so it stays readable.
-  const compact = size < 24 && number;
-  const fontSize = compact
-    ? text.length >= 3
-      ? 17
-      : text.length === 2
-        ? 22
-        : 26
-    : text.length >= 3
-      ? 12
-      : text.length === 2
-        ? 16
-        : 19;
-  const textY = compact ? 31 + fontSize * 0.36 : 35 + fontSize * 0.36;
-  const double = DOUBLE_RIM.includes(t.id);
+  const t = tierById(tier) ?? tierById("teal")!,
+    col = TIER_COLORS[t.id];
+  const number =
+    showNumber && years !== undefined && Number.isInteger(years) && years >= 0;
+  const text = number ? String(years) : "";
+  const fontSize = text.length >= 3 ? 20 : text.length === 2 ? 24 : 28;
   return (
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={a11y}
-      style={{ width: size, height: (size * 56) / 48 }}
+      accessibilityLabel={label ?? shieldLabel(t, years, certain, number)}
+      style={{ width: size, height: (size * 56) / 48, flexShrink: 0 }}
     >
       <Svg width={size} height={(size * 56) / 48} viewBox="0 0 48 56">
-        <Defs>
-          <LinearGradient id={metalId} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#ffffff" stopOpacity={0.3} />
-            <Stop offset="0.42" stopColor="#ffffff" stopOpacity={0} />
-            <Stop offset="1" stopColor="#ffffff" stopOpacity={0.1} />
-          </LinearGradient>
-        </Defs>
         <Path
           d={BODY}
           fill={col.fill}
           stroke={col.edge}
-          strokeWidth={double ? 2.6 : 2}
+          strokeWidth={1.6}
           strokeLinejoin="round"
         />
-        <Path d={BODY} fill={`url(#${metalId})`} />
-        <Path
-          d={INNER}
-          fill="none"
-          stroke={col.edge}
-          strokeOpacity={double ? 1 : 0.55}
-          strokeWidth={double ? 1.6 : 1}
-        />
-        <Path
-          d="M9 12 L24 7 L24 47 C15 42 10 35 9 27 Z"
-          fill={col.fill}
-          opacity={0.4}
-        />
-        {compact ? null : (
-          <Glyph
-            id={t.mark}
-            x={24}
-            y={number ? 18 : 28}
-            r={number ? 5.5 : 9}
-            color={col.ink}
-          />
-        )}
         {number ? (
           <SvgText
             x={24}
-            y={textY}
+            y={25 + fontSize * 0.36}
             fontSize={fontSize}
-            fontWeight="800"
+            fontWeight="700"
             fontFamily="sans-serif"
             fill={col.ink}
             textAnchor="middle"

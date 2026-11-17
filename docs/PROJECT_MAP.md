@@ -1,5 +1,9 @@
 #
 
+## Stage 7B — identity refinement
+
+Existing `components/identity/Shield`, `EmblemBadge`, `NameLine`, `IdentitySheet` and `UserIdentity`/`AuthorIdentity` own all updated rendering. Flat shields retain stored colour IDs and date math; `domain/shield.ts` adds date-value-free precision explanations and neutral labels. Emblems reuse `domain/emblems.ts`. Shared identity metadata places existing fictional/owner markers beneath names in post-card/post-detail. Profile's owner-only shield card reuses the detail sheet; public projections/schema/backend are unchanged. `application-shell.tsx` pops details before selecting the existing tab to avoid revealing retained onboarding after profile edits. New tests: `shield-refinement.test.ts`, `e2e/stage7b.spec.ts`; [report and synthetic screenshots](IDENTITY_UI_REFINEMENT.md).
+
 ## Stage 7A.5 — grouped story editing
 
 `src/overlay-transform.ts` defines normalized placement/uniform scale/opacity and shared SVG composition. Create owns session-only transform state separately from data/photo/options. New `components/create/overlay-interaction` and `editor-slider` have web/native adapters; `overlay-controls.tsx` uses existing primitives. `artwork-preview.tsx` keeps editing chrome and matte outside the capture surface. `art/templates.ts` marks the mandatory source disclosure so it stays pinned/full opacity. Existing export renderer, backend and glucose calculations remain unchanged. `art/copy.ts` owns optional tones and neutral defaults; `story.ts` / `art/model.ts` preserve user-written words across style/period changes. New tests: `overlay-transform.test.ts`, `e2e/stage7a5.spec.ts`; synthetic evidence: `docs/screenshots/stage7a5`. Guides: [STORY_EDITOR](STORY_EDITOR.md), [voice](GLUCA_VOICE_AND_TONE.md), [verification/file report](UI_REFINEMENT.md).

@@ -101,7 +101,7 @@ export function PartialDateInput({
         <Group>
           <SwitchRow
             title="Not sure of the exact date"
-            detail="Your shield then says “about” and never claims more than you entered."
+            detail="Date precision is explained in shield details. Missing parts stay unknown."
             value={parts.approx}
             onChange={(v) => update({ ...parts, approx: v })}
           />

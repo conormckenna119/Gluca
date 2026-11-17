@@ -1,10 +1,12 @@
 # Profile privacy — Stage 6B
 
+Stage 7B preserves this storage and public projection architecture. Shield details explain precision without receiving a public diagnosis date. Owner-only cards may use their own private date to show a known next anniversary. No diagnosis year/month sharing permission exists, so those values remain omitted from public responses. No migration or new public medical field is introduced.
+
 ## Boundaries
 
 Private owner data: community connection, diagnosis with its original precision, birthday month/day, age-confirmation preference, monitoring/device/model, delivery/model, interests and visibility switches. These never enter telemetry. Choosing a device is self-reporting; it does not connect Dexcom, prove ownership or confer permission to view glucose data.
 
-Explicit public profile fields: display name and optional user-chosen handle, bio and cropped photo. Medical fields are independently off by default. `publicView()` is the single allowlist for shield/emblem, diabetes type, device/delivery and birthday celebration opt-ins. Public responses never contain diagnosis date, birthday date, age, account credentials, Dexcom connection details or glucose readings. A birthday opt-in can expose only a celebration boolean on that date, not the stored date/year. Hiding shield years still reveals its broad tier, which the user chooses by enabling the shield.
+Explicit public profile fields: display name and optional user-chosen handle, bio and cropped photo. Medical fields are independently off by default. `publicView()` is the single allowlist for shield/emblem, diabetes type, device/delivery and birthday celebration opt-ins. Public responses never contain diagnosis date, birthday date, age, account credentials, Dexcom connection details or glucose readings. A birthday opt-in can expose only a celebration boolean on that date, not the stored date/year. Hiding shield years still reveals its broad shield style, which the user chooses by enabling the shield.
 
 ## Existing backend, additive storage
 
