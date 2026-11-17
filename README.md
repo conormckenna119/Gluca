@@ -1,5 +1,11 @@
 # Gluca
 
+**Stage 7A — focused UI fixes:** transparent story artwork now stays above an added photo, and one persistent bottom navigation serves normal tab/detail routes. Original templates, API/authentication and profile features are retained. [Causes, changed files, real PNG/browser evidence and repeat commands](docs/UI_BUGFIXES_STAGE7A.md). 360 core tests and typecheck pass; the Playwright worker is blocked by this environment, with direct browser verification recorded separately.
+
+
+**Stage 6B — onboarding and identity:** existing account/profile/shield systems now support inclusive progressive onboarding, locally processed profile photos, public handles/bios, owner-encrypted backend profiles, explicit visibility controls and shared identity displays. Start with [ONBOARDING.md](docs/ONBOARDING.md), [IDENTITY_SHIELDS.md](docs/IDENTITY_SHIELDS.md) and [PROFILE_PRIVACY.md](docs/PROFILE_PRIVACY.md). Enable `identity,accounts` alongside your existing Dexcom flags, rebuild the development web export and restart the same backend. Native accounts/production release remain gated. Earlier stage notes below are historical.
+
+
 **Stage 5 — automatic foreground Dexcom sandbox sync:** My Glucose and Create share a session-isolated cache. Open/resume checks, bounded incremental overlap, Sync Now, backoff and privacy controls are implemented. Live official sandbox verification retrieved **1,678 readings**, skipped fresh EGV downloads and verified overlapping refresh plus Create integration. **340 automated tests pass**, with clean typecheck and development web export. Browser history is **ephemeral memory**; reload requires online retrieval. The native SQLCipher adapter requires a custom build/device verification; native OAuth remains gated. No public deployment or permanent backend glucose history. [Setup and evidence](docs/GLUCOSE_SYNC.md) · [Security/production gates](docs/DEXCOM_SECURITY.md). Enable `EXPO_PUBLIC_FLAGS=dexcomApi,dexcomDiagnostics,dexcomSync`, rebuild development web and restart the existing backend. Creative polish remains for Claude.
 
 

@@ -40,12 +40,14 @@ export function PartialDateInput({
   onChange,
   maxYear = new Date().getFullYear(),
   allowApproximate = true,
+  onValidityChange,
 }: {
   label: string;
   value?: PartialDate;
   onChange: (v: PartialDate | undefined) => void;
   maxYear?: number;
   allowApproximate?: boolean;
+  onValidityChange?: (valid: boolean) => void;
 }) {
   const [parts, setParts] = useState<Parts>({
     y: value ? String(value.year) : "",
@@ -58,6 +60,7 @@ export function PartialDateInput({
     setParts(next);
     const r = parseParts(next, maxYear);
     setError(r.error);
+    onValidityChange?.(!r.error);
     onChange(r.value);
   };
   return (

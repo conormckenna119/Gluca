@@ -1,5 +1,26 @@
 # Decisions
 
+## Stage 7A — 17 November 2026
+
+- Fix the demonstrated CSS paint order with a positioned SVG foreground above the photo; preserve template/analytics code and the existing photo-first/SVG-second export renderer.
+- Keep one persistent root navigation shell, with the original icons/labels and existing Tab navigator routes. Use navigator-key actions through the SDK's synthetic root to avoid recreating the editor when leaving sibling stack screens.
+- Keep account/welcome as explicit bar exceptions with Close; existing sheets retain Close/Done/Cancel. Use visual-viewport sizing and safe-area padding; physical-device verification remains open.
+- An account-scope reset clears photos only when scope changes, allowing React Activity to resume unchanged screens. No raw glucose persistence, new dependency, schema change, feature system or public deployment. Preserve existing Stage 6B changes.
+- Record actual PNG/browser evidence separately from the Playwright runner, whose worker spawning is blocked here. Stop after Stage 7A.
+
+
+## Stage 6B — 16 November 2026
+
+- Latest owner request authorizes onboarding/identity UI implementation and vector shield treatment in this stage. Existing design tokens, SVG tiers/emblems/date logic and registration are reused; no competing account/profile service.
+- Extend the existing Node/SQLite backend with encrypted owner profiles and additive migration 5. Reuse AES-GCM vault key with independent profile owner context; missing encryption fails closed. Public response is a derived allowlist, not private-row serialization.
+- Public handle is separate from the sign-in credential and unique on explicit save. Name/handle/bio/cropped photo are public; diagnosis/birthday dates never are. Device answers are self-reporting, independent of Dexcom OAuth.
+- New profiles stay out of global plaintext device persistence. Preserve previous local profiles unchanged for explicit review, reset medical visibility on review, and never auto-upload them. Guest changes remain ephemeral.
+- Add SDK-compatible `expo-image-manipulator ~58.0.16` via Expo install for local crop/128px JPEG resizing before save. Reuse ImagePicker; no cloud image/analytics service or original-photo upload.
+- Existing exact/partial/leap-year shield convention is retained (Feb 29 → March 1 in non-leap years). Unknown dates remain approximate and never acquire invented anniversary parts. Midnight/resume updates are metadata/calendar only.
+- Account changes invalidate identity and glucose; provider disconnect invalidates glucose while preserving identity. Broadcast messages contain only closed event/reason enums, with legacy-message support.
+- Existing feed/following/community remain fictional local prototype. Real social ownership, verified production authentication/recovery/minimum-age policy and native account/device verification remain future gates, not Stage 6B claims. No deployment or additional stage is authorized.
+
+
 ## Stage 5 — 16 November 2026
 
 - Owner authorized automatic foreground sync, storage/privacy controls and shared dashboard/Create. No public deployment or new social features.

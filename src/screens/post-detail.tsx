@@ -17,6 +17,8 @@ import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
 import { Guard } from "../components/guard";
+import { AuthorIdentity } from "../components/identity/user-identity";
+import { isEnabled } from "../flags";
 
 export function PostDetail() {
   return (
@@ -82,7 +84,9 @@ function PostConversation() {
               const who = p.commentAuthors?.[i] ?? "Community member";
               return (
                 <View key={i} style={{ flexDirection: "row", gap: space.md }}>
-                  <Avatar name={who} size={36} />
+                  {!isEnabled("identity") ? (
+                    <Avatar name={who} size={36} />
+                  ) : null}
                   <View
                     style={{
                       flex: 1,
@@ -102,9 +106,13 @@ function PostConversation() {
                         flexWrap: "wrap",
                       }}
                     >
-                      <T small bold>
-                        {who}
-                      </T>
+                      {isEnabled("identity") ? (
+                        <AuthorIdentity name={who} />
+                      ) : (
+                        <T small bold>
+                          {who}
+                        </T>
+                      )}
                       {who === "You" ? (
                         <Pill tone="accent">You</Pill>
                       ) : (

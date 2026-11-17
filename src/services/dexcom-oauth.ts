@@ -30,7 +30,12 @@ export function createOAuthClient(base = "", fetcher: typeof fetch = fetch) {
         "/api/session/logout",
         "/api/dexcom/disconnect",
       ].includes(route);
-    if (mutation) sessionEvent("lock");
+    if (mutation)
+      sessionEvent(
+        "lock",
+        false,
+        route === "/api/dexcom/disconnect" ? "provider" : "account",
+      );
     const res = await fetcher(`${base}${route}`, {
       method,
       credentials: "include",

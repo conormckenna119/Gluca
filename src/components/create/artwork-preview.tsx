@@ -2,6 +2,7 @@ import React from "react";
 import { Image, View } from "react-native";
 import { SvgXml } from "react-native-svg";
 import { useColors } from "../../ui";
+import { PHOTO_LAYER, ARTWORK_LAYER } from "../../story-composition";
 
 type Props = {
   svg: string;
@@ -37,7 +38,6 @@ export const ArtworkPreview = React.forwardRef<
           width,
           height,
           backgroundColor: "transparent",
-          borderRadius: 14,
           overflow: "hidden",
         }}
       >
@@ -46,10 +46,12 @@ export const ArtworkPreview = React.forwardRef<
             source={{ uri: photoUri }}
             accessibilityIgnoresInvertColors
             resizeMode="cover"
-            style={{ position: "absolute", top: 0, left: 0, width, height }}
+            style={{ ...PHOTO_LAYER, width, height }}
           />
         ) : null}
-        <SvgXml xml={svg} width={width} height={height} />
+        <View pointerEvents="none" style={ARTWORK_LAYER}>
+          <SvgXml xml={svg} width={width} height={height} />
+        </View>
       </View>
     </View>
   );

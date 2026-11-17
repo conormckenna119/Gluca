@@ -28,11 +28,14 @@ export function NameLine({
   const emblem = publicProfile?.emblem;
   const label = (
     <Text
+      numberOfLines={1}
+      ellipsizeMode="tail"
       style={{
         color: c.text,
         fontSize: 16,
         fontWeight: bold ? "700" : "400",
         flexShrink: 1,
+        minWidth: 0,
       }}
     >
       {name}
@@ -46,7 +49,8 @@ export function NameLine({
       style={{
         flexDirection: "row",
         alignItems: "center",
-        flexWrap: "wrap",
+        flexWrap: "nowrap",
+        minWidth: 0,
         columnGap: space.xs,
       }}
     >
@@ -60,6 +64,7 @@ export function NameLine({
               kind: "shield",
               tier: shield.tier,
               years: shield.years,
+              certain,
               showNumber: shield.years !== undefined,
               diagnosis,
             })
@@ -74,6 +79,7 @@ export function NameLine({
           <Shield
             tier={shield.tier}
             years={shield.years}
+            certain={certain}
             showNumber={shield.years !== undefined}
             size={30}
           />

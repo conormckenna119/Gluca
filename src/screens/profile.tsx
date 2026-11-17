@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
-import { router } from "expo-router";
-import { NameLine } from "../components/identity/name-line";
+import { router, useLocalSearchParams } from "expo-router";
+import type { PublicProfile } from "../domain/profile";
 import { Shield } from "../components/identity/shield";
 import { publicView } from "../domain/public-view";
 import {
@@ -34,6 +34,10 @@ import { PostCard } from "../components/post-card";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
 import { AccountEntry } from "../components/account-entry";
+import {
+  UserIdentity,
+  AuthorIdentity,
+} from "../components/identity/user-identity";
 
 /** What others see, built from the same function everything else uses, so the person sees exactly that. */
 function useOwnPublicView() {
@@ -51,19 +55,24 @@ function useOwnPublicView() {
 }
 
 function IdentityHeader() {
-  const { state } = useDemo();
   const { view } = useOwnPublicView();
-  const name = state.profile.displayName;
   return (
     <View style={{ alignItems: "center", gap: space.md }}>
-      <Avatar name={name} size={88} />
-      <NameLine
-        name={name}
-        publicProfile={view}
-        diagnosis={state.profile.diagnosis}
-      />
+      <UserIdentity expanded profile={view} />
+      {view.username ? (
+        <Button
+          label="View saved public profile"
+          onPress={() =>
+            router.push({
+              pathname: "/profile",
+              params: { username: view.username },
+            })
+          }
+        />
+      ) : null}
       <T muted align="center">
-        This is how others see you. This profile exists only on this device.
+        Public preview. Your diagnosis date and birthday date are never part of
+        it.
       </T>
     </View>
   );
@@ -132,7 +141,7 @@ function IdentityCards() {
   );
 }
 
-export function Profile() {
+function OwnProfile() {
   const { state } = useDemo();
   const flags = getFlags();
   const mine = state.posts.filter((p) => p.author === "You");
@@ -175,6 +184,15 @@ export function Profile() {
         </Section>
       ) : null}
       {flags.identity ? <IdentityCards /> : null}
+      {flags.identity && state.following.length ? (
+        <Section title="Following" note="Your existing local demo connections.">
+          {state.following.map((name) => (
+            <Card key={name}>
+              <AuthorIdentity name={name} />
+            </Card>
+          ))}
+        </Section>
+      ) : null}
       {flags.achievements ? (
         <View style={{ gap: space.md }}>
           <PinnedMedals awards={state.awards} />
@@ -199,5 +217,72 @@ export function Profile() {
         </Group>
       </Section>
     </Page>
+  );
+}
+
+function MemberProfile({ username }: { username: string }) {
+  const [data, D] = React.useState<PublicProfile | null>(null),
+    [error, E] = React.useState("");
+  React.useEffect(() => {
+    const abort = new AbortController();
+    let alive = true;
+    void fetch(
+      `/api/profiles/public?username=${encodeURIComponent(username)}`,
+      {
+        credentials: "include",
+        cache: "no-store",
+        redirect: "error",
+        signal: abort.signal,
+        headers: { "X-Gluca-Request": "1" },
+      },
+    )
+      .then(async (r) => {
+        if (!r.ok)
+          throw new Error(
+            r.status === 401
+              ? "Sign in to Gluca to view this profile."
+              : r.status === 404
+                ? "This public profile was not found."
+                : "This profile is unavailable.",
+          );
+        const value = (await r.json()) as PublicProfile;
+        if (alive) D(value);
+      })
+      .catch((e) => {
+        if (alive)
+          E(e instanceof Error ? e.message : "This profile is unavailable.");
+      });
+    return () => {
+      alive = false;
+      abort.abort();
+    };
+  }, [username]);
+  return (
+    <Page
+      title="Community profile"
+      subtitle="Only the details this person chose to share."
+    >
+      {data ? (
+        <Card>
+          <UserIdentity expanded profile={data} />
+          <T small muted>
+            Self-reported identity. Shields and emblems do not grant access to
+            private glucose data.
+          </T>
+        </Card>
+      ) : (
+        <T>{error || "Loading public profile…"}</T>
+      )}
+      <Button label="Your profile" onPress={() => router.replace("/profile")} />
+    </Page>
+  );
+}
+export function Profile() {
+  const { username } = useLocalSearchParams<{ username?: string }>();
+  const { profileVersion } = useDemo();
+  return getFlags().identity && typeof username === "string" && username ? (
+    <MemberProfile key={`${profileVersion}:${username}`} username={username} />
+  ) : (
+    <OwnProfile />
   );
 }

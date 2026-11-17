@@ -1,5 +1,6 @@
 import { HttpError, redirect, sendJson, type Ctx, type Route } from "./http";
 import { sessionRoutes } from "./session";
+import { profileRoutes } from "./profiles";
 import {
   buildAuthorizeUrl,
   consumeState,
@@ -136,6 +137,7 @@ export const routes: Route[] = [
       sendJson(res, 200, { ok: true, mode: deps.mode }),
   },
   ...sessionRoutes,
+  ...profileRoutes,
   { method: "POST", path: "/api/dexcom/connect", handler: connect },
   {
     method: "GET",

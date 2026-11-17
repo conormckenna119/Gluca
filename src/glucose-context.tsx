@@ -10,7 +10,11 @@ import { AppState, Platform } from "react-native";
 import { GlucoseSync, type SyncState } from "./glucose-sync";
 import { createPrivateGlucoseCache } from "./private-glucose-cache";
 import { createSyncTransport } from "./services/glucose-sync-transport";
-import { onSessionEvent, sessionEvent } from "./services/session-events";
+import {
+  onSessionEvent,
+  sessionEvent,
+  parseSessionMessage,
+} from "./services/session-events";
 import { getFlags } from "./flags";
 import { useDemo } from "./store";
 import { MockGlucoseProvider } from "./providers";
@@ -92,28 +96,28 @@ export function GlucoseDataProvider({
     () => INITIAL,
   );
   useEffect(() => {
-    if (!available) return;
+    if (!available && !f.identity) return;
     const channel =
       typeof BroadcastChannel !== "undefined"
         ? new BroadcastChannel("gluca-private-session-v1")
         : null;
-    const off = onSessionEvent((e, remote) => {
+    const off = onSessionEvent((e, remote, reason) => {
       lockMarker(e !== "check");
       if (e === "lock") void engine?.invalidate();
       else if (e === "purge") void engine?.clearLocal();
       else void engine?.activate();
-      if (!remote) channel?.postMessage(e);
+      if (!remote) channel?.postMessage({ event: e, reason });
     });
     if (channel)
       channel.onmessage = (e) => {
-        if (e.data === "lock" || e.data === "check" || e.data === "purge")
-          sessionEvent(e.data, true);
+        const message = parseSessionMessage(e.data);
+        if (message) sessionEvent(message.event, true, message.reason);
       };
     return () => {
       off();
       channel?.close();
     };
-  }, [available, engine]);
+  }, [available, engine, f.identity]);
   useEffect(() => {
     if (!engine) return;
     if (!locked()) void engine.activate();

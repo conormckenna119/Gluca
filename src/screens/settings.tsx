@@ -16,6 +16,7 @@ import {
   useColors,
 } from "../ui";
 import type { PrivacySettings } from "../domain/profile";
+import { ProfileSave } from "../components/identity/profile-save";
 import { useDemo, seed } from "../store";
 import { Page } from "../components/page";
 import { RangeInputs } from "../components/range-inputs";
@@ -111,8 +112,9 @@ function ProfilePrivacy() {
   return (
     <Section
       title="Profile and privacy"
-      note="Everything here starts off. Creating a profile shares nothing. Supporters never see your glucose data."
+      note="Medical details start private. Save applies your visibility choices. Supporters never see your glucose data."
     >
+      <ProfileSave />
       <Group>
         {sw(
           "showShield",

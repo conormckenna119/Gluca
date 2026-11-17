@@ -41,6 +41,7 @@ export const PUMP_METHODS: readonly DeliveryMethod[] = [
   "tandem",
   "omnipod",
   "twiist",
+  "medtronic",
   "other_pump",
 ];
 const usesCgm = (m?: Monitoring) => m === "cgm" || m === "both";
@@ -121,6 +122,9 @@ export const CGM_LABEL: Record<CgmBrand, string> = {
   prefer_not: "Prefer not to say",
 };
 export const DELIVERY_LABEL: Record<DeliveryMethod, string> = {
+  medtronic: "Medtronic",
+  syringes: "Syringes",
+  none: "None",
   tandem: "Tandem pump",
   omnipod: "Omnipod",
   twiist: "twiist pump",
@@ -178,8 +182,12 @@ export function formatPartialDate(d: PartialDate): string {
   return d.approximate ? `around ${text}` : text;
 }
 
-export const birthdayFrom = (month: number, day: number): Birthday => ({ month, day });
-export const formatBirthday = (d: Birthday): string => `${d.day} ${monthName(d.month)}`;
+export const birthdayFrom = (month: number, day: number): Birthday => ({
+  month,
+  day,
+});
+export const formatBirthday = (d: Birthday): string =>
+  `${d.day} ${monthName(d.month)}`;
 
 /** Remove answers that belong to steps the draft no longer reaches (for example after changing role). */
 export function pruneDraft(draft: OnboardingDraft): OnboardingDraft {

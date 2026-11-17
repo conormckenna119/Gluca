@@ -6,7 +6,6 @@ import {
   Chip,
   ConfirmSheet,
   Group,
-  Input,
   Notice,
   Section,
   SwitchRow,
@@ -14,18 +13,24 @@ import {
   space,
 } from "../ui";
 import { useDemo } from "../store";
+import { ProfileFields } from "../components/identity/profile-fields";
+import { ProfileSave } from "../components/identity/profile-save";
+import {
+  CONNECTIONS,
+  chooseConnection,
+  connectionChoice,
+  type ConnectionChoice,
+} from "../domain/profile-experience";
 import { Page } from "../components/page";
 import { PartialDateInput } from "../components/identity/partial-date-input";
 import { BirthdayFields, ChoiceChips, ModelInput } from "./onboarding";
 import { getFlags } from "../flags";
 import {
   CGM_BRANDS,
-  COMMUNITY_ROLES,
   DELIVERY_METHODS,
   DIABETES_TYPES,
   EMBLEMS,
   MAX_INTERESTS,
-  MAX_NAME_LENGTH,
   MONITORING,
   defaultProfile,
   sanitizeProfile,
@@ -37,9 +42,7 @@ import {
   EMBLEM_NAME,
   INTEREST_SUGGESTIONS,
   MONITORING_LABEL,
-  ROLE_LABEL,
   TYPE_LABEL,
-  pruneDraft,
 } from "../domain/onboarding";
 
 /** A titled field with a clear Remove action while it holds something. */
@@ -71,36 +74,38 @@ function Field({
   );
 }
 
-/** Edit every profile field. Each change is saved as it is made; each optional field can be removed. */
-export function ProfileEdit() {
-  const { state, set } = useDemo();
+/** Edit every profile field in memory, then explicitly save to the current account. */
+function ProfileEditor() {
+  const { state, set, profileStatus, hasLegacyProfile, reviewLegacyProfile } =
+    useDemo();
   const [confirm, setConfirm] = useState(false);
   const [bump, setBump] = useState(0);
-  const [name, setName] = useState(
-    state.profile.displayName === "You" ? "" : state.profile.displayName,
-  );
+  const [validDate, validDateSet] = useState(true);
+  const [validBirthday, validBirthdaySet] = useState(true);
   if (!getFlags().identity) return <Redirect href="/create" />;
   const p = state.profile;
   const interests = p.interests;
-  // Save a change; answers that no longer apply to the chosen role are dropped.
+  // Edit in memory. Explicit save commits to the authenticated account.
   const save = (next: Partial<Profile>) =>
     set((s) => {
       const merged = { ...s.profile, ...next };
-      const kept = pruneDraft({ profile: merged }).profile;
+      const kept = merged;
       return {
         ...s,
-        profile: sanitizeProfile({
+        profile: {
           ...kept,
           displayName: merged.displayName,
           onboarded: s.profile.onboarded,
-        }),
+        } as Profile,
       };
     });
   const remove = (keys: (keyof Profile)[], remount = false) => {
+    if (keys.includes("diagnosis")) validDateSet(true);
+    if (keys.includes("birthday")) validBirthdaySet(true);
     set((s) => {
       const q: Partial<Profile> = { ...s.profile };
       for (const k of keys) delete q[k];
-      const kept = pruneDraft({ profile: q }).profile;
+      const kept = q;
       return {
         ...s,
         profile: sanitizeProfile({
@@ -114,33 +119,51 @@ export function ProfileEdit() {
   };
   const living = p.role === "living";
   const onCgm = p.monitoring === "cgm" || p.monitoring === "both";
-  const pump = ["tandem", "omnipod", "twiist", "other_pump"].includes(
-    p.delivery?.method ?? "",
-  );
+  const pump = [
+    "tandem",
+    "omnipod",
+    "twiist",
+    "medtronic",
+    "other_pump",
+  ].includes(p.delivery?.method ?? "");
 
   return (
     <Page
       title="Edit profile"
-      subtitle="Everything here is optional and private until you switch it on in Settings. Changes save as you make them."
+      subtitle="Edit your choices, then save. Medical details are private unless you explicitly share them."
     >
       <Section title="Name">
-        <Input
-          label="Display name"
-          value={name}
-          placeholder="You"
-          maxLength={MAX_NAME_LENGTH}
-          onChange={(v) => {
-            setName(v);
-            save({ displayName: v.trim() || defaultProfile().displayName });
-          }}
+        <Notice
+          title={
+            profileStatus === "account"
+              ? "Protected account profile"
+              : "Session-only profile"
+          }
+        >
+          {profileStatus === "account"
+            ? "Save commits your choices to your signed-in account. Public fields are previewed below."
+            : "Guest changes last only in this open app. Sign in for protected account storage."}
+        </Notice>
+        {hasLegacyProfile ? (
+          <Button
+            label="Review previous local profile"
+            onPress={reviewLegacyProfile}
+          />
+        ) : null}
+        <ProfileFields
+          profile={p}
+          privacy={state.privacy}
+          patch={(next) =>
+            set((s) => ({ ...s, profile: { ...s.profile, ...next } }))
+          }
         />
       </Section>
       <Section title="About you">
         <ChoiceChips
-          options={COMMUNITY_ROLES}
-          labels={ROLE_LABEL}
-          value={p.role}
-          onChange={(v) => (v ? save({ role: v }) : remove(["role"]))}
+          options={Object.keys(CONNECTIONS) as ConnectionChoice[]}
+          labels={CONNECTIONS}
+          value={connectionChoice(p)}
+          onChange={(choice) => save(chooseConnection(p, choice ?? "private"))}
         />
       </Section>
       {living ? (
@@ -171,7 +194,8 @@ export function ProfileEdit() {
               key={`dx${bump}`}
               label="Month and day are optional. Enter what you know."
               value={p.diagnosis}
-              onChange={(v) => v && save({ diagnosis: v })}
+              onValidityChange={validDateSet}
+              onChange={(v) => save({ diagnosis: v })}
             />
           </Field>
           <Field
@@ -270,7 +294,8 @@ export function ProfileEdit() {
           <BirthdayFields
             key={`bd${bump}`}
             value={p.birthday}
-            onChange={(v) => v && save({ birthday: v })}
+            onValidityChange={validBirthdaySet}
+            onChange={(v) => save({ birthday: v })}
           />
         </Field>
         <Group>
@@ -316,19 +341,56 @@ export function ProfileEdit() {
       </Section>
       <Section title="Remove information">
         <Notice>
-          Your display name is kept. Everything else optional is deleted from
-          this device.
+          Your display name is kept. Clear optional fields from this draft, then
+          save to update your account. Preserved legacy local records stay
+          unchanged.
         </Notice>
         <Button
           label="Remove all optional information"
           onPress={() => setConfirm(true)}
         />
       </Section>
+      <Section
+        title="Public visibility"
+        note="Every medical field is private until you explicitly choose otherwise."
+      >
+        {(
+          [
+            "showShield",
+            "showShieldNumber",
+            "showEmblem",
+            "showBirthday",
+            "showDiabetesType",
+            "showCgm",
+            "showDelivery",
+          ] as const
+        ).map((k) => (
+          <SwitchRow
+            key={k}
+            title={
+              {
+                showShield: "Show experience shield",
+                showShieldNumber: "Show completed years",
+                showEmblem: "Show supporter emblem",
+                showBirthday: "Celebrate my birthday",
+                showDiabetesType: "Show diabetes type",
+                showCgm: "Show CGM device",
+                showDelivery: "Show insulin delivery",
+              }[k]
+            }
+            value={state.privacy[k]}
+            onChange={(value) =>
+              set((s) => ({ ...s, privacy: { ...s.privacy, [k]: value } }))
+            }
+          />
+        ))}
+        <ProfileSave disabled={!validDate || !validBirthday} />
+      </Section>
       <ConfirmSheet
         visible={confirm}
         title="Remove all optional information?"
-        body="This deletes your role, diabetes details, diagnosis date, devices, emblem, birthday and interests from this device. Your display name and privacy settings are kept. This can't be undone."
-        confirmLabel="Yes, remove everything optional"
+        body="This clears optional profile fields from your draft. Save profile and privacy to commit the change to your account. Your display name and privacy choices are kept. Preserved legacy local records and exported files stay unchanged."
+        confirmLabel="Clear optional fields"
         onCancel={() => setConfirm(false)}
         onConfirm={() => {
           set((s) => ({
@@ -344,5 +406,15 @@ export function ProfileEdit() {
         }}
       />
     </Page>
+  );
+}
+export function ProfileEdit() {
+  const { profileStatus, profileVersion } = useDemo();
+  return profileStatus === "checking" ? (
+    <Page title="Loading your profile">
+      <T>Verifying your account…</T>
+    </Page>
+  ) : (
+    <ProfileEditor key={profileVersion} />
   );
 }

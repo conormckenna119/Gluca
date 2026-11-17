@@ -21,8 +21,14 @@ export function publicView(
     name: profile.displayName,
     pinnedAchievements: [],
   };
+  if (profile.username) out.username = profile.username;
+  if (profile.bio) out.bio = profile.bio;
+  if (profile.photo) out.photo = profile.photo;
 
-  if (privacy.showShield) {
+  const medical =
+    profile.role === "living" ||
+    (!profile.role && profile.diabetesType !== "prefer_not");
+  if (privacy.showShield && medical) {
     const s = shieldFor(profile.diagnosis, extras.today);
     if (s) {
       out.shield = { tier: s.tier.id, certain: s.certain };
@@ -31,6 +37,7 @@ export function publicView(
   }
   if (privacy.showEmblem && profile.emblem) out.emblem = profile.emblem;
   if (
+    medical &&
     privacy.showDiabetesType &&
     profile.diabetesType &&
     profile.diabetesType !== "prefer_not"
@@ -38,13 +45,19 @@ export function publicView(
     out.diabetesType = profile.diabetesType;
   }
   if (
+    medical &&
     privacy.showDelivery &&
     profile.delivery &&
     profile.delivery.method !== "prefer_not"
   ) {
     out.delivery = { ...profile.delivery };
   }
-  if (privacy.showCgm && profile.cgm && profile.cgm.brand !== "prefer_not") {
+  if (
+    medical &&
+    privacy.showCgm &&
+    profile.cgm &&
+    profile.cgm.brand !== "prefer_not"
+  ) {
     out.cgm = { ...profile.cgm };
   }
   const b = profile.birthday;

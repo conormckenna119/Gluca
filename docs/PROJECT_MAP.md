@@ -1,5 +1,19 @@
 #
 
+## Stage 7A focused fixes
+
+`src/components/application-shell.tsx` wraps the root Stack in `app/_layout.tsx`; `primary-nav-icons.tsx` reuses the original icons. `app/(tabs)/_layout.tsx` retains its screens without a duplicate bar. `src/nav.ts` owns visibility/selection and recursive navigator-key targeting through SDK 58's synthetic root. `src/story-composition.ts` provides background policy and explicit photo/foreground layer styles consumed by Create/artwork-preview. `server/static.ts` now serves the existing account route. Unit/browser regressions and PNG helpers are listed in [UI_BUGFIXES_STAGE7A.md](UI_BUGFIXES_STAGE7A.md).
+
+
+## Stage 6B profile/identity additions
+
+`server/profiles.ts` reuses existing authenticated routes, AES-GCM helper and additive `user_profiles` migration 5 in server/db.ts. Own GET/POST and authenticated public-shaped lookup have separate responses. `src/services/profile.ts` is the same-origin transport; existing DemoStore hydrates owner profiles, prevents stale-account writes, preserves legacy local records and excludes new profiles from global persistence.
+
+`src/screens/onboarding.tsx` remains the route-facing export; new `onboarding-flow.tsx` is the progressive screen. Existing reusable input helpers moved to `components/identity/question-fields.tsx` for onboarding/editor reuse. `profile-fields.tsx` provides live public preview, handle/bio/photo; `profile-save.tsx` commits explicit changes. `user-identity.tsx` is shared across profile, posts/comments and existing people/following displays; NameLine, Shield, EmblemBadge, IdentitySheet and domain date/privacy calculations are reused. `domain/profile-experience.ts` centralizes seven community choices and public-field validation. Existing identity-preview remains a development gallery.
+
+Metadata-only session invalidation distinguishes account changes from provider disconnect, so disconnect stops private glucose work without removing a signed-in user's profile. Cross-tab invalidation also runs for identity-only builds; old enum messages remain accepted. No private payload travels in this channel. New tests: server-profiles/profile-experience plus persistence/session-event extensions. See the three Stage 6B docs for setup, privacy and limitations.
+
+
 ## Stage 5 data flow and files
 
 `app/_layout.tsx` wraps existing store/navigation with `src/glucose-context.tsx`. One `GlucoseSync` (`src/glucose-sync.ts`) uses `src/services/glucose-sync-transport.ts` → existing authenticated relay/token vault. `server/dexcom/status.ts` shares status/session/connection cache metadata between routes and live verification. EGVs remain transient on the server.

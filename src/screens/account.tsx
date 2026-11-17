@@ -235,7 +235,7 @@ function CreateForm({
     setError(null);
     try {
       await register(normalizeUsername(username), passphrase);
-      // Clear the secrets straight away; only the age confirmation is kept, on this device.
+      // Optional onboarding is separate from account registration and Dexcom authorization.
       setPassphrase("");
       setConfirm("");
       set((s) => ({ ...s, profile: { ...s.profile, ageConfirmed: true } }));

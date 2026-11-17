@@ -6,7 +6,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { NameLine } from "../components/identity/name-line";
+import { AuthorIdentity } from "../components/identity/user-identity";
 import {
   COMMUNITIES,
   joinCommunity,
@@ -15,7 +15,6 @@ import {
   suggestedFor,
 } from "../domain/communities";
 import { localToday } from "../domain/shield";
-import { demoMember } from "../demo-members";
 import {
   Avatar,
   Card,
@@ -158,7 +157,7 @@ function Entry({
       <View
         style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
       >
-        <Avatar name={name} size={48} />
+        {!nameNode ? <Avatar name={name} size={48} /> : null}
         <View style={{ flex: 1, gap: 2 }}>
           {nameNode ?? <T bold>{name}</T>}
           <T small muted>
@@ -294,11 +293,7 @@ function ExploreBody() {
               <Entry
                 key={p}
                 name={p}
-                nameNode={
-                  identity ? (
-                    <NameLine name={p} publicProfile={demoMember(p)} />
-                  ) : undefined
-                }
+                nameNode={identity ? <AuthorIdentity name={p} /> : undefined}
                 line={personLines[people.indexOf(p) % personLines.length]}
                 toggle={
                   <Toggle

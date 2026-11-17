@@ -15,6 +15,8 @@ test("same-origin static host serves only exported assets/routes, never project 
     const page = await a.call("GET", "/settings");
     assert.equal(page.status, 200);
     assert.match(page.text, /Synthetic test/);
+    for (const route of ["/account", "/profile-edit", "/post/seed-0"])
+      assert.equal((await a.call("GET", route)).status, 200, route);
     assert.ok(
       page.headers
         .get("content-security-policy")

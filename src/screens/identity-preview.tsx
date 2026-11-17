@@ -27,7 +27,7 @@ const FEED = [
 /** Development-only gallery for the identity components. Redirects to Create unless the identity flag is on. */
 export function IdentityPreview() {
   const [choice, setChoice] = useState<Emblem | undefined>("supporter");
-  if (!getFlags().identity) return <Redirect href="/create" />;
+  if (!__DEV__ || !getFlags().identity) return <Redirect href="/create" />;
   return (
     <Page
       title="Identity preview"

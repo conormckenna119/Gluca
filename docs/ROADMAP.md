@@ -1,5 +1,11 @@
 # Roadmap and specifications
 
+Stage 7A (2026-11-17): fixed reproduced overlay CSS stacking and tab-only navigation ownership; retained editor navigator keys through stack detail routes and added the missing account deep-link fallback. Verified real Story/Portrait/Square PNGs, alpha, 21 responsive route/scroll combinations, keyboard viewport simulation and authentication exits. 360 core tests/typecheck pass. See [focused report](UI_BUGFIXES_STAGE7A.md) for browser automation timeout and physical-device limits. No additional stage or feature work authorized.
+
+
+Stage 6B implemented (2026-11-16): reused identity/account systems for progressive inclusive onboarding, ten SVG tiers, supporter emblems, shared public identity components, optional photo/handle/bio and encrypted account-owned profile storage. Existing migrations/data preserved and legacy local profiles require explicit review before upload. No new social/achievement/reaction system or production deployment. [Onboarding and verification](ONBOARDING.md), [identity](IDENTITY_SHIELDS.md), [privacy](PROFILE_PRIVACY.md). Physical native device/account handoff and production identity/age/recovery remain gated. Stop at Stage 6B.
+
+
 Stage 5 complete for the development web sandbox (2026-11-16): foreground automatic/incremental sync, shared dashboard/Create cache, account/session isolation, delete/logout/disconnect handling and SQLCipher native adapter implemented. Web cache is ephemeral; native OAuth/physical encryption, hosting and real-user production remain gated. 340 tests/typecheck pass; real sandbox initial/overlap retrieved 1,678 readings and Create used the shared dataset. See [GLUCOSE_SYNC.md](GLUCOSE_SYNC.md). This scoped owner request supersedes earlier sync deferrals. No further stage is automatically authorized.
 
 

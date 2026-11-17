@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useId } from "react";
 import { View } from "react-native";
-import Svg, { Circle, Path, Rect, Text as SvgText } from "react-native-svg";
+import Svg, {
+  Circle,
+  Path,
+  Rect,
+  Defs,
+  LinearGradient,
+  Stop,
+  Text as SvgText,
+} from "react-native-svg";
 import {
   shieldLabel,
   tierById,
@@ -195,9 +203,10 @@ export function Shield({
 }) {
   const t = tierById(tier) ?? tierById("teal")!;
   const col = TIER_COLORS[t.id];
+  const metalId = "shield" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const number = showNumber && years !== undefined;
   const a11y = label ?? shieldLabel(t, years, certain, number);
-  const text = String(years ?? "");
+  const text = `${certain ? "" : "≈"}${years ?? ""}`;
   // Under 24 px the inner shape is dropped and the number takes the middle, so it stays readable.
   const compact = size < 24 && number;
   const fontSize = compact
@@ -221,6 +230,13 @@ export function Shield({
       style={{ width: size, height: (size * 56) / 48 }}
     >
       <Svg width={size} height={(size * 56) / 48} viewBox="0 0 48 56">
+        <Defs>
+          <LinearGradient id={metalId} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#ffffff" stopOpacity={0.3} />
+            <Stop offset="0.42" stopColor="#ffffff" stopOpacity={0} />
+            <Stop offset="1" stopColor="#ffffff" stopOpacity={0.1} />
+          </LinearGradient>
+        </Defs>
         <Path
           d={BODY}
           fill={col.fill}
@@ -228,12 +244,18 @@ export function Shield({
           strokeWidth={double ? 2.6 : 2}
           strokeLinejoin="round"
         />
+        <Path d={BODY} fill={`url(#${metalId})`} />
         <Path
           d={INNER}
           fill="none"
           stroke={col.edge}
           strokeOpacity={double ? 1 : 0.55}
           strokeWidth={double ? 1.6 : 1}
+        />
+        <Path
+          d="M9 12 L24 7 L24 47 C15 42 10 35 9 27 Z"
+          fill={col.fill}
+          opacity={0.4}
         />
         {compact ? null : (
           <Glyph

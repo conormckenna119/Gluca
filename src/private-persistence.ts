@@ -1,7 +1,10 @@
 import type { State } from "./types";
 /** Only explicit social snapshots/preferences persist. Raw imported CGM history remains session memory. */
-export function persistableState(state: State) {
-  return { ...state, imported: [] };
+export function persistableState(
+  state: State,
+  legacyProfile?: Pick<State, "profile" | "privacy">,
+) {
+  return { ...state, imported: [], ...legacyProfile };
 }
 export function removeLegacyPlaintextHistory(raw: string) {
   try {

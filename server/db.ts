@@ -47,6 +47,13 @@ const MIGRATIONS: string[] = [
    ALTER TABLE dexcom_connections ADD COLUMN generation TEXT NOT NULL DEFAULT '';
    ALTER TABLE dexcom_connections ADD COLUMN refresh_nonce TEXT;
    ALTER TABLE dexcom_connections ADD COLUMN refresh_started INTEGER;`,
+  // 5: account-owned, encrypted optional profile. Existing tables and rows are untouched.
+  `CREATE TABLE user_profiles (
+    user_id TEXT PRIMARY KEY REFERENCES users(id),
+    handle TEXT UNIQUE,
+    payload_enc TEXT NOT NULL,
+    revision INTEGER NOT NULL DEFAULT 1,
+    updated_at INTEGER NOT NULL);`,
 ];
 
 export function migrate(db: DatabaseSync): void {

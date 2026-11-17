@@ -23,8 +23,7 @@ import { useDemo } from "../store";
 import { Post } from "../types";
 import { relativeTime } from "../time";
 import { isEnabled } from "../flags";
-import { NameLine } from "./identity/name-line";
-import { demoMember } from "../demo-members";
+import { AuthorIdentity } from "./identity/user-identity";
 
 const MGDL_PER_MMOL = 18.0182;
 
@@ -62,7 +61,7 @@ export function PostCard({
       <View
         style={{ flexDirection: "row", alignItems: "center", gap: space.md }}
       >
-        <Avatar name={post.author} />
+        {!isEnabled("identity") ? <Avatar name={post.author} /> : null}
         <View style={{ flex: 1, gap: 2 }}>
           <View
             style={{
@@ -72,11 +71,8 @@ export function PostCard({
               flexWrap: "wrap",
             }}
           >
-            {isEnabled("identity") && !mine ? (
-              <NameLine
-                name={post.author}
-                publicProfile={demoMember(post.author)}
-              />
+            {isEnabled("identity") ? (
+              <AuthorIdentity name={post.author} />
             ) : (
               <T bold>{post.author}</T>
             )}

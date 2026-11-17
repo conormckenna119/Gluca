@@ -1,5 +1,5 @@
 // Identity and profile model. Pure TypeScript (no React Native) so it can be tested.
-// Everything except `displayName` is optional, self-reported and private by default.
+// Name/handle/bio/photo are public profile fields. Medical attributes are optional and private by default.
 
 /** A date the person may only know partly. Never fill in a missing month or day. */
 export type PartialDate = {
@@ -14,18 +14,65 @@ export type PartialDate = {
 export type Birthday = { month: number; day: number };
 
 export type CommunityRole = "living" | "supporting" | "awareness";
-export type DiabetesType = "type1" | "type2" | "lada" | "mody" | "gestational" | "other" | "prefer_not";
+export type DiabetesType =
+  "type1" | "type2" | "lada" | "mody" | "gestational" | "other" | "prefer_not";
 export type Emblem = "supporter" | "caregiver" | "advocate";
 export type Monitoring = "cgm" | "meter" | "both" | "none" | "prefer_not";
 export type CgmBrand = "dexcom" | "libre" | "other" | "prefer_not";
-export type DeliveryMethod = "tandem" | "omnipod" | "twiist" | "other_pump" | "injections" | "pens" | "other" | "prefer_not";
+export type DeliveryMethod =
+  | "tandem"
+  | "omnipod"
+  | "twiist"
+  | "medtronic"
+  | "other_pump"
+  | "injections"
+  | "syringes"
+  | "pens"
+  | "none"
+  | "other"
+  | "prefer_not";
 
-export const COMMUNITY_ROLES: CommunityRole[] = ["living", "supporting", "awareness"];
-export const DIABETES_TYPES: DiabetesType[] = ["type1", "type2", "lada", "mody", "gestational", "other", "prefer_not"];
+export const COMMUNITY_ROLES: CommunityRole[] = [
+  "living",
+  "supporting",
+  "awareness",
+];
+export const DIABETES_TYPES: DiabetesType[] = [
+  "type1",
+  "type2",
+  "lada",
+  "mody",
+  "gestational",
+  "other",
+  "prefer_not",
+];
 export const EMBLEMS: Emblem[] = ["supporter", "caregiver", "advocate"];
-export const MONITORING: Monitoring[] = ["cgm", "meter", "both", "none", "prefer_not"];
-export const CGM_BRANDS: CgmBrand[] = ["dexcom", "libre", "other", "prefer_not"];
-export const DELIVERY_METHODS: DeliveryMethod[] = ["tandem", "omnipod", "twiist", "other_pump", "injections", "pens", "other", "prefer_not"];
+export const MONITORING: Monitoring[] = [
+  "cgm",
+  "meter",
+  "both",
+  "none",
+  "prefer_not",
+];
+export const CGM_BRANDS: CgmBrand[] = [
+  "dexcom",
+  "libre",
+  "other",
+  "prefer_not",
+];
+export const DELIVERY_METHODS: DeliveryMethod[] = [
+  "tandem",
+  "omnipod",
+  "twiist",
+  "medtronic",
+  "other_pump",
+  "pens",
+  "syringes",
+  "injections",
+  "other",
+  "none",
+  "prefer_not",
+];
 
 export const MAX_MODEL_LENGTH = 40;
 export const MAX_NAME_LENGTH = 40;
@@ -33,6 +80,9 @@ export const MAX_INTERESTS = 12;
 
 export type Profile = {
   displayName: string;
+  username?: string;
+  bio?: string;
+  photo?: string;
   /** False until the optional onboarding questions have been answered or skipped. */
   onboarded: boolean;
   role?: CommunityRole;
@@ -64,19 +114,42 @@ export type PrivacySettings = {
   achievementNotifications: boolean;
 };
 export const PRIVACY_KEYS: (keyof PrivacySettings)[] = [
-  "showShield", "showShieldNumber", "showEmblem", "showBirthday", "showDiabetesType",
-  "showDelivery", "showCgm", "showMemberships", "healthAchievements", "achievementNotifications",
+  "showShield",
+  "showShieldNumber",
+  "showEmblem",
+  "showBirthday",
+  "showDiabetesType",
+  "showDelivery",
+  "showCgm",
+  "showMemberships",
+  "healthAchievements",
+  "achievementNotifications",
 ];
 
-export const defaultProfile = (): Profile => ({ displayName: "You", onboarded: false, interests: [] });
+export const defaultProfile = (): Profile => ({
+  displayName: "You",
+  onboarded: false,
+  interests: [],
+});
 export const defaultPrivacy = (): PrivacySettings => ({
-  showShield: false, showShieldNumber: false, showEmblem: false, showBirthday: false, showDiabetesType: false,
-  showDelivery: false, showCgm: false, showMemberships: false, healthAchievements: false, achievementNotifications: false,
+  showShield: false,
+  showShieldNumber: false,
+  showEmblem: false,
+  showBirthday: false,
+  showDiabetesType: false,
+  showDelivery: false,
+  showCgm: false,
+  showMemberships: false,
+  healthAchievements: false,
+  achievementNotifications: false,
 });
 
 /** What another person may see of a profile once privacy settings are applied. Built by `publicView` (task 2.4). */
 export type PublicProfile = {
   name: string;
+  username?: string;
+  bio?: string;
+  photo?: string;
   /** `certain` is false when the count comes from an approximate or partial date; the label then says "about". */
   shield?: { tier: string; years?: number; certain?: boolean };
   emblem?: Emblem;
@@ -88,23 +161,44 @@ export type PublicProfile = {
   pinnedAchievements: string[];
 };
 
-const isInt = (v: unknown): v is number => typeof v === "number" && Number.isInteger(v);
-const daysIn = (year: number, month: number) => new Date(Date.UTC(year, month, 0)).getUTCDate();
+const isInt = (v: unknown): v is number =>
+  typeof v === "number" && Number.isInteger(v);
+const daysIn = (year: number, month: number) =>
+  new Date(Date.UTC(year, month, 0)).getUTCDate();
 
 /** A partial date is valid when the parts that are present make a real calendar date. A day needs a month. */
-export function isValidPartialDate(d: unknown, minYear = 1900, maxYear = 2100): d is PartialDate {
+export function isValidPartialDate(
+  d: unknown,
+  minYear = 1900,
+  maxYear = 2100,
+): d is PartialDate {
   if (!d || typeof d !== "object") return false;
   const { year, month, day, approximate } = d as Record<string, unknown>;
   if (!isInt(year) || year < minYear || year > maxYear) return false;
-  if (month !== undefined && (!isInt(month) || month < 1 || month > 12)) return false;
-  if (day !== undefined && (month === undefined || !isInt(day) || day < 1 || day > daysIn(year, month as number))) return false;
+  if (month !== undefined && (!isInt(month) || month < 1 || month > 12))
+    return false;
+  if (
+    day !== undefined &&
+    (month === undefined ||
+      !isInt(day) ||
+      day < 1 ||
+      day > daysIn(year, month as number))
+  )
+    return false;
   return approximate === undefined || typeof approximate === "boolean";
 }
 /** Month 1-12 and a day that exists in that month in a leap year. Any year in saved data is ignored. */
 export function isValidBirthday(b: unknown): b is Birthday {
   if (!b || typeof b !== "object") return false;
   const { month, day } = b as Record<string, unknown>;
-  return isInt(month) && month >= 1 && month <= 12 && isInt(day) && day >= 1 && day <= daysIn(2000, month);
+  return (
+    isInt(month) &&
+    month >= 1 &&
+    month <= 12 &&
+    isInt(day) &&
+    day >= 1 &&
+    day <= daysIn(2000, month)
+  );
 }
 const cleanDate = (d: unknown): PartialDate | undefined => {
   if (!isValidPartialDate(d)) return undefined;
@@ -114,8 +208,13 @@ const cleanDate = (d: unknown): PartialDate | undefined => {
   if (d.approximate) out.approximate = true;
   return out;
 };
-const oneOf = <T extends string>(list: readonly T[], v: unknown): T | undefined =>
-  typeof v === "string" && (list as readonly string[]).includes(v) ? (v as T) : undefined;
+const oneOf = <T extends string>(
+  list: readonly T[],
+  v: unknown,
+): T | undefined =>
+  typeof v === "string" && (list as readonly string[]).includes(v)
+    ? (v as T)
+    : undefined;
 const text = (v: unknown, max: number): string | undefined => {
   if (typeof v !== "string") return undefined;
   const t = v.trim().slice(0, max);
@@ -128,6 +227,19 @@ export function sanitizeProfile(raw: unknown): Profile {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return p;
   const r = raw as Record<string, unknown>;
   p.displayName = text(r.displayName, MAX_NAME_LENGTH) ?? p.displayName;
+  if (
+    typeof r.username === "string" &&
+    /^[a-z0-9_.-]{3,30}$/.test(r.username.trim().toLowerCase())
+  )
+    p.username = r.username.trim().toLowerCase();
+  const bio = text(r.bio, 160);
+  if (bio) p.bio = bio;
+  if (
+    typeof r.photo === "string" &&
+    r.photo.length <= 24000 &&
+    /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(r.photo)
+  )
+    p.photo = r.photo;
   p.onboarded = r.onboarded === true;
   const role = oneOf(COMMUNITY_ROLES, r.role);
   if (role) p.role = role;
@@ -135,18 +247,23 @@ export function sanitizeProfile(raw: unknown): Profile {
   if (type) p.diabetesType = type;
   const diagnosis = cleanDate(r.diagnosis);
   if (diagnosis) p.diagnosis = diagnosis;
-  if (isValidBirthday(r.birthday)) p.birthday = { month: r.birthday.month, day: r.birthday.day };
+  if (isValidBirthday(r.birthday))
+    p.birthday = { month: r.birthday.month, day: r.birthday.day };
   if (r.ageConfirmed === true) p.ageConfirmed = true;
   const monitoring = oneOf(MONITORING, r.monitoring);
   if (monitoring) p.monitoring = monitoring;
   const cgm = r.cgm as Record<string, unknown> | undefined;
-  const brand = cgm && typeof cgm === "object" ? oneOf(CGM_BRANDS, cgm.brand) : undefined;
+  const brand =
+    cgm && typeof cgm === "object" ? oneOf(CGM_BRANDS, cgm.brand) : undefined;
   if (brand) {
     const model = text(cgm!.model, MAX_MODEL_LENGTH);
     p.cgm = model ? { brand, model } : { brand };
   }
   const delivery = r.delivery as Record<string, unknown> | undefined;
-  const method = delivery && typeof delivery === "object" ? oneOf(DELIVERY_METHODS, delivery.method) : undefined;
+  const method =
+    delivery && typeof delivery === "object"
+      ? oneOf(DELIVERY_METHODS, delivery.method)
+      : undefined;
   if (method) {
     const model = text(delivery!.model, MAX_MODEL_LENGTH);
     p.delivery = model ? { method, model } : { method };
@@ -168,6 +285,7 @@ export function sanitizeProfile(raw: unknown): Profile {
 export function sanitizePrivacy(raw: unknown): PrivacySettings {
   const out = defaultPrivacy();
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return out;
-  for (const k of PRIVACY_KEYS) out[k] = (raw as Record<string, unknown>)[k] === true;
+  for (const k of PRIVACY_KEYS)
+    out[k] = (raw as Record<string, unknown>)[k] === true;
   return out;
 }

@@ -32,6 +32,7 @@ import { PublishCard } from "../components/create/publish-card";
 import { rangeToText } from "../state";
 import { useCreateReadings } from "../hooks/use-create-readings";
 import { utcDayWindow } from "../create-source";
+import { storyComposition } from "../story-composition";
 import { GlucoseSyncStatus } from "../components/glucose-sync-status";
 import { getFlags, isEnabled } from "../flags";
 import { track, exportFormatId, exportFailReason } from "../telemetry";
@@ -70,7 +71,10 @@ export function Create() {
   const [picked, setPicked] = useState<number | null>(null);
   const [busy, B] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const previousSession = useRef(feed.sessionVersion);
   React.useEffect(() => {
+    if (previousSession.current === feed.sessionVersion) return;
+    previousSession.current = feed.sessionVersion;
     setPhotoUri(null);
     setResult({ kind: "idle" });
     setPicked(null);
@@ -147,7 +151,8 @@ export function Create() {
     [data, anchor, o, events],
   );
   // The contents list must match the image: a chosen photo is part of the export, so it is listed.
-  const hasPhoto = o.transparent && !!photoUri;
+  const composition = storyComposition(o.transparent, photoUri);
+  const hasPhoto = composition.background === "photo";
   const contents = React.useMemo(
     () =>
       hasPhoto
@@ -192,7 +197,7 @@ export function Create() {
           }),
         save,
         `gluca-${slug(o.template)}-${o.transparent ? "transparent-" : ""}${o.format.toLowerCase()}.png`,
-        o.transparent && photoUri ? photoUri : undefined,
+        composition.photoUri ?? undefined,
       );
       if (!isDexcom) track("export_succeeded", evt);
       if (!isDexcom)
@@ -335,7 +340,7 @@ export function Create() {
             width={pw}
             height={ph}
             label={`Preview of your graphic. ${contents.join(". ")}`}
-            photoUri={o.transparent ? photoUri : null}
+            photoUri={composition.photoUri}
           />
           <T small muted align="center">
             {w} × {h} px ·{" "}

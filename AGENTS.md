@@ -18,6 +18,15 @@ All paths in these docs are relative to that root.
 
 ## Current state in one paragraph
 
+**Stage 7A update (2026-11-17):** reproduced and fixed photo-over-SVG stacking and bottom navigation disappearing on root-stack detail routes. Added explicit composition layers/shared background policy, one persistent root shell using existing icons and navigator identities, account deep-link serving, and account-scope-aware photo reset. 360 core tests/typecheck pass; real browser and PNG evidence, new browser regressions, process-spawn and phone-test limits are in docs/UI_BUGFIXES_STAGE7A.md. Existing Stage 6B work remains intact. Stop after these two fixes.
+
+
+**Stage 7A update (2026-11-17):** reproduced and fixed photo-over-SVG stacking and bottom navigation disappearing on root-stack detail routes. Added explicit composition layers/shared background policy, one persistent root shell using existing icons and navigator identities, account deep-link serving, and account-scope-aware photo reset. 360 core tests/typecheck pass; real browser and PNG evidence, new browser regressions, process-spawn and phone-test limits are in docs/UI_BUGFIXES_STAGE7A.md. Existing Stage 6B work remains intact. Stop after these two fixes.
+
+
+**Stage 6B update (2026-11-16):** owner authorized onboarding, identity shields/emblems and profile experience. Reused optional identity/account systems; added five-part progressive flow, public handle/bio/photo, shared UserIdentity/AuthorIdentity, encrypted account-owned profiles in additive migration 5 and explicit save/privacy controls. Guest edits remain in memory; preexisting local profiles are preserved for explicit review, never silently uploaded. Existing auth and Dexcom integration remain. Read docs/ONBOARDING.md, docs/IDENTITY_SHIELDS.md and docs/PROFILE_PRIVACY.md. No new achievements/community systems/reactions. Stop after Stage 6B. Native device and public production gates remain open.
+
+
 **Stage 5 update (2026-11-16):** owner authorized automatic foreground Dexcom sync and secure local storage. Root GlucoseDataProvider/GlucoseSync feed dashboard/Create with bounded incremental overlap, backoff, scoped versioned cache and privacy controls. Web raw Dexcom/CSV history is ephemeral; legacy persisted CSV history is removed with a notice. SQLCipher native adapter fails closed, but native OAuth/device encryption remains gated. Live sandbox initial/overlap verification returned 1,678 readings; 340 tests/typecheck pass. Read docs/GLUCOSE_SYNC.md and docs/DEXCOM_SECURITY.md before historical notes below. Flags dexcomApi,dexcomDiagnostics,dexcomSync enable development web only. No polling service, cloud history, public release or new social features. Stop after Stage 5.
 
 

@@ -20,6 +20,7 @@ const MIME: Record<string, string> = {
 const ROUTES = new Set([
   "/",
   "/welcome",
+  "/account",
   "/settings",
   "/dexcom-data",
   "/create",

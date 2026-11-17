@@ -17,6 +17,7 @@ import { useArtFonts } from "../src/fonts";
 import { useAchievements } from "../src/hooks/use-achievements";
 import { UnlockToastHost } from "../src/components/achievements/unlock-toast";
 import { GlucoseDataProvider } from "../src/glucose-context";
+import { ApplicationShell } from "../src/components/application-shell";
 
 // Literal env access: Expo inlines these at bundle time. Telemetry stays "off" unless EXPO_PUBLIC_TELEMETRY=local.
 // Development only, web only: a comma list in localStorage "gluca-dev-flags" is added to the env flags, so a feature
@@ -57,37 +58,42 @@ function Nav() {
   return (
     <>
       <StatusBar style={state.dark ? "light" : "dark"} />
-      <Stack
-        screenOptions={{
-          headerTitle: BRAND.name,
-          headerStyle: { backgroundColor: c.bg },
-          headerTintColor: c.text,
-          headerShadowVisible: false,
-          contentStyle: { backgroundColor: c.bg },
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="welcome" options={{ headerShown: false }} />
-        <Stack.Screen name="post/[id]" options={{ title: "Conversation" }} />
-        <Stack.Screen
-          name="settings"
-          options={{ title: "Settings & privacy" }}
-        />
-        <Stack.Screen name="import" options={{ title: "Import & export" }} />
-        <Stack.Screen name="trophies" options={{ title: "Medals" }} />
-        <Stack.Screen name="onboarding" options={{ title: "Your profile" }} />
-        <Stack.Screen name="account" options={{ title: "Account" }} />
-        <Stack.Screen name="profile-edit" options={{ title: "Edit profile" }} />
-        <Stack.Screen
-          name="log"
-          options={{
-            presentation: "formSheet",
-            sheetGrabberVisible: true,
-            sheetAllowedDetents: [0.75, 1],
-            title: "Log something",
+      <ApplicationShell covered={covered}>
+        <Stack
+          screenOptions={{
+            headerTitle: BRAND.name,
+            headerStyle: { backgroundColor: c.bg },
+            headerTintColor: c.text,
+            headerShadowVisible: false,
+            contentStyle: { backgroundColor: c.bg },
           }}
-        />
-      </Stack>
+        >
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="welcome" options={{ headerShown: false }} />
+          <Stack.Screen name="post/[id]" options={{ title: "Conversation" }} />
+          <Stack.Screen
+            name="settings"
+            options={{ title: "Settings & privacy" }}
+          />
+          <Stack.Screen name="import" options={{ title: "Import & export" }} />
+          <Stack.Screen name="trophies" options={{ title: "Medals" }} />
+          <Stack.Screen name="onboarding" options={{ title: "Your profile" }} />
+          <Stack.Screen name="account" options={{ title: "Account" }} />
+          <Stack.Screen
+            name="profile-edit"
+            options={{ title: "Edit profile" }}
+          />
+          <Stack.Screen
+            name="log"
+            options={{
+              presentation: "formSheet",
+              sheetGrabberVisible: true,
+              sheetAllowedDetents: [0.75, 1],
+              title: "Log something",
+            }}
+          />
+        </Stack>
+      </ApplicationShell>
       {covered ? null : <UnlockToastHost />}
       {covered ? (
         <View

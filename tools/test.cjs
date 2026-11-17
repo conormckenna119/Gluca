@@ -4,16 +4,26 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const build = path.join(root, ".test-build");
-// Every plain .ts file under src/ (no .tsx) and every tests/*.test.ts is transpiled, so new
-// source and test files are picked up without editing this list.
+// Every plain .ts file under src/, server/ and tests/ (including shared test helpers) is transpiled; only tests/*.test.ts runs.
+// New source and test files are picked up without editing this list.
 function walk(dir) {
-  return fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) =>
-    e.isDirectory() ? walk(`${dir}/${e.name}`) : e.name.endsWith(".ts") && !e.name.endsWith(".d.ts") ? [`${dir}/${e.name}`] : [],
-  );
+  return fs
+    .readdirSync(path.join(root, dir), { withFileTypes: true })
+    .flatMap((e) =>
+      e.isDirectory()
+        ? walk(`${dir}/${e.name}`)
+        : e.name.endsWith(".ts") && !e.name.endsWith(".d.ts")
+          ? [`${dir}/${e.name}`]
+          : [],
+    );
 }
-const tests = fs.readdirSync(path.join(root, "tests")).filter((f) => f.endsWith(".test.ts")).sort().map((f) => `tests/${f}`);
+const tests = fs
+  .readdirSync(path.join(root, "tests"))
+  .filter((f) => f.endsWith(".test.ts"))
+  .sort()
+  .map((f) => `tests/${f}`);
 fs.rmSync(build, { recursive: true, force: true });
-for (const file of [...walk("src"), ...walk("server"), ...tests]) {
+for (const file of [...walk("src"), ...walk("server"), ...walk("tests")]) {
   const out = path.join(build, file.replace(/\.ts$/, ".js"));
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(

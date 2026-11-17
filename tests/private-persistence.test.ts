@@ -25,3 +25,24 @@ test("legacy plaintext CGM cache is purged without deleting ordinary preferences
   assert.equal(JSON.parse(result.raw).dark, false);
   assert.equal(removeLegacyPlaintextHistory(result.raw).removed, false);
 });
+
+test("new account profiles never replace the preserved legacy profile in device-wide storage", () => {
+  const state = emptyState();
+  state.profile = {
+    ...state.profile,
+    displayName: "New synthetic account",
+    diagnosis: { year: 2017 },
+    birthday: { month: 5, day: 12 },
+  };
+  const legacy = {
+    profile: {
+      ...emptyState().profile,
+      displayName: "Preserved local profile",
+    },
+    privacy: emptyState().privacy,
+  };
+  const stored = persistableState(state, legacy);
+  assert.equal(stored.profile.displayName, "Preserved local profile");
+  assert.ok(!JSON.stringify(stored).includes("2017"));
+  assert.equal(state.profile.diagnosis!.year, 2017);
+});
