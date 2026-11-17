@@ -1,8 +1,10 @@
 import React from "react";
 import { Image, View } from "react-native";
 import { SvgXml } from "react-native-svg";
-import { useColors } from "../../ui";
+import { palette, useColors } from "../../ui";
 import { PHOTO_LAYER, ARTWORK_LAYER } from "../../story-composition";
+import { OverlayInteraction } from "./overlay-interaction";
+import type { OverlayInteractionProps } from "./overlay-interaction";
 
 type Props = {
   svg: string;
@@ -10,12 +12,16 @@ type Props = {
   height: number;
   label: string;
   photoUri: string | null;
+  editing?: Omit<OverlayInteractionProps, "width" | "height">;
 };
 
 export const ArtworkPreview = React.forwardRef<
   React.ElementRef<typeof View>,
   Props
->(function ArtworkPreview({ svg, width, height, label, photoUri }, ref) {
+>(function ArtworkPreview(
+  { svg, width, height, label, photoUri, editing },
+  ref,
+) {
   const c = useColors();
   return (
     <View
@@ -28,6 +34,21 @@ export const ArtworkPreview = React.forwardRef<
         borderColor: c.border,
       }}
     >
+      {/* Preview-only matte shows transparent white ink in light mode.
+          It is a sibling of the capture surface, never an exported background. */}
+      {!photoUri ? (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 8,
+            top: 8,
+            width,
+            height,
+            backgroundColor: palette.dark.raised,
+          }}
+        />
+      ) : null}
       <View
         ref={ref}
         collapsable={false}
@@ -53,6 +74,9 @@ export const ArtworkPreview = React.forwardRef<
           <SvgXml xml={svg} width={width} height={height} />
         </View>
       </View>
+      {editing ? (
+        <OverlayInteraction {...editing} width={width} height={height} />
+      ) : null}
     </View>
   );
 });

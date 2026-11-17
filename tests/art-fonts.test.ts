@@ -79,22 +79,19 @@ test("native output has no ignored filter and emulates the glow with two round s
 });
 
 test("week artwork swaps built-in single-day headlines, never a custom one", () => {
-  assert.equal(
-    headlineForPeriod("Another day of showing up.", "week"),
-    "Another week of showing up.",
-  );
-  assert.equal(
-    headlineForPeriod("Another day of showing up.", "day"),
-    "Another day of showing up.",
-  );
+  assert.equal(headlineForPeriod("Daily recap", "week"), "Weekly recap");
+  assert.equal(headlineForPeriod("Daily recap", "day"), "Daily recap");
   assert.equal(
     headlineForPeriod("My own words about a day", "week"),
     "My own words about a day",
   );
   const o = { ...defaultOptions("daily_recap"), period: "week" as const };
   const week = storyArtwork(rows, anchor, o).contents;
-  assert.ok(week.includes("Headline: “Another week of showing up.”"), week.join("|"));
-  const custom = storyArtwork(rows, anchor, { ...o, headline: "Another day of showing up" }).contents;
+  assert.ok(week.includes("Headline: “Weekly recap”"), week.join("|"));
+  const custom = storyArtwork(rows, anchor, {
+    ...o,
+    headline: "Another day of showing up",
+  }).contents;
   assert.ok(!custom.some((c) => c.includes("week of")));
 });
 

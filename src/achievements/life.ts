@@ -68,7 +68,7 @@ export const DIAGNOSIS_ANNIVERSARY = mk({
 export const PERSONAL_MILESTONE = mk({
   id: "personal_milestone",
   name: "Personal milestone",
-  description: "You celebrated a milestone that matters to you.",
+  description: "You added a personal milestone.",
   category: "life",
   icon: "milestone",
   requiredData: ["challenges"],

@@ -18,6 +18,8 @@ All paths in these docs are relative to that root.
 
 ## Current state in one paragraph
 
+**Stage 7A.5 update (2026-11-17):** grouped normalized story overlay positioning/scaling/opacity, web/native controls, shared SVG preview/export composition and neutral default copy with optional caption tones. Photo/data/layout remain independent; simulation disclosure stays pinned. 364 core tests/typecheck and 7 normal browser regressions pass, including simulated touch and 375/430/1280px light/dark. See docs/STORY_EDITOR.md, docs/GLUCA_VOICE_AND_TONE.md and docs/UI_REFINEMENT.md. Physical native validation remains open; stop after Stage 7A.5.
+
 **Stage 7A update (2026-11-17):** reproduced and fixed photo-over-SVG stacking and bottom navigation disappearing on root-stack detail routes. Added explicit composition layers/shared background policy, one persistent root shell using existing icons and navigator identities, account deep-link serving, and account-scope-aware photo reset. 360 core tests/typecheck pass; real browser and PNG evidence, new browser regressions, process-spawn and phone-test limits are in docs/UI_BUGFIXES_STAGE7A.md. Existing Stage 6B work remains intact. Stop after these two fixes.
 
 

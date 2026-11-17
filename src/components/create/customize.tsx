@@ -131,7 +131,10 @@ export function Customize({
         }
       >
         <View style={{ gap: space.xl }}>
-          <Section title="Words">
+          <Section
+            title="Words"
+            note="Optional caption suggestions. Edit or remove any text."
+          >
             <View style={row}>
               {TONES.map((t) => (
                 <Chip
@@ -162,7 +165,7 @@ export function Customize({
             />
             <Count value={o.caption} max={CAPTION_MAX} />
             <Button
-              label="Another line"
+              label="Next suggestion"
               onPress={() => {
                 const tone = o.tone === "custom" ? "minimal" : o.tone;
                 const next = toneIndex + 1;
@@ -173,6 +176,12 @@ export function Customize({
                   caption: captionFor(tone, next),
                 });
               }}
+            />
+            <Button
+              label="Remove headline and caption"
+              onPress={() =>
+                patch({ tone: "custom", headline: "", caption: "" })
+              }
             />
             {o.template === "milestone" ? (
               <>

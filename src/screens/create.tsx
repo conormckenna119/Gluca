@@ -33,6 +33,8 @@ import { rangeToText } from "../state";
 import { useCreateReadings } from "../hooks/use-create-readings";
 import { utcDayWindow } from "../create-source";
 import { storyComposition } from "../story-composition";
+import { DEFAULT_OVERLAY, transformOverlaySvg } from "../overlay-transform";
+import { OverlayControls } from "../components/create/overlay-controls";
 import { GlucoseSyncStatus } from "../components/glucose-sync-status";
 import { getFlags, isEnabled } from "../flags";
 import { track, exportFormatId, exportFailReason } from "../telemetry";
@@ -71,11 +73,15 @@ export function Create() {
   const [picked, setPicked] = useState<number | null>(null);
   const [busy, B] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [overlay, setOverlay] = useState({ ...DEFAULT_OVERLAY });
+  const [positioning, setPositioning] = useState(false);
   const previousSession = useRef(feed.sessionVersion);
   React.useEffect(() => {
     if (previousSession.current === feed.sessionVersion) return;
     previousSession.current = feed.sessionVersion;
     setPhotoUri(null);
+    setOverlay({ ...DEFAULT_OVERLAY });
+    setPositioning(false);
     setResult({ kind: "idle" });
     setPicked(null);
   }, [feed.sessionVersion]);
@@ -152,6 +158,9 @@ export function Create() {
   );
   // The contents list must match the image: a chosen photo is part of the export, so it is listed.
   const composition = storyComposition(o.transparent, photoUri);
+  const previewSvg = o.transparent
+    ? transformOverlaySvg(built.svg, w, h, overlay)
+    : built.svg;
   const hasPhoto = composition.background === "photo";
   const contents = React.useMemo(
     () =>
@@ -185,7 +194,7 @@ export function Create() {
         events,
       });
       await exportImage(
-        svg,
+        o.transparent ? transformOverlaySvg(svg, w, h, overlay) : svg,
         o.format,
         () =>
           captureRef(art, {
@@ -240,7 +249,7 @@ export function Create() {
     >
       <GlucoseSyncStatus />
       <Card>
-        <T bold>Glucose Story · Share My Day</T>
+        <T bold>Glucose story</T>
         <T small muted>
           Choose the data used for this graphic. Nothing is published
           automatically.
@@ -320,8 +329,8 @@ export function Create() {
         ) : null}
       </Card>
       <T muted>
-        Your day, your words. Pick a look, and everything on the image is listed
-        below so you know exactly what you are sharing.
+        Choose a template for your recap. Review what’s included before
+        exporting.
       </T>
 
       {noData ? (
@@ -336,11 +345,21 @@ export function Create() {
         <View style={{ alignItems: "center", gap: space.md }}>
           <ArtworkPreview
             ref={art}
-            svg={built.svg}
+            svg={previewSvg}
             width={pw}
             height={ph}
             label={`Preview of your graphic. ${contents.join(". ")}`}
             photoUri={composition.photoUri}
+            editing={
+              o.transparent
+                ? {
+                    value: overlay,
+                    selected: positioning,
+                    onSelect: () => setPositioning(true),
+                    onChange: setOverlay,
+                  }
+                : undefined
+            }
           />
           <T small muted align="center">
             {w} × {h} px ·{" "}
@@ -369,7 +388,15 @@ export function Create() {
         />
       </View>
       {o.transparent ? (
-        <PhotoBackground photoUri={photoUri} onChange={setPhotoUri} />
+        <>
+          <OverlayControls
+            value={overlay}
+            selected={positioning}
+            onSelect={() => setPositioning((p) => !p)}
+            onChange={setOverlay}
+          />
+          <PhotoBackground photoUri={photoUri} onChange={setPhotoUri} />
+        </>
       ) : null}
 
       {!isDexcom || !noData ? (

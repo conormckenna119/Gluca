@@ -1,5 +1,13 @@
 # Decisions
 
+## Stage 7A.5 — 17 November 2026
+
+- Use one pure normalized center/uniform scale/opacity model, applied to SVG before both preview and export. Keep original solid layouts; retain session placement/photo when returning to transparency. Existing export canvas paints photo first. No new dependency: Pointer Events and native PanResponder/range adapters are sufficient.
+- Limit scale to 50–150%, opacity to 20–100%, center to the inner 80% of the canvas. Cropping is intentional/visible; handles and reset remain reachable. Editing chrome and preview matte never enter captured/exported artwork. Mandatory synthetic/sandbox disclosure stays pinned/full opacity independently of editable composition.
+- Keep layouts/photos in memory; do not add cloud/draft persistence or analytics fields. Preserve OAuth, glucose models/calculations/sync/cache and social data.
+- Every template defaults to Minimal. Casual, Humorous, Motivational and Custom are opt-in; legacy Educational stays parseable but is not offered. Keep typed words through template/period changes and allow empty captions without fallback slogans. Do not rewrite historic posts or stored captions. Existing achievement/challenge edits are copy only.
+- Native physical-device validation, native alpha capture and screen readers remain required. No rotation, individual-element editing, saved drafts, deployment or additional stage. Claude can revisit creative styling within these functional/privacy boundaries.
+
 ## Stage 7A — 17 November 2026
 
 - Fix the demonstrated CSS paint order with a positioned SVG foreground above the photo; preserve template/analytics code and the existing photo-first/SVG-second export renderer.

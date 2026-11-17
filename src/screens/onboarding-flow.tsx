@@ -161,14 +161,14 @@ function OnboardingEditor() {
     return (
       <Page
         title={`Welcome, ${p.displayName === "You" ? "friend" : p.displayName}`}
-        subtitle="There is a place for you here."
+        subtitle="Your profile is ready."
       >
         <Card>
           <UserIdentity expanded profile={view} />
           <T>
             {living
-              ? "Your journey is yours to share, at your own pace."
-              : "Your support belongs here. No glucose connection is needed."}
+              ? "Explore the community or connect your glucose data."
+              : "Explore the community. No glucose connection is needed."}
           </T>
           <T small muted>
             {profileStatus === "account"
@@ -227,7 +227,7 @@ function OnboardingEditor() {
         ) : null}
         {stage === "Journey" ? (
           <>
-            <T heading>When did your diabetes journey begin?</T>
+            <T heading>When were you diagnosed?</T>
             <T muted>
               Year only, month and year, or an exact date—share only what you
               know. Your date stays private. An optional shield can show your

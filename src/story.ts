@@ -55,10 +55,12 @@ export function defaultOptions(template: TemplateId, unit: "mg/dL" | "mmol/L" = 
   };
 }
 
-/** Switching template keeps look-and-feel (theme, accent, unit, range, format) and resets words and toggles. */
+/** Switching styles keeps user-written words; generated suggestions use neutral template defaults. */
 export function switchTemplate(o: StoryOptions, template: TemplateId): StoryOptions {
   const next = withTemplate(toSettings(o), template);
-  return { ...defaultOptions(template, o.unit, o.format), theme: next.theme, accent: next.accent, range: next.range, period: next.period, transparent: next.transparent, ...(o.provenance?{provenance:o.provenance}:{}) };
+  return { ...defaultOptions(template, o.unit, o.format), theme: next.theme, accent: next.accent, range: next.range, period: next.period, transparent: next.transparent,
+    ...(o.tone === "custom" ? {tone:o.tone,headline:o.headline,caption:o.caption} : {}), milestoneBig:o.milestoneBig,
+    ...(o.provenance?{provenance:o.provenance}:{}) };
 }
 export const pickTone = (o: StoryOptions, tone: Tone, index = 0): StoryOptions =>
   tone === "custom" ? { ...o, tone } : { ...o, tone, headline: headlineFor(tone, index), caption: captionFor(tone, index) };

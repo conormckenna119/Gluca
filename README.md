@@ -1,5 +1,7 @@
 # Gluca
 
+**Stage 7A.5 — movable story overlays and concise copy:** Create → Transparent overlay now supports grouped drag/pinch, desktop corner resizing, size/opacity sliders, keyboard/directional movement and reset. Placement survives photo/style/date changes; exports use the same normalized transform. All templates default to Minimal copy, with optional editable caption tones. [Editor guide](docs/STORY_EDITOR.md), [voice and tone](docs/GLUCA_VOICE_AND_TONE.md), [changed files, tests, evidence and limitations](docs/UI_REFINEMENT.md). 364 core tests and 7 browser tests pass; physical native device checks remain open.
+
 **Stage 7A — focused UI fixes:** transparent story artwork now stays above an added photo, and one persistent bottom navigation serves normal tab/detail routes. Original templates, API/authentication and profile features are retained. [Causes, changed files, real PNG/browser evidence and repeat commands](docs/UI_BUGFIXES_STAGE7A.md). 360 core tests and typecheck pass; the Playwright worker is blocked by this environment, with direct browser verification recorded separately.
 
 

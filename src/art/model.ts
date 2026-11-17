@@ -53,7 +53,7 @@ export function makeArtModel(readings: readonly Reading[], source: 'demo' | 'csv
   return {
     template: s.template, format: s.format, transparent: s.transparent, theme: s.theme, accent: s.accent, unit: s.unit, range: s.range, source,
     start, end, stats: computeStats(readings, start, end, s.range), segs: segmentsFor(readings, start, end),
-    headline: headlineForPeriod(s.headline, s.period), caption: s.caption, milestoneBig: s.milestoneBig, show: s.show, embedFont: o.embedFont, measure: o.measure,
+    headline: s.tone === 'custom' ? s.headline : headlineForPeriod(s.headline, s.period), caption: s.caption, milestoneBig: s.milestoneBig, show: s.show, embedFont: o.embedFont, measure: o.measure,
     ...(o.events && o.events.length ? { events: o.events } : {}),
   };
 }

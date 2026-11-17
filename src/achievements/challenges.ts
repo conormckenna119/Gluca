@@ -14,8 +14,7 @@ export const CHALLENGES: Challenge[] = [
   {
     id: "share_moment",
     title: "Share a moment",
-    prompt:
-      "Share a moment from your diabetes journey, if and when you feel like it.",
+    prompt: "Share a moment from your day, if you choose.",
     howToComplete:
       "Mark it done once you have shared something you are happy to share, in your own words.",
   },
@@ -36,10 +35,9 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: "personal_milestone",
-    title: "Celebrate a personal milestone",
-    prompt: "Take a moment to celebrate something that matters to you.",
-    howToComplete:
-      "Mark it done once you have celebrated a milestone in whatever way you like.",
+    title: "Add a personal milestone",
+    prompt: "Add a date or moment that matters to you.",
+    howToComplete: "Mark it done after adding your milestone.",
   },
   {
     id: "helpful_experience",

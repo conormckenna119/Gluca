@@ -1,5 +1,7 @@
 # Roadmap and specifications
 
+Stage 7A.5 implemented (17 November 2026): movable/scalable transparent story group, independent photo and normalized transforms, shared preview/export composition, accessible controls, neutral defaults and optional caption tones. Source disclosures stay pinned. 364 core tests, typecheck and all 7 normal browser regressions pass, including simulated pinch and 375/430/1280px light/dark checks. Native hardware/capture/accessibility checks remain open. No new dependency, backend, social system or medical calculations. [Evidence and limitations](UI_REFINEMENT.md). Stop after Stage 7A.5.
+
 Stage 7A (2026-11-17): fixed reproduced overlay CSS stacking and tab-only navigation ownership; retained editor navigator keys through stack detail routes and added the missing account deep-link fallback. Verified real Story/Portrait/Square PNGs, alpha, 21 responsive route/scroll combinations, keyboard viewport simulation and authentication exits. 360 core tests/typecheck pass. See [focused report](UI_BUGFIXES_STAGE7A.md) for browser automation timeout and physical-device limits. No additional stage or feature work authorized.
 
 

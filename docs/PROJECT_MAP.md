@@ -1,5 +1,9 @@
 #
 
+## Stage 7A.5 — grouped story editing
+
+`src/overlay-transform.ts` defines normalized placement/uniform scale/opacity and shared SVG composition. Create owns session-only transform state separately from data/photo/options. New `components/create/overlay-interaction` and `editor-slider` have web/native adapters; `overlay-controls.tsx` uses existing primitives. `artwork-preview.tsx` keeps editing chrome and matte outside the capture surface. `art/templates.ts` marks the mandatory source disclosure so it stays pinned/full opacity. Existing export renderer, backend and glucose calculations remain unchanged. `art/copy.ts` owns optional tones and neutral defaults; `story.ts` / `art/model.ts` preserve user-written words across style/period changes. New tests: `overlay-transform.test.ts`, `e2e/stage7a5.spec.ts`; synthetic evidence: `docs/screenshots/stage7a5`. Guides: [STORY_EDITOR](STORY_EDITOR.md), [voice](GLUCA_VOICE_AND_TONE.md), [verification/file report](UI_REFINEMENT.md).
+
 ## Stage 7A focused fixes
 
 `src/components/application-shell.tsx` wraps the root Stack in `app/_layout.tsx`; `primary-nav-icons.tsx` reuses the original icons. `app/(tabs)/_layout.tsx` retains its screens without a duplicate bar. `src/nav.ts` owns visibility/selection and recursive navigator-key targeting through SDK 58's synthetic root. `src/story-composition.ts` provides background policy and explicit photo/foreground layer styles consumed by Create/artwork-preview. `server/static.ts` now serves the existing account route. Unit/browser regressions and PNG helpers are listed in [UI_BUGFIXES_STAGE7A.md](UI_BUGFIXES_STAGE7A.md).

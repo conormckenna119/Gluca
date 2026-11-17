@@ -23,9 +23,9 @@ export const TEMPLATE_INFO: Record<TemplateId, { label: string; blurb: string; n
   minimal_trace: { label: 'Minimal trace', blurb: 'Just the line.', needsData: true, transparentByDefault: false },
   daily_recap: { label: 'Daily recap', blurb: 'The full day at a glance.', needsData: true, transparentByDefault: false },
   transparent_overlay: { label: 'Transparent overlay', blurb: 'Layer it over a photo.', needsData: true, transparentByDefault: true },
-  real_side: { label: 'The real side', blurb: 'For the unpredictable days.', needsData: true, transparentByDefault: false },
-  humorous: { label: 'Shift report', blurb: 'Diabetes humour, your words.', needsData: true, transparentByDefault: false },
-  milestone: { label: 'Milestone', blurb: 'Anniversaries and wins.', needsData: false, transparentByDefault: false },
+  real_side: { label: 'The real side', blurb: 'A closer look at your day.', needsData: true, transparentByDefault: false },
+  humorous: { label: 'Shift report', blurb: 'A bold recap, your words.', needsData: true, transparentByDefault: false },
+  milestone: { label: 'Milestone', blurb: 'Dates and moments.', needsData: false, transparentByDefault: false },
 };
 
 export interface ShowOptions {
@@ -145,7 +145,11 @@ export function buildArtwork(m: ArtModel): Artwork {
   const centerFooter = m.template === 'milestone';
   {
     let ny = Y1 - brandH - notesH - (brandH && notesH ? 14 : 0);
-    notes.forEach((nt, i) => { body.push(text(centerFooter ? W / 2 : X, ny + 24 + i * 34, nt, { size: 21, weight: 600, fill: p.muted, ls: 3, anchor: centerFooter ? 'middle' : 'start', shadow })); });
+    notes.forEach((nt, i) => {
+      const svg = text(centerFooter ? W / 2 : X, ny + 24 + i * 34, nt, { size: 21, weight: 600, fill: p.muted, ls: 3, anchor: centerFooter ? 'middle' : 'start', shadow });
+      // Mandatory source disclosure stays visible even when the editable group is cropped.
+      body.push(nt.startsWith('DEMO DATA') || nt.startsWith('DEXCOM SANDBOX') ? `<g id="source-disclosure">${svg}</g>` : svg);
+    });
     if (notes.length) contents.push(...notes.map((x) => `Note: ${x.toLowerCase().replace(/^./, (c) => c.toUpperCase())}`));
     if (m.show.brand) { body.push(brandMark(centerFooter ? W / 2 : X, Y1 - brandSize, BRAND.name, brandSize, p, centerFooter ? 'middle' : 'start').svg); contents.push(`${BRAND.name} wordmark`); }
   }
@@ -277,9 +281,9 @@ export function buildArtwork(m: ArtModel): Artwork {
       let y = Y0;
       const eb = dateEyebrow();
       if (eb) { body.push(eyebrow(eb, y)); note(`Date: ${eb}`); y += topGap; }
-      const hd = m.headline.trim() || 'Some days are just like this.';
+      const hd = m.headline.trim();
       const h = head(hd, y, { size: pick(112, 92, 76), min: 52, lines: pick(3, 3, 2) });
-      body.push(h.svg); note(`Headline: “${hd}”`); y += h.h + 34;
+      body.push(h.svg); if (hd) note(`Headline: “${hd}”`); y += h.h + 34;
       const items = keys(['tir', 'avg', 'readings', 'coverage']).slice(0, 3);
       const statH = items.length ? vs * 0.82 + lbl * 2.0 : 0;
       const cap = m.caption.trim() ? para(m.caption.trim(), 0, { size: pick(40, 40, 32), min: 26, lines: pick(3, 3, 2) }) : null;
@@ -302,9 +306,9 @@ export function buildArtwork(m: ArtModel): Artwork {
       const ink = luminance(p.accent) > 0.4 ? NEAR_BLACK : '#FFFFFF';
       body.push(`<rect x="${X}" y="${y}" width="${n1(bw)}" height="56" rx="28" fill="${p.accent}"${shadow ? ' filter="url(#sh)"' : ''}/>`);
       body.push(text(X + 28, y + 37, badge, { size: 24, weight: 700, fill: ink, ls: 3 })); note(`Badge: ${badge}`); y += pick(100, 100, 82);
-      const hd = m.headline.trim() || 'Pancreas replacement shift.';
+      const hd = m.headline.trim();
       const h = head(hd, y, { size: pick(136, 112, 84), min: 56, lines: pick(4, 4, 3), fill: p.accentText });
-      body.push(h.svg); note(`Headline: “${hd}”`); y += h.h + 30;
+      body.push(h.svg); if (hd) note(`Headline: “${hd}”`); y += h.h + 30;
       const items = keys(['tir', 'avg', 'readings', 'coverage']).slice(0, 3);
       const vsH = pick(68, 56, 48);
       const statH = items.length ? vsH * 0.82 + lbl * 2.0 : 0;
