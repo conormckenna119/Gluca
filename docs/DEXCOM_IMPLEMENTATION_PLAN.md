@@ -1,6 +1,8 @@
 # Gluca — Dexcom integration implementation plan
 
-**Stage 3 update (16 November 2026):** owner authorized a transient in-memory provider and development viewer, documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). Stage 2 account/session/OAuth/token infrastructure is reused. Durable local storage and cloud sync in the historical plan below are deferred by Stage 3's memory-only requirement. Stage 4 is not started. No local credentials or authorized connection are available, so live OAuth/EGV verification remains pending.
+**Stage 4 complete (16 November 2026):** explicit in-memory Create source selection, UTC historical-day artwork, mandatory sandbox provenance and a real G7 sandbox verification command are implemented. Live dataRange/devices/EGV responses and an actual 1080×1920 browser PNG export passed. See [DEXCOM_SANDBOX_TEST_RESULTS.md](DEXCOM_SANDBOX_TEST_RESULTS.md). Historical Stage 1/2/3 observations below remain for context; durable health storage, production access and background sync remain deferred.
+
+**Stage 3 update (16 November 2026):** owner authorized a transient in-memory provider and development viewer, documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md). Stage 2 account/session/OAuth/token infrastructure is reused. Durable local storage and cloud sync in the historical plan below are deferred by Stage 3's memory-only requirement. Live backend verification now retrieves 277 official simulated sandbox readings after a UTC query-format correction; 297 automated tests pass. Restart an older running backend to load the fix. Stage 4 is not started. Missing-configuration observations in the original review below are historical.
 
 Stage 1 architecture review · 16 November 2026 · inspection and documentation only
 

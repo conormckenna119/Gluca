@@ -33,7 +33,7 @@ export function requireDiagnostics(ctx: Ctx) {
       "Configure sandbox OAuth before retrieving data.",
     );
 }
-function envelope(body: unknown, kind: string): Record<string, unknown> {
+export function envelope(body: unknown, kind: string): Record<string, unknown> {
   if (!body || typeof body !== "object" || Array.isArray(body))
     throw new UnexpectedSchema();
   const b = body as Record<string, unknown>;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { Redirect } from "expo-router";
 import { Card, Section, T, row, space } from "../ui";
@@ -8,7 +8,8 @@ import { Shield } from "../components/identity/shield";
 import { EmblemBadge } from "../components/identity/emblem";
 import { NameLine } from "../components/identity/name-line";
 import { SHIELD_TIERS } from "../domain/shield";
-import { EMBLEMS } from "../domain/profile";
+import { EMBLEMS, type Emblem } from "../domain/profile";
+import { EmblemChoice } from "../components/identity/emblem-choice";
 
 const SAMPLE_YEARS = [0, 3, 7, 12, 17, 22, 27, 35, 45, 52];
 const FEED = [
@@ -25,6 +26,7 @@ const FEED = [
 
 /** Development-only gallery for the identity components. Redirects to Create unless the identity flag is on. */
 export function IdentityPreview() {
+  const [choice, setChoice] = useState<Emblem | undefined>("supporter");
   if (!getFlags().identity) return <Redirect href="/create" />;
   return (
     <Page
@@ -52,18 +54,67 @@ export function IdentityPreview() {
           </View>
         </Card>
       </Section>
-      <Section title="Emblems">
+      <Section
+        title="Sizes"
+        note="Each tier at 20, 28 and 44 px, with a number."
+      >
         <Card>
-          <View style={[row, { alignItems: "center", gap: space.xl }]}>
-            {EMBLEMS.map((e) => (
-              <View key={e} style={{ gap: space.xs, alignItems: "center" }}>
-                <EmblemBadge emblem={e} size={40} />
-                <T small muted>
-                  {e}
-                </T>
+          <View style={{ gap: space.sm }}>
+            {SHIELD_TIERS.map((t, i) => (
+              <View
+                key={t.id}
+                style={[row, { alignItems: "center", gap: space.lg }]}
+              >
+                <View style={{ width: 70 }}>
+                  <T small muted>
+                    {t.label}
+                  </T>
+                </View>
+                {[20, 28, 44].map((n) => (
+                  <Shield
+                    key={n}
+                    tier={t.id}
+                    years={SAMPLE_YEARS[i]}
+                    size={n}
+                  />
+                ))}
+                <Shield tier={t.id} years={88} size={28} />
               </View>
             ))}
           </View>
+        </Card>
+      </Section>
+      <Section
+        title="Emblems"
+        note="Badge at 20, 28 and 56 px, then the plain variant."
+      >
+        <Card>
+          <View style={{ gap: space.md }}>
+            {EMBLEMS.map((e) => (
+              <View
+                key={e}
+                style={[row, { alignItems: "center", gap: space.lg }]}
+              >
+                <View style={{ width: 80 }}>
+                  <T small muted>
+                    {e}
+                  </T>
+                </View>
+                {[20, 28, 56].map((n) => (
+                  <EmblemBadge key={n} emblem={e} size={n} />
+                ))}
+                <EmblemBadge emblem={e} size={28} variant="plain" />
+              </View>
+            ))}
+          </View>
+        </Card>
+      </Section>
+      <Section
+        title="Emblem choice"
+        note="Used in onboarding. Selection is local to this page."
+      >
+        <Card>
+          <EmblemChoice value={choice} onChange={setChoice} />
         </Card>
       </Section>
       <Section

@@ -12,7 +12,8 @@ import {
 import type { PartialDate } from "../../domain/profile";
 import { Sheet } from "../../ui";
 import { Shield } from "./shield";
-import { EmblemBadge, EMBLEM_LABEL, EMBLEM_MEANING } from "./emblem";
+import { EmblemBadge } from "./emblem";
+import { EMBLEM_NOTE, EMBLEM_TABLE } from "../../domain/emblems";
 
 export type IdentityTarget =
   | {
@@ -37,7 +38,7 @@ export function IdentitySheet({
   const isShield = target.kind === "shield";
   const title = isShield
     ? "Diabetes experience shield"
-    : EMBLEM_LABEL[target.emblem];
+    : EMBLEM_TABLE[target.emblem].label;
   const next =
     isShield && target.diagnosis
       ? nextAnniversary(target.diagnosis, localToday())
@@ -87,7 +88,7 @@ export function IdentitySheet({
           ) : null}
         </>
       ) : (
-        <T>{EMBLEM_MEANING[target.emblem]}</T>
+        <T>{EMBLEM_TABLE[target.emblem].description}</T>
       )}
       <T muted>
         It is self-reported and optional. Nobody checks it, and it can be hidden
@@ -96,7 +97,7 @@ export function IdentitySheet({
       <Notice tone="info">
         {isShield
           ? "Time since diagnosis is not a ranking. It says nothing about skill, success or how much anyone's words are worth."
-          : "An emblem is not a ranking. It only tells people how someone relates to diabetes."}
+          : `${EMBLEM_NOTE} It is not a ranking.`}
       </Notice>
     </Sheet>
   );

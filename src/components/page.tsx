@@ -10,10 +10,12 @@ export function Page({
   title,
   subtitle,
   children,
+  glucoseLabel,
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
+  glucoseLabel?: string;
 }) {
   const c = useColors();
   const { ready, storageError, state } = useDemo();
@@ -41,7 +43,10 @@ export function Page({
           <Pill>Local demo</Pill>
           {community ? <Pill>Fictional community</Pill> : null}
           <Pill tone={state.imported.length ? "accent" : "neutral"}>
-            {state.imported.length ? "Imported CSV glucose" : "Synthetic glucose"}
+            {glucoseLabel ??
+              (state.imported.length
+                ? "Imported CSV glucose"
+                : "Synthetic glucose")}
           </Pill>
         </View>
       </View>

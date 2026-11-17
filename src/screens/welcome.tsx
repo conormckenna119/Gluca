@@ -4,14 +4,20 @@ import { router } from "expo-router";
 import { Button, Eyebrow, Mark, Pill, T, row, space, useColors } from "../ui";
 import { useDemo } from "../store";
 import { BRAND } from "../art/brand";
-import { getFlags } from "../flags";
+import { getFlags, isEnabled } from "../flags";
 import { linkVisible } from "../nav";
 import { track } from "../telemetry";
 
 export function Welcome() {
   const c = useColors();
   const { set } = useDemo();
-  const go = (href: "/create?template=milestone" | "/create" | "/import?from=welcome") => {
+  const go = (
+    href:
+      | "/create?template=milestone"
+      | "/create"
+      | "/import?from=welcome"
+      | "/account?mode=create",
+  ) => {
     set((s) => ({ ...s, seenWelcome: true }));
     router.replace(href);
   };
@@ -46,6 +52,13 @@ export function Welcome() {
           <Button label="Import Dexcom Clarity CSV" onPress={() => go("/import?from=welcome")} />
         ) : null}
         <Button label="Make a milestone graphic (no data)" onPress={() => go("/create?template=milestone")} />
+        {isEnabled("accounts") ? (
+          <Button
+            kind="ghost"
+            label="Sign in or create an account"
+            onPress={() => go("/account?mode=create")}
+          />
+        ) : null}
       </View>
       <T small muted>
         Your file is read on this device. Nothing is uploaded, and the file name is not kept.

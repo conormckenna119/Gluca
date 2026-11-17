@@ -15,16 +15,20 @@ const TIER_COLORS: Record<
   { fill: string; edge: string; ink: string }
 > = {
   teal: { fill: "#3FB8B0", edge: "#0F5F5A", ink: "#08201F" },
-  silver: { fill: "#C3CBD3", edge: "#59636D", ink: "#14181A" },
+  silver: { fill: "#B2BCC6", edge: "#4F5963", ink: "#14181A" },
   bronze: { fill: "#C98A52", edge: "#6B3F1A", ink: "#1E1208" },
   gold: { fill: "#E8B93C", edge: "#7A5A0A", ink: "#241A02" },
   amethyst: { fill: "#A98BE0", edge: "#4B2F8A", ink: "#170C33" },
   sapphire: { fill: "#4F86E8", edge: "#183C86", ink: "#04122E" },
   emerald: { fill: "#3DBE8A", edge: "#136042", ink: "#04201A" },
-  platinum: { fill: "#E4E9EE", edge: "#6A7581", ink: "#14181A" },
+  platinum: { fill: "#EEF2F6", edge: "#55606C", ink: "#14181A" },
   diamond: { fill: "#BFEAF5", edge: "#2F7C92", ink: "#06202A" },
-  legacy: { fill: "#1B1B1F", edge: "#E8B93C", ink: "#E8B93C" },
+  legacy: { fill: "#2A2A31", edge: "#E8B93C", ink: "#F0C650" },
 };
+
+// Tiers with a second, solid rim: platinum is told from silver by it, legacy gets a ring that
+// stays visible on the dark theme background.
+const DOUBLE_RIM: ShieldTierId[] = ["platinum", "legacy"];
 
 const BODY = "M24 2 L44 9 V28 C44 42 35 51 24 54 C13 51 4 42 4 28 V9 Z";
 const INNER =
@@ -194,7 +198,21 @@ export function Shield({
   const number = showNumber && years !== undefined;
   const a11y = label ?? shieldLabel(t, years, certain, number);
   const text = String(years ?? "");
-  const fontSize = text.length >= 3 ? 12 : text.length === 2 ? 16 : 19;
+  // Under 24 px the inner shape is dropped and the number takes the middle, so it stays readable.
+  const compact = size < 24 && number;
+  const fontSize = compact
+    ? text.length >= 3
+      ? 17
+      : text.length === 2
+        ? 22
+        : 26
+    : text.length >= 3
+      ? 12
+      : text.length === 2
+        ? 16
+        : 19;
+  const textY = compact ? 31 + fontSize * 0.36 : 35 + fontSize * 0.36;
+  const double = DOUBLE_RIM.includes(t.id);
   return (
     <View
       accessible
@@ -207,27 +225,29 @@ export function Shield({
           d={BODY}
           fill={col.fill}
           stroke={col.edge}
-          strokeWidth={2}
+          strokeWidth={double ? 2.6 : 2}
           strokeLinejoin="round"
         />
         <Path
           d={INNER}
           fill="none"
           stroke={col.edge}
-          strokeOpacity={0.55}
-          strokeWidth={1}
+          strokeOpacity={double ? 1 : 0.55}
+          strokeWidth={double ? 1.6 : 1}
         />
-        <Glyph
-          id={t.mark}
-          x={24}
-          y={number ? 18 : 28}
-          r={number ? 5.5 : 9}
-          color={col.ink}
-        />
+        {compact ? null : (
+          <Glyph
+            id={t.mark}
+            x={24}
+            y={number ? 18 : 28}
+            r={number ? 5.5 : 9}
+            color={col.ink}
+          />
+        )}
         {number ? (
           <SvgText
             x={24}
-            y={42}
+            y={textY}
             fontSize={fontSize}
             fontWeight="800"
             fontFamily="sans-serif"

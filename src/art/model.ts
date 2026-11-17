@@ -48,7 +48,7 @@ export function periodBounds(kind: PeriodKind, anyMsInAnchorDay: number): { star
   return kind === 'day' ? { start: d, end: d + DAY_MS } : { start: d - 6 * DAY_MS, end: d + DAY_MS };
 }
 
-export function makeArtModel(readings: readonly Reading[], source: 'demo' | 'csv', anchorMs: number, s: Settings, o: { embedFont: boolean; measure?: Measure; events?: ArtEvent[] }): ArtModel {
+export function makeArtModel(readings: readonly Reading[], source: 'demo' | 'csv' | 'dexcom-sandbox', anchorMs: number, s: Settings, o: { embedFont: boolean; measure?: Measure; events?: ArtEvent[] }): ArtModel {
   const { start, end } = periodBounds(s.period, anchorMs);
   return {
     template: s.template, format: s.format, transparent: s.transparent, theme: s.theme, accent: s.accent, unit: s.unit, range: s.range, source,

@@ -3,7 +3,7 @@
 import type { GlucaEvent, Reading } from "./types";
 import { buildArtwork, defaultShow, supportsEvents, TEMPLATE_INFO, TEMPLATE_ORDER, type Artwork, type ShowOptions } from "./art/templates";
 import { defaultSettings, makeArtModel, withTemplate, type Settings } from "./art/model";
-import { toEngine, wall } from "./analytics";
+import { toEngine, toUtcEngine, wall } from "./analytics";
 import { captionFor, headlineFor, TONES, TONE_LABEL, type Tone } from "./art/copy";
 import { FORMATS as ART_FORMATS, type FormatId } from "./art/formats";
 import { SWATCHES, type Measure } from "./art/svg";
@@ -38,6 +38,7 @@ export type StoryOptions = {
   unit: "mg/dL" | "mmol/L";
   range: { low: number; high: number }; // always mg/dL
   period: "day" | "week";
+  provenance?: 'dexcom-sandbox' | 'csv';
 };
 
 const toSettings = (o: StoryOptions): Settings => ({
@@ -57,7 +58,7 @@ export function defaultOptions(template: TemplateId, unit: "mg/dL" | "mmol/L" = 
 /** Switching template keeps look-and-feel (theme, accent, unit, range, format) and resets words and toggles. */
 export function switchTemplate(o: StoryOptions, template: TemplateId): StoryOptions {
   const next = withTemplate(toSettings(o), template);
-  return { ...defaultOptions(template, o.unit, o.format), theme: next.theme, accent: next.accent, range: next.range, period: next.period, transparent: next.transparent };
+  return { ...defaultOptions(template, o.unit, o.format), theme: next.theme, accent: next.accent, range: next.range, period: next.period, transparent: next.transparent, ...(o.provenance?{provenance:o.provenance}:{}) };
 }
 export const pickTone = (o: StoryOptions, tone: Tone, index = 0): StoryOptions =>
   tone === "custom" ? { ...o, tone } : { ...o, tone, headline: headlineFor(tone, index), caption: captionFor(tone, index) };
@@ -128,10 +129,12 @@ export function storyArtwork(
   o: StoryOptions,
   opts: { embedFont?: boolean; native?: boolean; measure?: Measure; events?: GlucaEvent[] } = {},
 ): StoryArtwork {
-  const readings = toEngine(rows);
-  const source = rows.length && rows[0].source === "csv" ? "csv" : "demo";
-  const art = buildArtwork(makeArtModel(readings, source, wall(anchorMs), toSettings(o), { embedFont: !!opts.embedFont, measure: opts.measure,
-    events: opts.events?.map((e) => ({ kind: e.kind, t: wall(e.start), durationMin: e.durationMin, label: e.label })) }));
+  const sandbox=o.provenance==='dexcom-sandbox';
+  if(sandbox&&rows.some(r=>r.source!=='dexcom'||!('environment' in r)||r.environment!=='sandbox'))throw new Error('Sandbox story requires Dexcom sandbox readings.');
+  const readings = sandbox?toUtcEngine(rows):toEngine(rows);
+  const source = sandbox?'dexcom-sandbox':o.provenance==='csv'||rows.length && rows[0].source === "csv" ? "csv" : "demo";
+  const art = buildArtwork(makeArtModel(readings, source, sandbox?anchorMs:wall(anchorMs), toSettings(o), { embedFont: !!opts.embedFont, measure: opts.measure,
+    events: sandbox?undefined:opts.events?.map((e) => ({ kind: e.kind, t: wall(e.start), durationMin: e.durationMin, label: e.label })) }));
   return opts.native ? { ...art, svg: nativeSafe(art.svg) } : art;
 }
 export const storySvg = (rows: Reading[], anchorMs: number, o: StoryOptions, opts?: { embedFont?: boolean; native?: boolean; events?: GlucaEvent[] }) => storyArtwork(rows, anchorMs, o, opts).svg;

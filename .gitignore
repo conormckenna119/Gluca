@@ -42,3 +42,4 @@ prototypes/share-first-web/node_modules/
 
 # Local backend database (may hold tokens and readings)
 server/data/
+.dexcom-verification/

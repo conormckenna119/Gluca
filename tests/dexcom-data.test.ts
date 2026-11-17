@@ -286,7 +286,7 @@ test("authenticated relay retrieves historical V3 data, filters partial input, r
     assert.equal(req.searchParams.get("startDate"), "2025-01-01T00:00:00.000");
     assert.equal(
       req.searchParams.get("endDate"),
-      new Date(start + 23 * 3600000 + 1).toISOString().slice(0,-1),
+      new Date(start + 23 * 3600000 + 1).toISOString().slice(0, -1),
     );
     assert.ok(
       a.calls
@@ -780,6 +780,42 @@ test("partial calendar coverage never extrapolates a final reading beyond the re
   assert.equal(p.stats.covered, 1);
   assert.equal(p.stats.coverage, 100 / DAY_MS);
   assert.equal(p.fullyRequested, false);
+});
+
+test("EGV transport uses zone-less UTC with milliseconds, not the Z format rejected by the live sandbox", async () => {
+  const a = await startApp({ diagnosticsEnabled: true }, (url) => {
+    if (url.includes("/token")) return tokenOk();
+    const q = new URL(url).searchParams;
+    // Model the live sandbox's 400 for zoned query strings, not a permissive mock.
+    if (
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}$/.test(
+        q.get("startDate") ?? "",
+      ) ||
+      !/\.\d{3}$/.test(q.get("endDate") ?? "")
+    )
+      return json({}, 400);
+    assert.equal(q.get("startDate"), "2025-01-01T00:00:00.123");
+    assert.equal(q.get("endDate"), "2025-01-01T01:00:00.456");
+    return json(envelope([]));
+  });
+  try {
+    const cookie = await a.login();
+    await authorize(a, cookie);
+    const input = {
+      startDate: "2025-01-01T01:00:00.123+01:00",
+      endDate: "2025-01-01T01:00:00.456Z",
+    };
+    const result = await dexcomFetch(
+      a.app.deps,
+      owner(a),
+      "/v3/users/self/egvs",
+      input,
+    );
+    assert.deepEqual(result, envelope([]));
+    assert.equal(input.startDate, "2025-01-01T01:00:00.123+01:00");
+  } finally {
+    await a.close();
+  }
 });
 
 test("default browser fetch is called without binding it to the provider instance", async () => {

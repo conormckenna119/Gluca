@@ -33,6 +33,7 @@ import {
 import { PostCard } from "../components/post-card";
 import { getFlags } from "../flags";
 import { linkVisible } from "../nav";
+import { AccountEntry } from "../components/account-entry";
 
 /** What others see, built from the same function everything else uses, so the person sees exactly that. */
 function useOwnPublicView() {
@@ -180,6 +181,7 @@ export function Profile() {
           <ProfileMedalsLink />
         </View>
       ) : null}
+      <AccountEntry />
       <Section title="More">
         <Group>
           <ListRow

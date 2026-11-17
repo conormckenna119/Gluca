@@ -1,6 +1,8 @@
 # Gluca
 
-**Stage 3 — Dexcom development data viewer:** the existing backend retrieves authorized sandbox dataRange/EGVs, normalizes them, and returns transient readings to the existing chart/analytics engine. [Windows setup, first retrieval, privacy, file list and limitations](docs/DEXCOM_STAGE3.md). Demo/CSV remain functional. Live verification requires local credentials and consent; mocked tests are separate evidence. No background sync or permanent glucose history is added. Historical Stage 2 notes below are superseded by this update.
+**Stage 4 — verified Dexcom Sandbox → Create → PNG:** Create now offers explicit Demo, CSV and Dexcom Sandbox sources. A live G7 sandbox check retrieved 288 normalized readings for 15 November 2026, rendered the existing Daily recap template, and exported a verified **1080×1920 PNG** through the actual browser workflow. Nothing was published or added to a permanent raw-health store. Run `npm run test:dexcom:sandbox`; [full results, repeat commands and limitations](docs/DEXCOM_SANDBOX_TEST_RESULTS.md). This supersedes older statements below that Create accepts only demo/CSV. Development-only sandbox flags remain required.
+
+**Stage 3 — Dexcom development data viewer:** the existing backend retrieves authorized sandbox dataRange/EGVs, normalizes them, and returns transient readings to the existing chart/analytics engine. [Windows setup, first retrieval, privacy, file list and limitations](docs/DEXCOM_STAGE3.md). Live backend verification retrieved 277 official simulated sandbox readings after correcting the UTC query format. Restart a running backend after updating. Demo/CSV remain functional, and the ordinary dashboard/Create still use those sources. No background sync or permanent glucose history is added. Historical Stage 2 notes below are superseded by this update.
 
 Verify from this directory: `npm run typecheck`, `npm test`, `npm run dexcom:check`.
 

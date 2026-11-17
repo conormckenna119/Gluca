@@ -9,12 +9,14 @@ export type ExportResult =
 
 export function ExportPanel({
   busy,
+  disabled = false,
   result,
   contents,
   onShare,
   onSave,
 }: {
   busy: boolean;
+  disabled?: boolean;
   result: ExportResult;
   contents: string[];
   onShare: () => void;
@@ -47,13 +49,13 @@ export function ExportPanel({
       <Button
         kind="primary"
         label={busy ? "Exporting…" : "Export PNG / Share"}
-        disabled={busy}
+        disabled={busy || disabled}
         onPress={onShare}
       />
       {onSave ? (
         <Button
           label="Save to photo library"
-          disabled={busy}
+          disabled={busy || disabled}
           onPress={onSave}
         />
       ) : null}

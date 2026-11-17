@@ -56,7 +56,7 @@ export interface ArtModel {
   accent: string;
   unit: Unit;
   range: TargetRange;
-  source: 'demo' | 'csv';
+  source: 'demo' | 'csv' | 'dexcom-sandbox';
   start: number;
   end: number;
   stats: Stats;
@@ -135,6 +135,7 @@ export function buildArtwork(m: ArtModel): Artwork {
   // ----- footer (notes + brand) -----
   const notes: string[] = [];
   if (m.source === 'demo' && usesData) notes.push('DEMO DATA · SYNTHETIC');
+  if (m.source === 'dexcom-sandbox') notes.push('DEXCOM SANDBOX · SIMULATED');
   if (hasData && usesData && m.stats.coverage < 0.9 && m.show.partialNote) notes.push(`BASED ON ${Math.floor(m.stats.coverage * 100)}% OF THIS ${days <= 1 ? 'DAY' : 'PERIOD'} · GAPS LEFT EMPTY`);
   const brandSize = compact ? 34 : 40;
   const brandH = m.show.brand ? brandSize + 6 : 0;

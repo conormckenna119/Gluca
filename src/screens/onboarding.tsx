@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Redirect, router } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import {
   Button,
   Chip,
@@ -408,6 +408,7 @@ export function Onboarding() {
     state.profile.displayName === "You" ? "" : state.profile.displayName,
   );
   const [index, setIndex] = useState(0);
+  const { from } = useLocalSearchParams<{ from?: string }>();
   if (!flags.identity) return <Redirect href="/create" />;
 
   const steps = nextSteps(draft.profile).filter(
@@ -453,6 +454,12 @@ export function Onboarding() {
       subtitle="Only a display name is needed. Every question is optional and you can skip any of them."
     >
       <Steps labels={labels} current={at} />
+      {from === "account" && at === 0 && !onSummary ? (
+        <Notice title="Account created">
+          Your account is ready. These questions are optional and stay on this
+          device.
+        </Notice>
+      ) : null}
       {onSummary ? (
         <View style={{ gap: space.lg }}>
           <T heading>Your profile</T>

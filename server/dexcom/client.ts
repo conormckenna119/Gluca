@@ -182,7 +182,7 @@ export async function dexcomFetch(
   query: Record<string, string> = {},
   opts: { timeoutMs?: number } = {},
 ): Promise<unknown> {
-  if (!["/v3/users/self/dataRange", "/v3/users/self/egvs"].includes(resource))
+  if (!["/v3/users/self/dataRange", "/v3/users/self/egvs", "/v3/users/self/devices"].includes(resource))
     throw new UpstreamRejected();
   if (resource.endsWith("/egvs")) {
     const start = parseProviderTime(query.startDate),

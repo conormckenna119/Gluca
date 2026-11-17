@@ -45,6 +45,8 @@
     "test": "node tools/test.cjs",
     "test:e2e": "playwright test",
     "server": "tsx server/index.ts",
-    "dexcom:check": "node tools/dexcom-check.cjs"
+    "dexcom:check": "node tools/dexcom-check.cjs",
+    "test:dexcom:sandbox": "node tools/test-dexcom-sandbox.cjs",
+    "test:dexcom:create": "playwright test --config playwright.dexcom-create.config.ts"
   }
 }

@@ -1,5 +1,7 @@
 # Roadmap and specifications
 
+Stage 4 complete (2026-11-16): live G7 authorization reused and ownership/state evidence verified; official dataRange/devices/EGVs returned 200; 288 historical records normalized; existing Create rendered a sandbox-labeled story and actually exported a verified 1080×1920 PNG. Demo/CSV retained. Typecheck and 314 unit tests passed; actual browser UI verified where Playwright worker spawning is blocked. See [test report](DEXCOM_SANDBOX_TEST_RESULTS.md). Production, background scheduling and further social/medical work are not part of this milestone.
+
 Stage 3 update (2026-11-16): manual authenticated Dexcom sandbox retrieval, normalization, memory-only provider, development chart and common UTC summaries implemented. Synthetic automated verification is documented in [DEXCOM_STAGE3.md](DEXCOM_STAGE3.md); live verification awaits credentials and consent. No automatic synchronization, new health database, dashboard/Story Studio/social changes. Stage 4 is not authorized.
 
 Root: `C:\Users\conor\Documents\Codex\2026-11-12\le\outputs\gluca`. Read `AGENTS.md` first.
