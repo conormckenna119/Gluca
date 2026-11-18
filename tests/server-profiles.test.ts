@@ -59,6 +59,7 @@ test("private profile requires session, encrypted storage, ownership and no raw 
     );
     assert.equal(visible.status, 200);
     assert.deepEqual(Object.keys(visible.json).sort(), [
+      "accountId",
       "name",
       "pinnedAchievements",
       "username",

@@ -142,3 +142,8 @@ Append new entries with a date. Do not rewrite history; add a superseding entry 
 - The Claude session keeps identity, privacy, communities, Boosts and achievements, and does not edit the files above.
 - Left over from the Claude session's stopped sync task, for the Dexcom owner to remove or reuse: `server/dexcom/sync.ts` and `server/dexcom/data-routes.ts` (nothing imports them) and the `egvs` table in `server/db.ts`. They assume readings are stored, which Stage 3 decided against.
 - Still for the owner, whoever builds it: the developer terms on showing glucose data in shared images could not be read on 2026-11-16 and should be checked in the Dexcom portal before any public use.
+
+
+## 2026-11-18 — Stage 9A social ownership
+
+Extend the existing authenticated Node/SQLite backend. Add only the previously missing reaction/comment/follow/block/inbox tables through additive migration 9; no new service or dependency. Store comment text with existing AES-GCM account context. Keep private/public audiences; follows do not create a followers-only audience. Use explicit desired-state Boost/follow mutations, unique receipts, shared client locks and foreground reconciliation. Reuse the existing encrypted cabinet for server-verified support awards; stop fictional support/comment award submissions. No new telemetry, push or health-derived rewards. Public deployment still needs operational moderation, retention and distributed rate-limit decisions. Full contract: SOCIAL_INTERACTIONS.md.

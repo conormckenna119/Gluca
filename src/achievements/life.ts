@@ -93,8 +93,9 @@ export const COMMUNITY_PARTICIPATION = mk({
 });
 export const FIRST_SUPPORT = mk({
   id: "first_support",
+  ruleVersion: 3,
   name: "Community Boost",
-  description: "You gave a Boost or left a comment in the local community.",
+  description: "You gave a Boost to another Gluca member's post.",
   category: "community",
   icon: "support",
   requiredData: ["reactions"],

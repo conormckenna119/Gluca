@@ -1,5 +1,9 @@
-import { recordAchievementEvent } from "../achievements/events";
-import React, { useState } from "react";
+import { onSocialRefresh } from "../services/social";
+import { captureAchievementScope } from "../achievements/events";
+import { onSessionEvent } from "../services/session-events";
+import type { Post } from "../types";
+import { AccountConversation } from "../components/social-interactions";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -33,8 +37,50 @@ function PostConversation() {
   const { state, set } = useDemo();
   const c = useColors();
   const [comment, change] = useState("");
-  const p = state.posts.find((p) => p.id === id);
-  if (!p || state.blocked.includes(p.author))
+  const [detail, DETAIL] = useState<Post | null>(null);
+  useEffect(() => {
+    if (!id?.startsWith("post-")) return;
+    let alive = true,
+      serial = 0;
+    const load = async () => {
+      const scope = captureAchievementScope(),
+        n = ++serial;
+      try {
+        const r = await fetch(`/api/posts?id=${encodeURIComponent(id)}`, {
+          credentials: "include",
+          cache: "no-store",
+          redirect: "error",
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!r.ok) throw new Error();
+        const b = await r.json();
+        if (alive && n === serial && scope === captureAchievementScope())
+          DETAIL(b.post);
+      } catch {
+        if (alive && n === serial && scope === captureAchievementScope()) {
+          DETAIL(null);
+          set((s) => ({ ...s, posts: s.posts.filter((p) => p.id !== id) }));
+        }
+      }
+    };
+    DETAIL(null);
+    void load();
+    const session = onSessionEvent((e, _r, reason) => {
+      if (reason !== "account") return;
+      serial++;
+      DETAIL(null);
+      if (e === "check") void load();
+    });
+    const refresh = onSocialRefresh(() => void load());
+    return () => {
+      alive = false;
+      serial++;
+      session();
+      refresh();
+    };
+  }, [id, set]);
+  const p = state.posts.find((p) => p.id === id) ?? detail;
+  if (!p || (!p.remote && state.blocked.includes(p.author)))
     return (
       <Page title="Post not found">
         <EmptyState
@@ -55,9 +101,7 @@ function PostConversation() {
     return (
       <Page title="Post" glucoseLabel="Source labelled on graphic">
         <PostCard post={p} inDetail />
-        <T small muted>
-          Comments and reactions for account posts are not available yet.
-        </T>
+        <AccountConversation post={p} />
         <Button label="Back to feed" onPress={() => router.replace("/")} />
       </Page>
     );
@@ -82,7 +126,7 @@ function PostConversation() {
       ),
       counters: { ...s.counters, commentsMade: s.counters.commentsMade + 1 },
     }));
-    recordAchievementEvent("comment_added");
+    // Fictional comments do not award account medals.
     change("");
   };
   return (

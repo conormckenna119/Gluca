@@ -71,7 +71,11 @@ async function update(ctx: Ctx) {
           "invalid_event",
           "Unsupported participation event.",
         );
-      if (b.event.kind === "connection_confirmed")
+      if (
+        ["connection_confirmed", "support_given", "comment_added"].includes(
+          b.event.kind,
+        )
+      )
         throw new HttpError(
           400,
           "unsupported_event",

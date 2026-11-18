@@ -1,3 +1,4 @@
+import { onSocialRefresh, refreshSocial } from "../services/social";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 import { useDemo } from "../store";
@@ -41,11 +42,27 @@ export function useFeedPosts() {
       if (e === "check") void load();
       else clear();
     });
+    let resumedAt = 0;
+    const resume = () => {
+      if (
+        document.visibilityState !== "hidden" &&
+        Date.now() - resumedAt > 1000
+      ) {
+        resumedAt = Date.now();
+        refreshSocial();
+      }
+    };
+    window.addEventListener("focus", resume);
+    document.addEventListener("visibilitychange", resume);
+    const interval = setInterval(resume, 30000);
+    const refresh = onSocialRefresh(() => void load());
     const update = onFeedPublished((p) => {
       generation++;
       set((s) => ({
         ...s,
-        posts: [p, ...s.posts.filter((x) => x.id !== p.id)],
+        posts: s.posts.some((x) => x.id === p.id)
+          ? s.posts.map((x) => (x.id === p.id ? p : x))
+          : [p, ...s.posts],
       }));
     });
     return () => {
@@ -53,6 +70,10 @@ export function useFeedPosts() {
       generation++;
       stop();
       update();
+      refresh();
+      clearInterval(interval);
+      window.removeEventListener("focus", resume);
+      document.removeEventListener("visibilitychange", resume);
     };
   }, [ready, set]);
 }

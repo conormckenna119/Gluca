@@ -1,3 +1,4 @@
+import { MemberActions } from "../components/social-interactions";
 import React from "react";
 import { Pressable, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -202,9 +203,10 @@ function OwnProfile() {
           <ProfileMedalsLink />
         </View>
       ) : null}
+      {flags.accounts ? <MemberActions /> : null}
       <View style={{ flexDirection: "row", gap: space.lg }}>
         <Stat value={String(mine.length)} label="Posts" />
-        <Stat value={String(state.following.length)} label="Following" />
+        <Stat value={String(state.following.length)} label="Demo following" />
         <Stat value={String(state.clubs.length)} label="Clubs" />
       </View>
       {flags.communityFeed ? (
@@ -306,6 +308,9 @@ function MemberProfile({ username }: { username: string }) {
       {data ? (
         <Card>
           <UserIdentity expanded profile={data} />
+          {data.accountId ? (
+            <MemberActions id={data.accountId} profile={data} />
+          ) : null}
           {getFlags().achievements && data.medals?.length ? (
             <Section title="Trophy Cabinet">
               <View

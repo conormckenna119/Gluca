@@ -1,3 +1,4 @@
+import { socialRoutes } from "./social";
 import { HttpError, redirect, sendJson, type Ctx, type Route } from "./http";
 import { sessionRoutes } from "./session";
 import { profileRoutes } from "./profiles";
@@ -142,6 +143,7 @@ export const routes: Route[] = [
   ...sessionRoutes,
   ...profileRoutes,
   ...postRoutes,
+  ...socialRoutes,
   ...challengeRoutes,
   ...achievementRoutes,
   { method: "POST", path: "/api/dexcom/connect", handler: connect },

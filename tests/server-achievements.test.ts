@@ -42,7 +42,7 @@ test("encrypted account repository: auth, CSRF, idempotence, concurrent pin cons
     );
     for (const kind of [
       "awareness_confirmed",
-      "support_given",
+      "milestone_confirmed",
       "activity_logged",
     ])
       await post({ event: { id: `fictional-${kind}`, kind } });

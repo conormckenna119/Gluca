@@ -1,3 +1,4 @@
+import { SocialInbox } from "../components/social-interactions";
 import React, { useState } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
@@ -17,7 +18,7 @@ const EMPTY: Record<(typeof FILTERS)[number], { title: string; body: string }> =
     },
     Following: {
       title: "Nobody followed yet",
-      body: "Follow a fictional member from a post's options menu.",
+      body: "Open a member profile to follow their posts.",
     },
     Bookmarks: {
       title: "Nothing saved",
@@ -38,9 +39,10 @@ function HomeFeed() {
   const [limit, setLimit] = useState(8);
   const posts = state.posts.filter(
     (p) =>
-      !state.blocked.includes(p.author) &&
+      (p.remote || !state.blocked.includes(p.author)) &&
       (filter === "All" ||
-        (filter === "Following" && state.following.includes(p.author)) ||
+        (filter === "Following" &&
+          (p.remote ? p.isFollowing : state.following.includes(p.author))) ||
         (filter === "Bookmarks" && p.saved)),
   );
   const shown = posts.slice(0, limit);
@@ -54,6 +56,7 @@ function HomeFeed() {
       }
       subtitle="Your Gluca posts and a labelled fictional community. Private posts are visible only to their owner."
     >
+      {getFlags().accounts ? <SocialInbox /> : null}
       {getFlags().communityChallenges ? (
         <Button
           label="Discover Challenges"

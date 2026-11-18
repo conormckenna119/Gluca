@@ -1,3 +1,4 @@
+import { MemberActions } from "./social-interactions";
 import { deleteFeedPost } from "../services/feed-posts";
 import React, { useState } from "react";
 import { BoostButton } from "./boost-button";
@@ -126,6 +127,13 @@ export function PostCard({
           onPress={() => setMenu(true)}
         />
       </View>
+      {post.remote && post.authorId ? (
+        <MemberActions
+          id={post.authorId}
+          profile={post.authorProfile}
+          compact
+        />
+      ) : null}
       {post.media ? (
         <Pressable
           accessibilityRole="button"
@@ -172,14 +180,12 @@ export function PostCard({
           marginLeft: -space.sm,
         }}
       >
-        {!post.remote ? <BoostButton post={post} /> : null}
+        <BoostButton post={post} />
         {inDetail ? null : (
           <IconButton
             icon="comment"
-            count={post.comments.length}
-            label={
-              post.remote ? "View post" : `Comments, ${post.comments.length}`
-            }
+            count={post.commentCount ?? post.comments.length}
+            label={`Comments, ${post.commentCount ?? post.comments.length}`}
             onPress={() => router.push(`/post/${post.id}`)}
           />
         )}
@@ -227,7 +233,7 @@ export function PostCard({
             onPress={() => {
               close();
               if (post.visibility !== "public") {
-                msg("Only public demo posts can be shared.");
+                msg("Only public posts can be shared.");
                 return;
               }
               Share.share({

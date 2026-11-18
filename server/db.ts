@@ -67,6 +67,28 @@ const MIGRATIONS: string[] = [
   `CREATE TABLE challenge_participation (
     user_id TEXT NOT NULL REFERENCES users(id), challenge_id TEXT NOT NULL,
     payload_enc TEXT NOT NULL, PRIMARY KEY(user_id,challenge_id));`,
+  // 9: authenticated social facts; text remains encrypted and account scoped.
+  `CREATE TABLE post_reactions (
+    post_id TEXT NOT NULL REFERENCES feed_posts(id), user_id TEXT NOT NULL REFERENCES users(id),
+    kind TEXT NOT NULL CHECK(kind IN ('boost','love','celebrate','support','strength')),
+    created_at INTEGER NOT NULL, PRIMARY KEY(post_id,user_id));
+   CREATE TABLE post_comments (
+    id TEXT PRIMARY KEY, post_id TEXT NOT NULL REFERENCES feed_posts(id), user_id TEXT NOT NULL REFERENCES users(id),
+    request_key TEXT NOT NULL, text_enc TEXT NOT NULL, created_at INTEGER NOT NULL, deleted_at INTEGER,
+    UNIQUE(user_id,request_key));
+   CREATE INDEX comments_post ON post_comments(post_id,created_at);
+   CREATE TABLE user_follows (
+    user_id TEXT NOT NULL REFERENCES users(id), target_id TEXT NOT NULL REFERENCES users(id),
+    PRIMARY KEY(user_id,target_id), CHECK(user_id<>target_id));
+   CREATE TABLE user_blocks (
+    user_id TEXT NOT NULL REFERENCES users(id), target_id TEXT NOT NULL REFERENCES users(id),
+    PRIMARY KEY(user_id,target_id), CHECK(user_id<>target_id));
+   CREATE TABLE social_notifications (
+    recipient_id TEXT NOT NULL REFERENCES users(id), actor_id TEXT NOT NULL REFERENCES users(id),
+    kind TEXT NOT NULL CHECK(kind IN ('boost','comment','follow')), subject_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL, seen INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY(recipient_id,actor_id,kind,subject_id));
+   CREATE INDEX social_inbox ON social_notifications(recipient_id,created_at);`,
 ];
 
 export function migrate(db: DatabaseSync): void {

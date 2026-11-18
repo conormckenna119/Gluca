@@ -1,4 +1,13 @@
-import { recordAchievementEvent } from "../achievements/events";
+import {
+  acquireBoost,
+  releaseBoost,
+  socialRequest,
+  refreshSocial,
+  type SocialResult,
+} from "../services/social";
+import { captureAchievementScope } from "../achievements/events";
+import { refreshChallengeAwards } from "../hooks/use-achievements";
+import { feedPublished } from "../services/feed-posts";
 import React, { useEffect, useRef, useState } from "react";
 import {
   AccessibilityInfo,
@@ -10,6 +19,7 @@ import {
 import { reactionCount, toggleReaction } from "../domain/reactions";
 import {
   CHEER_LINE,
+  REACTION_WORDS,
   canReact,
   countLine,
   gaveLine,
@@ -29,6 +39,7 @@ export function BoostButton({ post }: { post: Post }) {
   const reduceMotion = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [line, setLine] = useState("");
+  const [busy, B] = useState(false);
 
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled()
@@ -43,8 +54,10 @@ export function BoostButton({ post }: { post: Post }) {
 
   const given = post.reactions.mine === "boost";
   const n = reactionCount(post.reactions);
-  const ownPost = post.author === "You";
-  const blocked = !canReact(post.author, state.blocked);
+  const ownPost = post.remote ? !!post.owned : post.author === "You";
+  const blocked =
+    (!post.remote && !canReact(post.author, state.blocked)) ||
+    (post.remote && ownPost);
 
   const pulse = () => {
     if (reduceMotion.current) return;
@@ -63,8 +76,51 @@ export function BoostButton({ post }: { post: Post }) {
     ]).start();
   };
 
-  const press = () => {
-    if (blocked) return;
+  const press = async () => {
+    if (blocked || busy) return;
+    if (post.remote) {
+      if (!acquireBoost(post.id)) return;
+      const scope = captureAchievementScope(),
+        before = post.reactions;
+      B(true);
+      setLine("");
+      set((s) => ({
+        ...s,
+        posts: s.posts.map((p) =>
+          p.id === post.id
+            ? { ...p, reactions: toggleReaction(p.reactions) }
+            : p,
+        ),
+      }));
+      if (!given) pulse();
+      try {
+        const result = await socialRequest<SocialResult>("boost", {
+          id: post.id,
+          active: !given,
+        });
+        if (scope === captureAchievementScope()) {
+          feedPublished(result.post);
+          void refreshChallengeAwards(scope, result.unlockedIds ?? []);
+        }
+      } catch {
+        if (scope === captureAchievementScope()) {
+          set((s) => ({
+            ...s,
+            posts: s.posts.map((p) =>
+              p.id === post.id ? { ...p, reactions: before } : p,
+            ),
+          }));
+          setLine(
+            `${REACTION_WORDS.boost.noun} could not be confirmed. Refresh to check before retrying.`,
+          );
+          refreshSocial();
+        }
+      } finally {
+        releaseBoost(post.id, scope);
+        B(false);
+      }
+      return;
+    }
     const nowGiven = !given;
     set((s) => {
       if (!canReact(post.author, s.blocked)) return s;
@@ -83,7 +139,7 @@ export function BoostButton({ post }: { post: Post }) {
     });
     if (timer.current) clearTimeout(timer.current);
     if (nowGiven) {
-      recordAchievementEvent("support_given", `boost:${post.id}`);
+      // Fictional demo interactions never create account awards.
       pulse();
       setLine(gaveLine(post.author));
       timer.current = setTimeout(() => setLine(""), 3000);
@@ -106,9 +162,18 @@ export function BoostButton({ post }: { post: Post }) {
       >
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={reactionLabel(n, given)}
-          accessibilityState={{ selected: given, disabled: blocked }}
-          disabled={blocked}
+          accessibilityLabel={
+            post.remote && ownPost
+              ? `${n} ${n === 1 ? REACTION_WORDS.boost.noun : REACTION_WORDS.boost.plural} on your post`
+              : reactionLabel(n, given)
+          }
+          aria-pressed={given}
+          accessibilityState={{
+            selected: given,
+            disabled: blocked || busy,
+            busy,
+          }}
+          disabled={blocked || busy}
           onPress={press}
           hitSlop={4}
           style={({ pressed }) => ({

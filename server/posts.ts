@@ -1,3 +1,10 @@
+import {
+  accessiblePost,
+  blocked,
+  publicIdentity,
+  socialCounts,
+  following,
+} from "./social-core";
 import { randomUUID } from "node:crypto";
 import { encrypt, decrypt, sha256hex } from "./crypto";
 import { type Ctx, type Route, HttpError, sendJson } from "./http";
@@ -6,9 +13,6 @@ import { limit } from "./limits";
 import { loadCabinet } from "./achievements";
 import { completeChallengeForPost } from "./challenges";
 import { applyEvent } from "../src/achievements/events";
-import { sanitizeProfile, sanitizePrivacy } from "../src/domain/profile";
-import { publicView } from "../src/domain/public-view";
-import { localToday } from "../src/domain/shield";
 type Row = {
   deleted_at?: number | null;
   id: string;
@@ -32,23 +36,10 @@ function meta(ctx: Ctx, r: Row) {
     decrypt(r.metadata_enc, key(ctx), `post:v1:${r.user_id}:${r.id}`),
   );
 }
-function view(ctx: Ctx, r: Row) {
+export function postView(ctx: Ctx, r: Row) {
   const m = meta(ctx, r),
     mine = r.user_id === ctx.session!.userId;
-  const p = ctx.deps.db
-    .prepare("SELECT payload_enc FROM user_profiles WHERE user_id=?")
-    .get(r.user_id) as { payload_enc: string } | undefined;
-  const saved = p
-    ? JSON.parse(decrypt(p.payload_enc, key(ctx), `profile:v1:${r.user_id}`))
-    : {};
-  const profile = sanitizeProfile(saved.profile);
-  // Only public identity metadata; no private profile is attached to a post.
-  const identity = publicView(profile, sanitizePrivacy(saved.privacy), {
-    today: localToday(),
-    clubs: [],
-    clubVisibility: {},
-    awards: [],
-  });
+  const identity = publicIdentity(ctx, r.user_id);
   return {
     id: r.id,
     author: mine ? "You" : identity.name,
@@ -59,13 +50,15 @@ function view(ctx: Ctx, r: Row) {
     remote: true,
     owned: mine,
     authorProfile: identity,
+    authorId: r.user_id,
+    isFollowing: following(ctx, r.user_id),
     media: {
       uri: `/api/posts/image?id=${r.id}`,
       width: m.width,
       height: m.height,
       alt: m.alt,
     },
-    reactions: { counts: {}, mine: null },
+    ...socialCounts(ctx, r.id),
     saved: false,
     comments: [],
   };
@@ -189,17 +182,10 @@ async function create(ctx: Ctx) {
     ctx.deps.db.exec("ROLLBACK");
     throw e;
   }
-  sendJson(ctx.res, 200, { post: view(ctx, row) });
+  sendJson(ctx.res, 200, { post: postView(ctx, row) });
 }
 function accessible(ctx: Ctx) {
-  const id = ctx.url.searchParams.get("id") ?? "";
-  const r = ctx.deps.db
-    .prepare(
-      "SELECT * FROM feed_posts WHERE id=? AND deleted_at IS NULL AND (user_id=? OR visibility='public')",
-    )
-    .get(id, ctx.session!.userId) as Row | undefined;
-  if (!r) throw new HttpError(404, "not_found", "Post unavailable.");
-  return r;
+  return accessiblePost(ctx, ctx.url.searchParams.get("id") ?? "");
 }
 export const postRoutes: Route[] = [
   { method: "POST", path: "/api/posts", handler: create },
@@ -208,12 +194,20 @@ export const postRoutes: Route[] = [
     path: "/api/posts",
     handler: (ctx) => {
       key(ctx);
+      if (ctx.url.searchParams.has("id")) {
+        sendJson(ctx.res, 200, { post: postView(ctx, accessible(ctx)) });
+        return;
+      }
       const rows = ctx.deps.db
         .prepare(
           "SELECT id,user_id,visibility,metadata_enc,created_at FROM feed_posts WHERE deleted_at IS NULL AND (user_id=? OR visibility='public') ORDER BY created_at DESC,id DESC LIMIT 30",
         )
         .all(ctx.session!.userId) as Row[];
-      sendJson(ctx.res, 200, { posts: rows.map((r) => view(ctx, r)) });
+      sendJson(ctx.res, 200, {
+        posts: rows
+          .filter((r) => !blocked(ctx, r.user_id))
+          .map((r) => postView(ctx, r)),
+      });
     },
   },
   {
@@ -243,13 +237,33 @@ export const postRoutes: Route[] = [
       if (!b || typeof b.id !== "string")
         throw new HttpError(400, "invalid_post", "Choose a post.");
       // Keep the idempotency receipt while erasing image/caption, preventing delayed retries from resurrecting it.
-      const r = ctx.deps.db
-        .prepare(
-          "UPDATE feed_posts SET deleted_at=?,metadata_enc='',image_enc='' WHERE id=? AND user_id=? AND deleted_at IS NULL",
-        )
-        .run(ctx.deps.now(), b.id, ctx.session!.userId);
-      if (!r.changes)
-        throw new HttpError(404, "not_found", "Post unavailable.");
+      ctx.deps.db.exec("BEGIN IMMEDIATE");
+      try {
+        const r = ctx.deps.db
+          .prepare(
+            "UPDATE feed_posts SET deleted_at=?,metadata_enc='',image_enc='' WHERE id=? AND user_id=? AND deleted_at IS NULL",
+          )
+          .run(ctx.deps.now(), b.id, ctx.session!.userId);
+        if (!r.changes)
+          throw new HttpError(404, "not_found", "Post unavailable.");
+        ctx.deps.db
+          .prepare(
+            "UPDATE post_comments SET text_enc='',deleted_at=COALESCE(deleted_at,?) WHERE post_id=?",
+          )
+          .run(ctx.deps.now(), b.id);
+        ctx.deps.db
+          .prepare("DELETE FROM post_reactions WHERE post_id=?")
+          .run(b.id);
+        ctx.deps.db
+          .prepare(
+            "DELETE FROM social_notifications WHERE subject_id=? AND kind IN ('boost','comment')",
+          )
+          .run(b.id);
+        ctx.deps.db.exec("COMMIT");
+      } catch (e) {
+        ctx.deps.db.exec("ROLLBACK");
+        throw e;
+      }
       sendJson(ctx.res, 200, { deleted: true });
     },
   },

@@ -87,3 +87,8 @@ The cabinet browser test starts the same backend on a private temporary port wit
 ## Before public production
 
 Complete existing production authentication/recovery/deletion and age/privacy policies, enforce HTTPS/secure cookies, restrict database and encryption-key permissions, establish encrypted backup/rotation/retention processes, and replace client-reported local-community events with trusted social-service receipts when that service exists. Add device and accessibility verification before native release. Design opt-in durable offline persistence separately. Keep all medical-outcome awards disabled pending qualified clinical review and separate authorization. Stage 8B was not started.
+
+
+## Stage 9A — Verified support events, 2026-11-18
+
+Community Boost rule version 3 is created atomically by a newly inserted authenticated Boost on another member's accessible account post. Existing cabinet, private defaults and unlock queue are reused; no duplicate award system. Direct support_given/comment_added award requests are rejected, and fictional demo Boost/comment handlers no longer emit account award events. Existing medals remain untouched. Comments are not automatically treated as meaningful participation, so spamming comments does not earn new medals. First Post/Challenges retain their verified publication integrations. See SOCIAL_INTERACTIONS.md for the authorization and test record.

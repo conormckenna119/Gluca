@@ -1,3 +1,4 @@
+import { blocked } from "./social-core";
 import { encrypt, decrypt } from "./crypto";
 import { HttpError, sendJson, type Ctx, type Route } from "./http";
 import {
@@ -140,7 +141,8 @@ function publicProfile(ctx: Ctx) {
   const r = ctx.deps.db
     .prepare("SELECT user_id,payload_enc FROM user_profiles WHERE handle=?")
     .get(handle) as { user_id: string; payload_enc: string } | undefined;
-  if (!r) throw new HttpError(404, "not_found", "Profile not found.");
+  if (!r || blocked(ctx, r.user_id))
+    throw new HttpError(404, "not_found", "Profile not found.");
   const p = JSON.parse(
     decrypt(r.payload_enc, key(ctx), `profile:v1:${r.user_id}`),
   );
@@ -159,6 +161,7 @@ function publicProfile(ctx: Ctx) {
         })
     : [];
   sendJson(ctx.res, 200, {
+    accountId: r.user_id,
     ...publicView(sanitizeProfile(p.profile), sanitizePrivacy(p.privacy), {
       today: localToday(new Date(ctx.deps.now())),
       clubs: [],

@@ -33,3 +33,8 @@ The existing glucose/token privacy architecture is unchanged. No raw glucose ser
 ## Release gates
 
 This remains a development account system. Before public use: verified identity/recovery/MFA policy, a defined minimum-age policy independent of birthdays, stable TLS origin/cookie configuration, vault ACL/key/backups/restore review, native account handoff and physical-device photo/storage testing, moderation/username policy, real social ownership/permissions, retention/deletion/export policy and regulatory/privacy review. No deployment or compliance claim is made. Existing dependency advisories still require review; the single added package is SDK-compatible `expo-image-manipulator`, used for local photo reduction rather than a cloud image service.
+
+
+## Stage 9A addition — 2026-11-18
+
+Public-shaped authenticated profile responses now include an opaque accountId for real follow/block relationships. This is not the account login name or a credential. Existing publicView medical opt-ins and private-date exclusions remain unchanged. Mutual blocks now protect public-profile lookup, feed posts, image bytes, comments and notifications. Follower/following counts do not grant access to private posts. Notification actors are reduced further to name/handle only. See SOCIAL_INTERACTIONS.md for migration 9, encrypted comment storage, account-session invalidation and deletion/retention limitations. The older local-only social description above is historical; fictional demo records remain separate and are not uploaded.

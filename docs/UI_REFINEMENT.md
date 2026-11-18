@@ -128,3 +128,13 @@ npm run test:e2e -- --workers=1
 ```
 
 Browser tests use isolated test contexts, synthetic photos/readings and explicit demo selection; they do not change the owner's account, private profile or historic posts. Native hardware, native capture alpha and screen readers remain unverified. Layout is in memory only; reload begins a new draft. Rotation, durable drafts and individual text/chart editing are not implemented. Stop after Stage 7A.5.
+
+
+## Stage 9A — Social interaction refinement, 2026-11-18
+
+Account feed/detail cards now reuse the existing Boost control instead of hiding reactions. Comment counts are server-derived. Shared member controls open profiles, follow/unfollow and manage blocks without another primary tab. Existing identity shields, media aspect ratios, editor/export and navigation remain intact. Account comments use the existing Input/Card/Sheet primitives; the old local-only conversation remains labelled separately. Home adds a small in-app notification inbox and Refresh feed. Following uses stable account relationships for account posts; legacy following is explicitly labelled Demo following on the profile. No general redesign or new reaction picker.
+
+See SOCIAL_INTERACTIONS.md for actual verification results and limits. Screenshots under screenshots/stage9a contain fictional accounts only. React Native Web required explicit aria-pressed on the Boost button; accessibilityState.selected alone did not appear in the rendered button. Browser tests scope profile controls after the active profile has loaded, avoiding Expo's retained inactive screen controls. Native screen readers and device behavior are not claimed verified.
+
+
+Stage 9A verification (2026-11-18): 389 core tests, 26 full Edge tests, 3 final affected-screen checks and both dedicated mocked Dexcom journeys passed. Typecheck and targeted Prettier checks clean; no lint script exists. No live Dexcom re-verification or native-device claim. Full evidence and remaining limits: SOCIAL_INTERACTIONS.md. Stage 9A complete; stop before Stage 9B.

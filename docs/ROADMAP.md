@@ -393,3 +393,11 @@ The full specification is the owner's brief of 2026-11-16. M12, M13 and M14 are 
 Implemented authorization only using the existing Node backend. Authenticated sandbox Gluca accounts replace anonymous OAuth sessions; state is browser-bound and single-use; encrypted token ownership, refresh rotation/leases and disconnect races are covered. Settings adds default-off connection controls. Static dist serving supports one-origin callbacks. Glucose endpoints are explicitly disabled (501); no callback-triggered ingestion remains.
 
 Verified: typecheck, 271 automated tests and OAuth-enabled web export. Browser-assisted synthetic preview checked connection states and 375/430/1280 light/dark layouts. Playwright's OAuth worker was blocked by spawn EPERM; live consent and native handoff are not verified. Local credentials and a portal-accepted callback are required; see docs/OAUTH_SETUP.md. Stop before Stage 3.
+
+
+## Stage 9A — 2026-11-18
+
+Authenticated Boosts, comments, follows, mutual blocks, grouped in-app notifications and verified Community Boost award source added to the existing application. No new backend, primary tab, push provider or health-data tracking. See SOCIAL_INTERACTIONS.md for changed files, actual verification and limitations. Stage 9B remains out of scope.
+
+
+Stage 9A verification (2026-11-18): 389 core tests, 26 full Edge tests, 3 final affected-screen checks and both dedicated mocked Dexcom journeys passed. Typecheck and targeted Prettier checks clean; no lint script exists. No live Dexcom re-verification or native-device claim. Full evidence and remaining limits: SOCIAL_INTERACTIONS.md. Stage 9A complete; stop before Stage 9B.
