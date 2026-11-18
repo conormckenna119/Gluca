@@ -1,3 +1,11 @@
+# Stage 8B safety decision - optional participation
+
+Five challenges concern experiences and community participation only. Registry/server conditions do not read glucose, A1C, insulin, food, exercise intensity, calories, pace or time in range. There are no streaks, health targets, public rosters, rankings, completion pressure or missed-day penalties. Supporters are eligible without a Dexcom account. Health-outcome definitions remain disabled.
+
+Activity/awareness/milestone confirmations are labelled self-reported. Make a Connection requires explicit confirmation of joining an existing community outside Gluca and a meaningful exchange; fictional demo joins, Boosts, counts of messages or invitations do not prove a connection. No private conversation/group name is collected. Share a Moment requires a genuinely new Public post after joining, with existing image/audience confirmation; a glucose-free photo or milestone graphic is sufficient. Private posts and download/share-sheet events are not public participation.
+
+Enrollment and completion stay private, encrypted in owner-scoped backend payloads and absent from public profile projections. Sharing/pinning a medal is a separate opt-in; no challenge publishes a health summary automatically. A completed challenge does not imply medical expertise, safety or successful treatment. The existing cabinet/notification privacy rules still apply. See COMMUNITY_CHALLENGES.md for actual sources and limitations.
+
 # Stage 8A safety decision - 2026-11-17
 
 This supersedes historical prototype gating below. All health definitions in the runtime registry are explicitly disabled, even if healthAchievements and profile opt-in are enabled. No Stage 8A event creates a medical-outcome award. Qualified clinical review and separately authorized development are required to change this. No lowest glucose/A1C, insulin/food restriction, perfect days, in-range streaks or medical competitions.

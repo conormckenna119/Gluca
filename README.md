@@ -1,3 +1,7 @@
+# Stage 8B - Community Challenges
+
+Explore -> Explore Challenges or Home -> Discover Challenges opens five optional experiences with private enrollment, leave/rejoin, completed history and associated cabinet medals. Enable communityChallenges with accounts/achievements; existing eventLogging is optional. Share a Moment verifies a new Public post; the other experiences use clearly labelled confirmations or the existing activity Log. [Guide, launch commands, conditions and limits](docs/COMMUNITY_CHALLENGES.md). No health competitions, sixth tab or new backend. Stop after Stage 8B.
+
 # Stage 8A.5 - export directly to Gluca
 
 Sign in, open Create, enable Also post to Gluca, choose Private/Public and confirm Export & Post. Export Graphic remains independent and does not publish. The same PNG reaches the existing feed; retries cannot duplicate a submission. Rebuild the web export and restart the existing backend to load migration 7/routes. [Editor/setup and limits](docs/STORY_EDITOR.md), [verification](docs/UI_REFINEMENT.md), [future design notes](docs/FUTURE_UX_ENHANCEMENTS.md). Native posting and production release remain gated.

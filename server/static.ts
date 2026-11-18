@@ -33,6 +33,7 @@ const ROUTES = new Set([
   "/profile-edit",
   "/identity-preview",
   "/trophies",
+  "/challenges",
 ]);
 export async function serveWeb(
   rawPath: string,

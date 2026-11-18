@@ -63,6 +63,10 @@ const MIGRATIONS: string[] = [
     image_enc TEXT NOT NULL, created_at INTEGER NOT NULL, deleted_at INTEGER,
     UNIQUE(user_id,request_key));
    CREATE INDEX feed_posts_visible ON feed_posts(visibility,created_at);`,
+  // 8: private challenge enrollment, separate from registry definitions and awards.
+  `CREATE TABLE challenge_participation (
+    user_id TEXT NOT NULL REFERENCES users(id), challenge_id TEXT NOT NULL,
+    payload_enc TEXT NOT NULL, PRIMARY KEY(user_id,challenge_id));`,
 ];
 
 export function migrate(db: DatabaseSync): void {

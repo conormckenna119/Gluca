@@ -77,12 +77,14 @@ export function MedalSheet({
           : def.description}
       </T>
       <T small muted>
-        {def.id === "first_post" && live.ruleVersion >= 3
-          ? "Source: Gluca confirmed a public post owned by this account."
-          : live.relatedEvent === "awareness_event" ||
-              live.relatedEvent === "personal_milestone"
-            ? "Source: user-confirmed activity."
-            : "Source: an action in Gluca. Community actions currently belong to the local demo feed."}
+        {live.relatedEvent?.startsWith("challenge:")
+          ? "Source: your self-reported private challenge confirmation."
+          : def.id === "first_post" && live.ruleVersion >= 3
+            ? "Source: Gluca confirmed a public post owned by this account."
+            : live.relatedEvent === "awareness_event" ||
+                live.relatedEvent === "personal_milestone"
+              ? "Source: user-confirmed activity."
+              : "Source: an action in Gluca. Community actions currently belong to the local demo feed."}
       </T>
       {!a.collectionPublic ? (
         <T small muted>

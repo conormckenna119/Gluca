@@ -1,3 +1,7 @@
+# Stage 8B - community participation
+
+Five optional private challenges implemented through the existing registry, backend sessions/encryption, feed events and Trophy Cabinet. Enrollment/leave/rejoin, once-only completion, genuine public-post verification and labelled self-reporting are supported. No health competition, live-group fabrication or new social reaction service. Verification/limitations: COMMUNITY_CHALLENGES.md. Stop after Stage 8B.
+
 # Stage 8A.5 - focused refinement
 
 Confirmed PNG export-to-feed publishing, encrypted account image storage, Private/Public authorization, idempotent retries and partial-failure states implemented. Simplified controls, shield details and deferred unlock feedback are scoped refinements. Verification/limits: UI_REFINEMENT.md and STORY_EDITOR.md. Followers-only, native posting and production/moderation gates remain open. Stop after Stage 8A.5; do not start 8B.

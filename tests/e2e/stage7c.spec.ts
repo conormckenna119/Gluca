@@ -76,6 +76,10 @@ test("audit real screens, responsive navigation, typography and modal behavior",
   }
   await page.goto("/create");
   await page.getByRole("button", { name: "Customize", exact: true }).click();
+  // RN Web activates Escape/focus handling after the opening animation's onShow.
+  await expect(
+    page.getByRole("dialog", { name: "Customize", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Done", exact: true }),
   ).toBeInViewport({ ratio: 1 });

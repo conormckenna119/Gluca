@@ -26,6 +26,27 @@ export function loadCabinet(ctx: Ctx, owner = ctx.session!.userId): Cabinet {
       )
     : emptyCabinet();
 }
+export function saveCabinet(ctx: Ctx, cabinet: Cabinet) {
+  if (!ctx.deps.tokenKey)
+    throw new HttpError(
+      503,
+      "unavailable",
+      "Protected medal storage unavailable.",
+    );
+  const owner = ctx.session!.userId;
+  ctx.deps.db
+    .prepare(
+      "INSERT INTO user_achievements(user_id,payload_enc) VALUES(?,?) ON CONFLICT(user_id) DO UPDATE SET payload_enc=excluded.payload_enc",
+    )
+    .run(
+      owner,
+      encrypt(
+        JSON.stringify(cabinet),
+        ctx.deps.tokenKey,
+        `achievements:v1:${owner}`,
+      ),
+    );
+}
 async function update(ctx: Ctx) {
   limit(ctx.deps, ctx.req, "achievement-write", 120);
   const b = (await ctx.readJson()) as {
@@ -49,6 +70,12 @@ async function update(ctx: Ctx) {
           400,
           "invalid_event",
           "Unsupported participation event.",
+        );
+      if (b.event.kind === "connection_confirmed")
+        throw new HttpError(
+          400,
+          "unsupported_event",
+          "Confirm community participation from Challenges.",
         );
       if (
         b.event.kind === "post_published" &&

@@ -12,6 +12,7 @@ export const EVENT_KINDS = [
   "awareness_confirmed",
   "milestone_confirmed",
   "anniversary_checked",
+  "connection_confirmed",
 ] as const;
 export type AchievementEvent = {
   id: string;
@@ -44,6 +45,7 @@ const ids: Partial<Record<AchievementEvent["kind"], string>> = {
   comment_added: "first_support",
   awareness_confirmed: "awareness_contribution",
   milestone_confirmed: "personal_milestone",
+  connection_confirmed: "community_connection",
 };
 /** The browser reports local actions; this is not a claim of third-party verification. */
 export function applyEvent(

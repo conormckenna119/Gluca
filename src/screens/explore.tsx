@@ -1,4 +1,5 @@
 import React from "react";
+import { router } from "expo-router";
 import {
   Pressable,
   Switch,
@@ -17,6 +18,7 @@ import {
 import { localToday } from "../domain/shield";
 import {
   Avatar,
+  Button,
   Card,
   EmptyState,
   Icon,
@@ -217,6 +219,18 @@ function ExploreBody() {
 
   return (
     <Page title="Explore" subtitle="Discover people and communities.">
+      {flags.communityChallenges ? (
+        <Card>
+          <T heading>Challenges</T>
+          <T small muted>
+            Optional community experiences. No glucose targets or streaks.
+          </T>
+          <Button
+            label="Explore Challenges"
+            onPress={() => router.push("/challenges")}
+          />
+        </Card>
+      ) : null}
       {suggestions.length ? (
         <Section
           title="Suggested for you"

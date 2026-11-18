@@ -1,4 +1,5 @@
 import { recordAchievementEvent } from "../achievements/events";
+import { challengeRequest } from "../services/community-challenges";
 import React, { useMemo, useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import Svg, { Line, Path, Rect, Text as SvgText } from "react-native-svg";
@@ -183,11 +184,21 @@ export function LogScreen() {
 
 function LogForm() {
   const c = useColors();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const {
+    id,
+    kind: initialKind,
+    challengeEnrollment,
+  } = useLocalSearchParams<{
+    id?: string;
+    kind?: string;
+    challengeEnrollment?: string;
+  }>();
   const { state, set } = useDemo();
   const existing = id ? state.events.find((e) => e.id === id) : undefined;
   const now = Date.now();
-  const [kind, setKind] = useState<EventKind>(existing?.kind ?? "meal");
+  const [kind, setKind] = useState<EventKind>(
+    existing?.kind ?? (initialKind === "activity" ? "activity" : "meal"),
+  );
   const [start, setStart] = useState(
     existing ? floorTo5(existing.start) : defaultStart(now),
   );
@@ -242,6 +253,20 @@ function LogForm() {
       set((s) => addEvent(s, { id: eventId, ...fields }));
       if (kind === "activity")
         recordAchievementEvent("activity_logged", eventId);
+      if (
+        kind === "activity" &&
+        challengeEnrollment &&
+        getFlags().communityChallenges
+      )
+        void challengeRequest({
+          action: "complete",
+          challengeId: "activity_of_choice",
+          enrollmentId: challengeEnrollment,
+          confirmed: true,
+          source: "activity_log",
+        }).catch(() => {
+          /* Enrollment stays joined on failure; explicit confirmation remains available. */
+        });
     }
     router.back();
   };

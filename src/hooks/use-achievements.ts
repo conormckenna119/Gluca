@@ -16,9 +16,12 @@ import {
   type AchievementEvent,
 } from "../achievements/events";
 import { CHALLENGES } from "../achievements/challenges";
+import { onChallengeChanged } from "../services/community-challenges";
+import { captureAchievementScope } from "../achievements/events";
 
 // Newly earned awards waiting for the unlock toast. Module-level so one host in the root layout can show them.
 let queue: string[] = [];
+const announced = new Set<string>();
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 const subscribe = (l: () => void) => {
@@ -27,8 +30,9 @@ const subscribe = (l: () => void) => {
 };
 const snapshot = () => queue;
 export const enqueueUnlocks = (ids: string[]) => {
-  const fresh = ids.filter((id) => !queue.includes(id));
+  const fresh = ids.filter((id) => !queue.includes(id) && !announced.has(id));
   if (!fresh.length) return;
+  fresh.forEach((id) => announced.add(id));
   queue = [...queue, ...fresh];
   emit();
 };
@@ -119,6 +123,34 @@ function transact(command: Command) {
 }
 
 export type PinOutcome = { ok: boolean; reason?: string };
+/** Existing medal repository/notification queue, with explicit IDs newly awarded by a challenge. */
+export function refreshChallengeAwards(scope: number, unlockedIds: string[]) {
+  const epoch = cabinetEpoch;
+  pending = pending.then(async () => {
+    if (
+      epoch !== cabinetEpoch ||
+      scope !== captureAchievementScope() ||
+      cabinetState.status !== "account"
+    )
+      return;
+    try {
+      const next = await cabinetRequest();
+      if (
+        !next ||
+        epoch !== cabinetEpoch ||
+        scope !== captureAchievementScope()
+      )
+        return;
+      publishCabinet(next, "account", "");
+      enqueueUnlocks(
+        unlockedIds.filter((id) => next.awards.some((a) => a.id === id)),
+      );
+    } catch {
+      /* Never invent an award or announce a failed write. */
+    }
+  });
+  return pending;
+}
 
 /**
  * Read and act on medals. Pass `{ evaluate: true }` from exactly one place (the root layout): it checks for newly
@@ -138,6 +170,7 @@ export function useAchievements(opts: { evaluate?: boolean } = {}) {
     const reset = () => {
       cabinetEpoch++;
       queue = [];
+      announced.clear();
       emit();
       publishCabinet(emptyCabinet(), "checking", "");
     };
@@ -174,12 +207,16 @@ export function useAchievements(opts: { evaluate?: boolean } = {}) {
     const stopEvents = onAchievementEvent((event) => {
       void transact({ event });
     });
+    const stopChallenges = onChallengeChanged((scope, ids) => {
+      void refreshChallengeAwards(scope, ids);
+    });
     return () => {
       alive = false;
       retryCabinet = () => {};
       cabinetEpoch++;
       stop();
       stopEvents();
+      stopChallenges();
     };
   }, [opts.evaluate, on, ready]);
   useEffect(() => {
@@ -207,7 +244,10 @@ export function useAchievements(opts: { evaluate?: boolean } = {}) {
     enabled: on,
     awards: on ? record.data.awards : [],
     defs: LIFE_RULES.filter(
-      (r) => !r.def.disabled && r.def.id !== "activity_accomplishment",
+      (r) =>
+        !r.def.disabled &&
+        isEnabled(r.def.flag) &&
+        r.def.id !== "activity_accomplishment",
     ).map((r) => r.def),
     status: record.status,
     error: record.error,

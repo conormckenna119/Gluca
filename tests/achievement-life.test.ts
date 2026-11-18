@@ -139,7 +139,7 @@ test("diagnosis anniversary uses the local calendar and never invents dates", ()
 
 test("every life def is private, flagged and not a health achievement", () => {
   for (const { def } of LIFE_RULES) {
-    assert.equal(def.flag, "achievements");
+    assert.ok(def.flag === "achievements" || def.flag === "communityChallenges");
     assert.equal(def.safetyReview, "not_required");
     assert.equal(def.needsHealthOptIn, false);
     assert.equal(def.defaultVisibility, "private");

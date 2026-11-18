@@ -108,6 +108,17 @@ export const ACTIVITY_ACCOMPLISHMENT = mk({
   requiredData: ["challenges"],
 });
 
+export const COMMUNITY_CONNECTION = mk({
+  id: "community_connection",
+  name: "Community Connection",
+  description:
+    "You confirmed joining a community and taking part in a thoughtful exchange.",
+  category: "community",
+  icon: "community",
+  requiredData: ["challenges"],
+  flag: "communityChallenges",
+});
+
 /** Exact anniversary day in the backend local calendar. Never infer unknown precision. */
 export function anniversaryHits(
   diagnosis:
@@ -129,6 +140,10 @@ export function anniversaryHits(
 }
 
 export const LIFE_RULES: Rule[] = [
+  {
+    def: COMMUNITY_CONNECTION,
+    evaluate: (c) => once(challengeDone(c, "helpful_experience")),
+  },
   {
     def: FIRST_POST,
     evaluate: (c) => once(c.state.posts.some((p) => p.author === "You")),

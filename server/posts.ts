@@ -4,6 +4,7 @@ import { type Ctx, type Route, HttpError, sendJson } from "./http";
 import { exportedPng } from "./post-image";
 import { limit } from "./limits";
 import { loadCabinet } from "./achievements";
+import { completeChallengeForPost } from "./challenges";
 import { applyEvent } from "../src/achievements/events";
 import { sanitizeProfile, sanitizePrivacy } from "../src/domain/profile";
 import { publicView } from "../src/domain/public-view";
@@ -181,6 +182,8 @@ async function create(ctx: Ctx) {
           );
       }
     }
+    if (!existing && b.visibility === "public")
+      completeChallengeForPost(ctx, row.id);
     ctx.deps.db.exec("COMMIT");
   } catch (e) {
     ctx.deps.db.exec("ROLLBACK");

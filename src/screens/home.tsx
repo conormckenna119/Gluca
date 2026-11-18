@@ -6,6 +6,7 @@ import { useDemo } from "../store";
 import { Page } from "../components/page";
 import { PostCard } from "../components/post-card";
 import { Guard } from "../components/guard";
+import { getFlags } from "../flags";
 
 const FILTERS = ["All", "Following", "Bookmarks"] as const;
 const EMPTY: Record<(typeof FILTERS)[number], { title: string; body: string }> =
@@ -53,6 +54,12 @@ function HomeFeed() {
       }
       subtitle="Your Gluca posts and a labelled fictional community. Private posts are visible only to their owner."
     >
+      {getFlags().communityChallenges ? (
+        <Button
+          label="Discover Challenges"
+          onPress={() => router.push("/challenges")}
+        />
+      ) : null}
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
         {FILTERS.map((f) => (
           <Chip

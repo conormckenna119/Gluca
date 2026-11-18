@@ -8,45 +8,150 @@ export type Challenge = {
   title: string;
   prompt: string;
   howToComplete: string;
+  description: string;
+  artwork: {
+    icon: import("../domain/achievements").MedalIcon;
+    category: "life" | "community";
+  };
+  eligibility: "all_accounts";
+  criterion:
+    "public_post" | "activity" | "awareness" | "connection" | "milestone";
+  medalId: string;
+  visibility: "private";
+  repeatable: "once";
+  flag: "communityChallenges";
+  startsAt: number | null;
+  endsAt: number | null;
+  disabled?: boolean;
+  ruleVersion: number;
 };
-
+const define = (
+  d: Omit<
+    Challenge,
+    | "eligibility"
+    | "visibility"
+    | "repeatable"
+    | "flag"
+    | "startsAt"
+    | "endsAt"
+    | "ruleVersion"
+    | "description"
+  >,
+): Challenge => ({
+  ...d,
+  description: d.prompt,
+  eligibility: "all_accounts",
+  visibility: "private",
+  repeatable: "once",
+  flag: "communityChallenges",
+  startsAt: null,
+  endsAt: null,
+  ruleVersion: 1,
+});
 export const CHALLENGES: Challenge[] = [
-  {
+  define({
     id: "share_moment",
-    title: "Share a moment",
-    prompt: "Share a moment from your day, if you choose.",
-    howToComplete:
-      "Mark it done once you have shared something you are happy to share, in your own words.",
-  },
-  {
-    id: "awareness_event",
-    title: "Take part in an awareness event",
-    prompt: "Join a diabetes awareness event, in person or online.",
-    howToComplete:
-      "Mark it done after you have taken part in any awareness event, big or small.",
-  },
-  {
-    id: "activity_of_choice",
-    title: "An activity you choose",
+    title: "Share a Moment",
     prompt:
-      "Do an activity you enjoy, at a pace that suits you and your care team's guidance.",
+      "Share a photo or story with the community. Glucose data is optional.",
     howToComplete:
-      "Mark it done after you have done something you chose. A walk, a stretch or a dance all count.",
-  },
-  {
-    id: "personal_milestone",
-    title: "Add a personal milestone",
-    prompt: "Add a date or moment that matters to you.",
-    howToComplete: "Mark it done after adding your milestone.",
-  },
-  {
+      "Join, then publish a new Public post to Gluca. Private posts and exports alone do not count.",
+    criterion: "public_post",
+    medalId: "first_post",
+    artwork: { icon: "post", category: "community" },
+  }),
+  define({
+    id: "activity_of_choice",
+    title: "Get Moving",
+    prompt:
+      "Choose an activity that suits you. No targets or time requirements.",
+    howToComplete:
+      "Join, then save an activity through Log or confirm an activity you completed. No health or activity details are needed.",
+    criterion: "activity",
+    medalId: "first_activity",
+    artwork: { icon: "activity", category: "life" },
+  }),
+  define({
+    id: "awareness_event",
+    title: "Spread Awareness",
+    prompt: "Take part in a diabetes awareness activity, in person or online.",
+    howToComplete:
+      "Confirm that you took part. This is self-reported, not independently verified.",
+    criterion: "awareness",
+    medalId: "awareness_contribution",
+    artwork: { icon: "awareness", category: "community" },
+  }),
+  define({
     id: "helpful_experience",
-    title: "Share something that helped",
-    prompt: "Share a helpful experience with the community.",
+    title: "Make a Connection",
+    prompt:
+      "Join an existing community and take part in a thoughtful exchange.",
     howToComplete:
-      "Mark it done after you have shared a tip or a story that might help someone else.",
-  },
+      "Confirm you joined an existing community outside Gluca and had a meaningful exchange. Gluca spaces are currently demos; demo joins and likes do not count. No group name or conversation is collected.",
+    criterion: "connection",
+    medalId: "community_connection",
+    artwork: { icon: "community", category: "community" },
+  }),
+  define({
+    id: "personal_milestone",
+    title: "Celebrate a Milestone",
+    prompt: "Mark a personal moment. You can keep it completely private.",
+    howToComplete:
+      "Confirm a meaningful event you chose to mark. No medical information, date or public post is required.",
+    criterion: "milestone",
+    medalId: "personal_milestone",
+    artwork: { icon: "milestone", category: "life" },
+  }),
 ];
+export type Participation = {
+  challengeId: string;
+  enrollmentId: string;
+  status: "joined" | "left" | "completed";
+  joinedAt: number;
+  leftAt?: number;
+  completedAt?: number;
+  visibility: "private";
+  ruleVersion: number;
+  source?: "verified_post" | "self_reported" | "self_reported_activity_log";
+  sourceId?: string;
+  communityId?: string;
+  awardId?: string;
+};
+export function challengeAvailable(c: Challenge, now: number) {
+  return (
+    !c.disabled &&
+    (c.startsAt === null || now >= c.startsAt) &&
+    (c.endsAt === null || now < c.endsAt)
+  );
+}
+export function enroll(
+  c: Challenge,
+  previous: Participation | undefined,
+  now: number,
+  id: string,
+): Participation {
+  if (!challengeAvailable(c, now))
+    throw new Error("This challenge is not currently available.");
+  if (previous?.status === "joined" || previous?.status === "completed")
+    return previous;
+  return {
+    challengeId: c.id,
+    enrollmentId: id,
+    status: "joined",
+    joinedAt: now,
+    visibility: "private",
+    ruleVersion: c.ruleVersion,
+  };
+}
+export function leaveParticipation(
+  p: Participation,
+  enrollmentId: string,
+  now: number,
+): Participation {
+  if (p.enrollmentId !== enrollmentId)
+    throw new Error("This enrollment changed. Reload before continuing.");
+  return p.status !== "joined" ? p : { ...p, status: "left", leftAt: now };
+}
 
 export const getChallenge = (id: string) => CHALLENGES.find((c) => c.id === id);
 

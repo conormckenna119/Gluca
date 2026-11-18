@@ -1,3 +1,7 @@
+# Stage 8B - private community challenges
+
+Existing achievements/challenges.ts defines all five catalog entries and pure enrollment transitions. New server/challenges.ts implements protected private enrollment/completion via additive migration 8. Existing server/posts.ts completes Share a Moment only for a new owned Public post; existing Log can send an enrollment-bound activity confirmation. services/community-challenges.ts and use-community-challenges.ts isolate account state; use-achievements.ts reuses the existing award repository and notification queue. New /challenges screen and original glyph illustration tile are linked from Home/Explore, with no sixth tab. Guide: COMMUNITY_CHALLENGES.md.
+
 # Stage 8A.5 - export-to-feed
 
 server/posts.ts and post-image.ts add protected PNG publication/image reads/deletion via migration 7 on the existing backend. services/feed-posts.ts and hooks/use-feed-posts.ts merge account posts into the existing Post feed without persisting them in AsyncStorage. Existing PublishCard configures the export; exportImage retains its exact PNG for retries. Existing shared post/identity/unlock/editor components are reused. See STORY_EDITOR.md, UI_REFINEMENT.md and FUTURE_UX_ENHANCEMENTS.md.

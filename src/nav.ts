@@ -59,14 +59,15 @@ export function primaryTabFor(pathname: string): TabName {
   )
     return "profile";
   if (p === "/create") return "create";
-  if (p.startsWith("/explore")) return "explore";
+  if (p.startsWith("/explore") || p === "/challenges") return "explore";
   if (["/glucose", "/import", "/log", "/dexcom-data"].includes(p))
     return "glucose";
   return "index";
 }
 
 /** Explore holds clubs and community members; it stays while either is on. */
-export const exploreHasContent = (f: FlagState) => f.communityFeed || f.clubs;
+export const exploreHasContent = (f: FlagState) =>
+  f.communityFeed || f.clubs || f.communityChallenges;
 
 export function tabVisible(tab: TabName, f: FlagState): boolean {
   if (tab === "index") return f.communityFeed;

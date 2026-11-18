@@ -1,3 +1,7 @@
+# Stage 8B decisions
+
+Extend the original challenge registry and preserve IDs/prototype compatibility; keep account participation separate and always private. Reuse existing medal definitions and encrypted award storage, adding only Community Connection. Do not scan old posts/counters into new enrollments. Use a fresh enrollment token after leaving; complete and award atomically. Current Gluca groups are demos, so meaningful real connection is explicitly self-reported for an existing community outside Gluca; no fake live membership or interaction verification. No new backend, dependencies, analytics, raw health storage or medical-outcome rules.
+
 # Stage 8A.5 decisions - 18 November 2026
 
 Reuse the existing PNG renderer, PublishCard/Post/feed types and Node session/encryption infrastructure. Store only explicitly approved PNG snapshots/captions/alt text, never raw history. Private/Public account reads enforce image and metadata visibility; no followers option without a relationship ACL. Encrypt persisted media and metadata; use request-key uniqueness and deletion tombstones. Keep retries/client images ephemeral. Native posting remains gated. Future premium motion/resizing stays documentation only. No new dependency or backend.
