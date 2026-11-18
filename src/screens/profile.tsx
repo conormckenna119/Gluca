@@ -1,8 +1,10 @@
+import { useAccount } from "../hooks/use-account";
+import { BRAND } from "../art/brand";
 import { OwnCommunities } from "../components/community-discovery";
 import { COMMUNITY_CATALOGUE } from "../domain/community-discovery";
 import { MemberActions } from "../components/social-interactions";
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, View, ScrollView, Share, Platform } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import type { PublicProfile } from "../domain/profile";
 import {
@@ -23,6 +25,8 @@ import {
   Avatar,
   Button,
   Card,
+  Chip,
+  Notice,
   EmptyState,
   Group,
   ListRow,
@@ -68,24 +72,49 @@ function useOwnPublicView() {
 
 function IdentityHeader() {
   const { view } = useOwnPublicView();
+  const account = useAccount();
+  const [message, M] = React.useState("");
+  const canShare = account.status === "signedIn" && !!view.username;
+  const share = async () => {
+    if (!canShare) return;
+    try {
+      const link =
+        Platform.OS === "web"
+          ? `${window.location.origin}/profile?username=${encodeURIComponent(view.username!)}`
+          : undefined;
+      if (link && typeof navigator.share !== "function") {
+        await navigator.clipboard.writeText(link);
+        M("Profile link copied. Viewing requires a Gluca account.");
+      } else {
+        await Share.share({
+          message: link ?? `${BRAND.name} profile · @${view.username}`,
+        });
+      }
+    } catch {
+      M(
+        "Sharing is unavailable. Open your saved public profile to copy its link.",
+      );
+    }
+  };
   return (
-    <View style={{ alignItems: "center", gap: space.md }}>
+    <View style={{ gap: space.lg }}>
       <UserIdentity expanded profile={view} />
-      {view.username ? (
-        <Button
-          label="View saved public profile"
-          onPress={() =>
-            router.push({
-              pathname: "/profile",
-              params: { username: view.username },
-            })
-          }
-        />
-      ) : null}
-      <T muted align="center">
-        Public preview. Your diagnosis date and birthday date are never part of
-        it.
-      </T>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
+        <View style={{ flex: 1, minWidth: 120 }}>
+          <Button
+            label="Edit profile"
+            onPress={() => router.push("/profile-edit")}
+          />
+        </View>
+        <View style={{ flex: 1, minWidth: 120 }}>
+          <Button
+            label="Share profile"
+            disabled={!canShare}
+            onPress={() => void share()}
+          />
+        </View>
+      </View>
+      {message ? <Notice>{message}</Notice> : null}
     </View>
   );
 }
@@ -169,100 +198,142 @@ function IdentityCards() {
         </Card>
       ) : null}
       <IdentitySheet target={target} onClose={() => setTarget(null)} />
-      <Group>
-        <ListRow
-          title="Edit profile"
-          icon="user"
-          onPress={() => router.push("/profile-edit")}
-        />
-      </Group>
     </View>
   );
 }
 
 function OwnProfile() {
-  const { state } = useDemo();
-  const flags = getFlags();
+  const { state } = useDemo(),
+    flags = getFlags();
+  const scroller = React.useRef<React.ComponentRef<typeof ScrollView>>(null);
+  const anchors = React.useRef({ Overview: 0, Posts: 0, More: 0 });
+  const [section, SECTION] = React.useState<"Overview" | "Posts" | "More">(
+    "Overview",
+  );
   const mine = state.posts.filter((p) =>
     p.remote ? p.owned === true : p.author === "You",
   );
   return (
-    <Page title="Profile">
+    <Page title="Profile" scrollRef={scroller}>
       {flags.identity ? (
         <IdentityHeader />
       ) : (
-        <View style={{ alignItems: "center", gap: space.md }}>
-          <Avatar name="You" size={88} />
+        <View style={{ gap: space.md }}>
+          <Avatar name="You" size={80} />
           <T heading>You</T>
-          <T muted align="center">
-            This profile exists only on this device.
-          </T>
+          <T muted>This profile exists only on this device.</T>
         </View>
       )}
-      {flags.achievements ? (
-        <View style={{ gap: space.md }}>
-          <PinnedMedals awards={state.awards} />
-          <ProfileMedalsLink />
-        </View>
-      ) : null}
-      {flags.accounts ? (
-        <>
-          <MemberActions />
-          <OwnCommunities />
-        </>
-      ) : null}
-      <View style={{ flexDirection: "row", gap: space.lg }}>
-        <Stat value={String(mine.length)} label="Posts" />
-        <Stat value={String(state.following.length)} label="Demo following" />
-        <Stat value={String(state.clubs.length)} label="Demo clubs" />
-      </View>
-      {flags.communityFeed ? (
-        <Section title="Your posts">
-          {mine.length ? (
-            mine.map((p) => <PostCard key={p.id} post={p} />)
-          ) : (
-            <EmptyState
-              icon="image"
-              title="No posts yet"
-              body="Make a graphic and share it when you choose. Nothing is posted automatically."
-              action={
-                <Button
-                  kind="primary"
-                  label="Create a graphic"
-                  onPress={() => router.push("/create")}
-                />
-              }
-            />
-          )}
-        </Section>
-      ) : null}
-      {flags.identity ? <IdentityCards /> : null}
-      {flags.identity && state.following.length ? (
-        <Section title="Following" note="Your existing local demo connections.">
-          {state.following.map((name) => (
-            <Card key={name}>
-              <AuthorIdentity name={name} />
-            </Card>
-          ))}
-        </Section>
-      ) : null}
-      <AccountEntry />
-      <Section title="More">
-        <Group>
-          <ListRow
-            title="Settings & privacy"
-            icon="settings"
-            onPress={() => router.push("/settings")}
+      {flags.accounts ? <MemberActions profileHeader /> : null}
+      <View
+        style={{ flexDirection: "row", gap: space.sm, flexWrap: "wrap" }}
+        accessibilityLabel="Profile sections"
+      >
+        {(["Overview", "Posts", "More"] as const).map((name) => (
+          <Chip
+            key={name}
+            label={name}
+            selected={section === name}
+            onPress={() => {
+              SECTION(name);
+              scroller.current?.scrollTo({
+                y: Math.max(0, anchors.current[name] - 16),
+                animated: false,
+              });
+            }}
           />
-          {linkVisible("import", flags) ? (
+        ))}
+      </View>
+      <View style={{ gap: space.lg }}>
+        {flags.achievements ? (
+          <>
+            <PinnedMedals awards={state.awards} />
+            <ProfileMedalsLink />
+          </>
+        ) : null}
+        {flags.accounts ? <OwnCommunities /> : null}
+      </View>
+      <View
+        onLayout={(e) => {
+          anchors.current.Posts = e.nativeEvent.layout.y;
+        }}
+      >
+        {flags.communityFeed ? (
+          <Section title="Your posts">
+            {mine.length ? (
+              mine.map((p) => <PostCard key={p.id} post={p} />)
+            ) : (
+              <EmptyState
+                icon="image"
+                title="No posts yet"
+                body="Make a graphic and share it when you choose. Nothing is posted automatically."
+                action={
+                  <Button
+                    kind="primary"
+                    label="Create a graphic"
+                    onPress={() => router.push("/create")}
+                  />
+                }
+              />
+            )}
+          </Section>
+        ) : null}
+      </View>
+      <View
+        style={{ gap: space.lg }}
+        onLayout={(e) => {
+          anchors.current.More = e.nativeEvent.layout.y;
+        }}
+      >
+        {state.profile.username ? (
+          <Button
+            kind="ghost"
+            label="View saved public profile"
+            onPress={() =>
+              router.push({
+                pathname: "/profile",
+                params: { username: state.profile.username },
+              })
+            }
+          />
+        ) : null}
+        {flags.accounts ? <MemberActions managementOnly /> : null}
+        {flags.identity ? <IdentityCards /> : null}
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.lg }}>
+          <Stat value={String(mine.length)} label="Posts" />
+          <Stat value={String(state.following.length)} label="Demo following" />
+          <Stat value={String(state.clubs.length)} label="Demo clubs" />
+        </View>
+        {flags.identity && state.following.length ? (
+          <Section
+            title="Following"
+            note="Your existing local demo connections."
+          >
+            {state.following.map((name) => (
+              <Card key={name}>
+                <AuthorIdentity name={name} />
+              </Card>
+            ))}
+          </Section>
+        ) : null}
+        <AccountEntry />
+        <Section title="More">
+          <Group>
             <ListRow
-              title="Import & export"
-              icon="upload"
-              onPress={() => router.push("/import")}
+              title="Settings & privacy"
+              icon="settings"
+              onPress={() => router.push("/settings")}
             />
-          ) : null}
-        </Group>
-      </Section>
+            {linkVisible("import", flags) ? (
+              <ListRow
+                title="Import & export"
+                icon="upload"
+                onPress={() => router.push("/import")}
+              />
+            ) : null}
+          </Group>
+        </Section>
+      </View>
     </Page>
   );
 }

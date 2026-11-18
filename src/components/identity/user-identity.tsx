@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Text, View } from "react-native";
-import { Avatar, T, space, useColors } from "../../ui";
+import { Avatar, T, space, typeface, useColors } from "../../ui";
 import { NameLine } from "./name-line";
 import type { PublicProfile } from "../../domain/profile";
 import { useDemo } from "../../store";
@@ -31,15 +31,15 @@ export function UserIdentity({
   photo?: boolean;
   metadata?: React.ReactNode;
 }) {
-  const size = expanded ? 76 : 36;
+  const size = expanded ? 80 : 36;
   const c = useColors();
   return (
     <View
       testID="user-identity"
       style={{
-        flexDirection: "row",
-        alignItems: metadata ? "flex-start" : "center",
-        gap: space.sm,
+        flexDirection: expanded ? "column" : "row",
+        alignItems: expanded || metadata ? "flex-start" : "center",
+        gap: expanded ? space.md : space.sm,
         minWidth: 0,
         maxWidth: "100%",
         width: expanded ? "100%" : undefined,
@@ -57,13 +57,29 @@ export function UserIdentity({
           <Avatar name={profile.name} size={size} />
         )
       ) : null}
-      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-        <NameLine name={profile.name} publicProfile={profile} />
+      <View
+        style={{
+          flex: expanded ? undefined : 1,
+          width: expanded ? "100%" : undefined,
+          minWidth: 0,
+          gap: 4,
+        }}
+      >
+        <NameLine
+          name={profile.name}
+          publicProfile={profile}
+          expanded={expanded}
+        />
         {profile.username ? (
           <Text
             numberOfLines={1}
             ellipsizeMode="tail"
-            style={{ color: c.muted, fontSize: 13.5, lineHeight: 19 }}
+            style={{
+              color: c.muted,
+              fontFamily: typeface,
+              fontSize: 13.5,
+              lineHeight: 19,
+            }}
           >
             @{profile.username}
           </Text>

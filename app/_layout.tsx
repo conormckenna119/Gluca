@@ -1,3 +1,4 @@
+import { BrandHeader } from "../src/components/brand-header";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import {
@@ -63,7 +64,7 @@ function Nav() {
       <ApplicationShell covered={covered} feedback={<UnlockToastHost />}>
         <Stack
           screenOptions={{
-            headerTitle: BRAND.name,
+            headerTitle: () => <BrandHeader />,
             headerStyle: { backgroundColor: c.bg },
             headerTintColor: c.text,
             headerShadowVisible: false,

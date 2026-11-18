@@ -138,3 +138,39 @@ See SOCIAL_INTERACTIONS.md for actual verification results and limits. Screensho
 
 
 Stage 9A verification (2026-11-18): 389 core tests, 26 full Edge tests, 3 final affected-screen checks and both dedicated mocked Dexcom journeys passed. Typecheck and targeted Prettier checks clean; no lint script exists. No live Dexcom re-verification or native-device claim. Full evidence and remaining limits: SOCIAL_INTERACTIONS.md. Stage 9A complete; stop before Stage 9B.
+
+
+## Stage 9C — Mobile restyle, 18 November 2026
+
+The application now uses shared neutral dark/light surfaces, the existing green brand accents, system-native interface typography, lighter cards/outlines and a reserved floating navigation pill. Profile hierarchy, feed toolbar/media presentation, numeric summaries, templates, sheets and supporting screens reuse this system. No Strava image was attached/found for this task; design followed the written principles without copying brand assets, orange, icons or an exact screen.
+
+### Findings and implementation
+
+| Finding | Change |
+| --- | --- |
+| Logo drop was clipped at the bottom | Rendered bounds were `(2,2,32,46)`, ending at y=48, but Mark's viewBox ended at y=36. Changed only the application viewport to `0 0 36 50`; retained the original paths/stroke/assets and added a shared 44px BrandHeader. |
+| Brand name repeated above every page title | Removed the repeated body eyebrow; retained one complete brand/header and all required data/source disclosures. |
+| Typography, metadata and borders competed for attention | Centralized application palette/type/space/radius/border/depth tokens; explicit system families, 32px titles/metrics, 21px section headings and 16px body/input text. Card borders are restrained, secondary actions outlined, and selected/primary actions use existing green. |
+| Profile avatar/name felt secondary; owner controls/counts cluttered the header | Added 80px avatar, larger name with fixed subtle shield, outlined Edit/Share, server-derived follower counts and Overview/Posts/More jump links. Reused existing pinned medals/cabinet/membership sections. Owner-only shield/date details, blocks and legacy counts remain reachable under More. Public profile allowlists and privacy defaults are unchanged. |
+| Feed controls and repeated copy pushed graphics down | Removed the long repeated header explanation, combined notification/refresh/challenge controls, kept existing filters, made member actions lighter and placed caption/title before the large correctly proportioned image. User captions/data are unchanged. |
+| Bottom navigation was visually flat/full-width | Added an inset neutral pill with one restrained depth token. It remains inside reserved footer space; existing route targeting, safe-area/visualViewport handling and intentional Close-equipped exceptions are retained. No duplicate navigation/tab. |
+| Motion preference was not shared by sheets | Sheets start static, subscribe to reduced-motion changes and omit slide animation when requested. Existing story gestures and achievement rules/art are unchanged. |
+
+New files: `src/design/tokens.ts`, `src/components/brand-header.tsx`, `src/hooks/use-reduced-motion.ts`, `tests/design-system.test.ts`, `tests/e2e/stage9c.spec.ts`, `docs/GLUCA_DESIGN_SYSTEM.md`, `docs/MOBILE_UX_GUIDELINES.md`. Shared UI exports preserve old imports. Header configuration, Page, ApplicationShell, identity components, PostCard/social controls, template strip, chart/tiles, Home and Profile were extended; compressed UI source was formatted with the existing formatter. No backend, schema, glucose analytics/provider, Dexcom service, award eligibility or story rendering-engine changes.
+
+### Verification
+
+- TypeScript: passed. `npm test`: **400/400 passed**, including the existing privacy/OAuth/sync/provider/analytics/social/challenge/achievement coverage and new theme-contrast/minimum-target checks.
+- **31 unique normal browser cases passed across the full run and targeted reruns.** The first full run had 28 passes and three old visual assertions expecting the former flush navigation edge/text colors. Those expectations were updated to the requested palette and reserved-footer geometry; all three reran successfully. Interaction, privacy and ownership assertions were retained.
+- The final Stage 9C visual/interaction rerun passed **2/2**: all requested widths/themes, actual path/header containment, no unintended page overflow, navbar target/inset checks, profile jumps, shield sheet and a 320×440 focused-input/save-action layout. A clipboard stub verified that Share profile sends only the public handle URL without replacing the owner's system clipboard. OS share-sheet behavior remains unverified.
+- Dedicated mocked Dexcom OAuth and mocked Dexcom-to-Create PNG journeys each passed **1/1**. Existing actual local PNG export, transparent/photo-backed composition, normalized drag/pinch/resize, explicit feed posting, retry/ownership and community workflows passed. No live Dexcom request was made for this UI stage.
+- Captured **40 before** and **149 after** PNGs under `docs/screenshots/stage9c/`, plus SVG-bound metrics. The after set includes ten routes at 320/375/393/430/768/1280px in both themes, full chart and insight views, shield/keyboard views, and copied synthetic editor/connection evidence from the regression journeys.
+- Representative screenshots actually reviewed: Home/feed; own Profile at mobile and desktop sizes; My Glucose/full chart/insight tiles; Create canvas, photo overlay and scale/opacity controls; Explore at mobile/tablet sizes; Trophy Cabinet; Challenges; onboarding; profile editing; shield detail; and the mocked connected Dexcom/settings panel. Capture automation rendered the complete matrix; the selected representative screenshots, not every PNG individually, were visually inspected.
+- The long frozen-clock fixture initially exhausted the existing achievement write-limit window during repeated reloads. The fixture clock now advances between viewport groups, and the cabinet must render its earned fixture medal with no update-error notice. **Production limits were not weakened.** Fresh final captures are clean.
+- Targeted Prettier and `git diff HEAD --check` passed. No lint script/configuration exists, so a lint pass is not claimed. Historical screenshots regenerated by regressions were restored; only Stage 9C evidence is retained as a new visual change.
+
+### Remaining limitations
+
+Physical iPhone/Android builds, Safari home-indicator/keyboard behavior, large dynamic type, VoiceOver/TalkBack and OS share sheets still need device review. Browser viewport/reduced-motion checks do not certify native behavior or full accessibility. Existing development/source labels and longer optional forms remain deliberately visible; this stage is not a production release or information-architecture migration. Native fonts may render differently from Edge/system fonts. Public production/moderation gates from earlier stages remain unchanged. Stop after Stage 9C.
+
+Design details: GLUCA_DESIGN_SYSTEM.md. Mobile conventions: MOBILE_UX_GUIDELINES.md.

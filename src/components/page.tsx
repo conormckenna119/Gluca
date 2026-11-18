@@ -1,8 +1,7 @@
 import React from "react";
 import { View, ScrollView } from "react-native";
-import { Eyebrow, Pill, T, row, space, useColors } from "../ui";
+import { Pill, T, row, space, layout, useColors } from "../ui";
 import { useDemo } from "../store";
-import { BRAND } from "../art/brand";
 import { getFlags } from "../flags";
 
 /** Screen frame: brand eyebrow, title, optional subtitle, the demo labels, then the content in one centred column. */
@@ -12,12 +11,14 @@ export function Page({
   children,
   glucoseLabel,
   accountCommunity = false,
+  scrollRef,
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
   glucoseLabel?: string;
   accountCommunity?: boolean;
+  scrollRef?: React.Ref<React.ComponentRef<typeof ScrollView>>;
 }) {
   const c = useColors();
   const { ready, storageError, state, privacyNotice } = useDemo();
@@ -26,19 +27,19 @@ export function Page({
   const community = flags.communityFeed || flags.clubs;
   return (
     <ScrollView
+      ref={scrollRef}
       style={{ flex: 1, backgroundColor: c.bg }}
       contentContainerStyle={{
-        padding: 20,
-        paddingBottom: 56,
+        padding: layout.pageInset,
+        paddingBottom: space.xl,
         gap: space.xl,
         width: "100%",
-        maxWidth: 720,
+        maxWidth: layout.contentWidth,
         alignSelf: "center",
       }}
       keyboardShouldPersistTaps="handled"
     >
       <View style={{ gap: space.sm }}>
-        <Eyebrow>{BRAND.name}</Eyebrow>
         <T large>{title}</T>
         {subtitle ? <T muted>{subtitle}</T> : null}
         <View style={row}>

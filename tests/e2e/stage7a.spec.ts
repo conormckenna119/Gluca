@@ -110,8 +110,16 @@ test("persistent shell survives direct links, transitions, scrolling, resized vi
       await expect(bar).toBeVisible();
       await expect(bar.getByRole("tab")).toHaveCount(5);
       const rect = await bar.boundingBox();
-      expect(rect!.y + rect!.height).toBeLessThanOrEqual(801);
-      expect(rect!.y + rect!.height).toBeGreaterThanOrEqual(799);
+      const footer = await page
+        .getByTestId("navigation-reserved-space")
+        .boundingBox();
+      // The reserved footer stays pinned; the floating pill has a deliberate safe bottom gap.
+      expect(footer!.y + footer!.height).toBeLessThanOrEqual(801);
+      expect(footer!.y + footer!.height).toBeGreaterThanOrEqual(799);
+      expect(rect!.y + rect!.height).toBeLessThanOrEqual(
+        footer!.y + footer!.height - 8,
+      );
+      expect(rect!.y).toBeGreaterThanOrEqual(footer!.y);
       await page.mouse.wheel(0, 3000);
       await expect(bar).toBeVisible();
       await bar.getByRole("tab", { name: "Create", exact: true }).click();

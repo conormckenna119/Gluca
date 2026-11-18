@@ -18,7 +18,17 @@ import {
 import type { PublicProfile } from "../domain/profile";
 import type { Post } from "../types";
 import { AuthorIdentity } from "./identity/user-identity";
-import { Button, Card, Input, Notice, Sheet, T, space } from "../ui";
+import {
+  Button,
+  IconButton,
+  Card,
+  Input,
+  Notice,
+  Sheet,
+  Stat,
+  T,
+  space,
+} from "../ui";
 
 export function useResource<T>(path: string, prefix = "/api/social") {
   const [data, D] = useState<T | null>(null),
@@ -94,10 +104,14 @@ export function MemberActions({
   id,
   profile,
   compact = false,
+  profileHeader = false,
+  managementOnly = false,
 }: {
   id?: string;
   profile?: PublicProfile;
   compact?: boolean;
+  profileHeader?: boolean;
+  managementOnly?: boolean;
 }) {
   const { data, error, busy, act } = useResource<Relationship>(
     `member${id ? `?id=${encodeURIComponent(id)}` : ""}`,
@@ -125,18 +139,29 @@ export function MemberActions({
       >
         {compact ? (
           <Button
+            kind="ghost"
             label={`View ${profile?.username ? `@${profile.username}` : (profile?.name ?? "member")}`}
             onPress={openProfile}
           />
         ) : null}
-        {data && !compact ? (
-          <T small muted>
-            {data.followers} followers · {data.followingCount} following
-          </T>
+        {data && !compact && !managementOnly ? (
+          profileHeader ? (
+            <View
+              style={{ flexDirection: "row", gap: space.xl, width: "100%" }}
+            >
+              <Stat value={String(data.followers)} label="Followers" />
+              <Stat value={String(data.followingCount)} label="Following" />
+            </View>
+          ) : (
+            <T small muted>
+              {data.followers} followers · {data.followingCount} following
+            </T>
+          )
         ) : null}
         {data && !data.owned ? (
           <Button
             disabled={busy}
+            kind={compact ? "ghost" : "secondary"}
             label={data.following ? "Unfollow" : "Follow"}
             onPress={() =>
               void act(async () => {
@@ -151,7 +176,7 @@ export function MemberActions({
         {data && !data.owned && !compact ? (
           <Button label="Block member" onPress={() => C(true)} />
         ) : null}
-        {data?.owned && !compact ? (
+        {data?.owned && !compact && !profileHeader ? (
           <Button
             label="Blocked members"
             onPress={() =>
@@ -355,7 +380,7 @@ export function AccountConversation({ post }: { post: Post }) {
     </View>
   );
 }
-export function SocialInbox() {
+export function SocialInbox({ extra }: { extra?: React.ReactNode }) {
   const { data, error, busy, act, reload } = useResource<{
     notifications: SocialNotification[];
   }>("notifications");
@@ -372,7 +397,12 @@ export function SocialInbox() {
             O(true);
           }}
         />
-        <Button label="Refresh feed" onPress={refreshSocial} />
+        <IconButton
+          icon="refresh"
+          label="Refresh feed"
+          onPress={refreshSocial}
+        />
+        {extra}
       </View>
       <Sheet visible={open} title="Notifications" onClose={() => O(false)}>
         <T small muted>

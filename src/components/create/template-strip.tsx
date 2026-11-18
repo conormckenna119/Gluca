@@ -1,7 +1,7 @@
 ﻿import React, { useMemo } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SvgXml } from "react-native-svg";
-import { Eyebrow, Icon, T, radius, space, useColors } from "../../ui";
+import { Eyebrow, Icon, T, borders, radius, space, useColors } from "../../ui";
 import {
   formats,
   storyArtwork,
@@ -63,6 +63,7 @@ export function TemplateStrip({
               accessibilityRole="button"
               accessibilityLabel={templateInfo[t].label}
               accessibilityState={{ selected, disabled }}
+              aria-pressed={selected}
               disabled={disabled}
               onPress={() => onSelect(t)}
               style={{
@@ -80,7 +81,7 @@ export function TemplateStrip({
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: radius.md,
-                  borderWidth: selected ? 3 : 1,
+                  borderWidth: selected ? 2 : borders.hairline,
                   borderColor: selected ? c.accent : c.border,
                   backgroundColor: c.surface,
                 }}

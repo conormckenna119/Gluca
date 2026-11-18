@@ -296,7 +296,7 @@ test("mobile and desktop challenge catalog is accessible in light and dark modes
         await page.goto(a.base + "/challenges");
         await expect(
           page.getByText("Challenges", { exact: true }).last(),
-        ).toHaveCSS("color", dark ? "rgb(244, 247, 245)" : "rgb(16, 20, 18)");
+        ).toHaveCSS("color", dark ? "rgb(245, 248, 246)" : "rgb(19, 33, 25)");
         await expect(button(page, "View Share a Moment")).toBeVisible();
         await page.screenshot({
           path: `docs/screenshots/stage8b/catalog-${width}-${dark ? "dark" : "light"}.png`,

@@ -1,7 +1,7 @@
+import { BrandHeader } from "../../src/components/brand-header";
 import React from "react";
 import { Tabs } from "expo-router";
-import { View } from "react-native";
-import { Mark, useColors } from "../../src/ui";
+import { useColors } from "../../src/ui";
 // The root application shell owns the one persistent navigation bar, including stack detail routes.
 export default function Layout() {
   const c = useColors();
@@ -9,11 +9,7 @@ export default function Layout() {
     <Tabs
       tabBar={() => null}
       screenOptions={{
-        headerTitle: () => (
-          <View>
-            <Mark size={20} />
-          </View>
-        ),
+        headerTitle: () => <BrandHeader />,
         headerTitleAlign: "left",
         headerStyle: { backgroundColor: c.bg },
         headerShadowVisible: false,

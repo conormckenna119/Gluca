@@ -17,6 +17,7 @@ import {
   Stat,
   T,
   radius,
+  borders,
   row,
   space,
   useColors,
@@ -85,7 +86,7 @@ function Tile({
         gap: space.sm,
         padding: space.lg,
         borderRadius: radius.lg,
-        borderWidth: 1,
+        borderWidth: borders.hairline,
         borderColor: c.border,
         backgroundColor: c.surface,
       }}

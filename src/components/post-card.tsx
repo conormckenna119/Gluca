@@ -22,6 +22,7 @@ import {
   Stat,
   T,
   space,
+  radius,
 } from "../ui";
 import { useDemo } from "../store";
 import { Post } from "../types";
@@ -140,9 +141,20 @@ export function PostCard({
           compact
         />
       ) : null}
+      {post.communityId ? (
+        <T small muted>
+          {post.communityName} · Community members
+        </T>
+      ) : null}
+      {post.moderated ? (
+        <Notice>Hidden from other community members.</Notice>
+      ) : null}
+      <T heading>{post.title}</T>
+      <T>{post.caption}</T>
       {post.media ? (
         <Pressable
           accessibilityRole="button"
+          style={{ borderRadius: radius.md, overflow: "hidden" }}
           accessibilityLabel="Open published graphic"
           onPress={() => {
             if (!inDetail) router.push(`/post/${post.id}`);
@@ -161,16 +173,6 @@ export function PostCard({
           />
         </Pressable>
       ) : null}
-      {post.communityId ? (
-        <T small muted>
-          {post.communityName} · Community members
-        </T>
-      ) : null}
-      {post.moderated ? (
-        <Notice>Hidden from other community members.</Notice>
-      ) : null}
-      <T heading>{post.title}</T>
-      <T>{post.caption}</T>
       {snap ? (
         <View style={{ gap: space.sm }}>
           <View

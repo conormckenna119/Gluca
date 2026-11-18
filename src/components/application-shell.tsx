@@ -1,3 +1,4 @@
+import { shadows } from "../design/tokens";
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, Platform, type ViewStyle } from "react-native";
 import {
@@ -9,7 +10,7 @@ import {
 } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
-import { Button, useColors } from "../ui";
+import { Button, useColors, typeface, layout, space } from "../ui";
 import { useDemo } from "../store";
 import { getFlags } from "../flags";
 import {
@@ -99,9 +100,9 @@ export function ApplicationShell({
     Platform.OS === "web"
       ? {
           paddingBottom:
-            `max(4px, env(safe-area-inset-bottom, 0px))` as unknown as number,
+            `max(12px, env(safe-area-inset-bottom, 0px))` as unknown as number,
         }
-      : { paddingBottom: Math.max(4, insets.bottom) };
+      : { paddingBottom: Math.max(12, insets.bottom) };
   return (
     <View style={[{ flex: 1, minHeight: 0, backgroundColor: c.bg }, webBounds]}>
       {!covered && !show ? (
@@ -123,83 +124,103 @@ export function ApplicationShell({
       {!covered ? feedback : null}
       {!covered && show ? (
         <View
-          role="tablist"
-          accessibilityLabel="Primary navigation"
+          testID="navigation-reserved-space"
           style={[
             {
-              flexDirection: "row",
               flexShrink: 0,
-              minHeight: 72 + insets.bottom,
-              paddingTop: 6,
-              borderTopWidth: 1,
-              borderTopColor: c.border,
-              backgroundColor: c.surface,
+              paddingHorizontal: layout.navInset,
+              paddingTop: layout.navGap,
+              backgroundColor: c.bg,
             },
             safeBottom,
           ]}
         >
-          {ITEMS.filter(([name]) => tabVisible(name, flags)).map(
-            ([name, label, href]) => (
-              <Pressable
-                key={name}
-                accessibilityRole="tab"
-                accessibilityLabel={label}
-                aria-selected={active === name}
-                accessibilityState={{ selected: active === name }}
-                onPress={() => navigate(name, href)}
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                  minHeight: 56,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 3,
-                }}
-              >
-                {name === "create" ? (
-                  <View
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      backgroundColor: c.accent,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginTop: -14,
-                      borderWidth: 3,
-                      borderColor: c.surface,
-                    }}
-                  >
-                    <Svg
-                      width={22}
-                      height={22}
-                      viewBox="0 0 24 24"
-                      stroke={c.accentInk}
-                      strokeWidth={2.6}
-                      strokeLinecap="round"
-                    >
-                      <Path d="M12 5v14M5 12h14" />
-                    </Svg>
-                  </View>
-                ) : (
-                  ICONS[name]({
-                    color: active === name ? c.accent : c.muted,
-                    filled: active === name,
-                  })
-                )}
-                <Text
-                  numberOfLines={1}
+          <View
+            role="tablist"
+            accessibilityLabel="Primary navigation"
+            style={[
+              {
+                flexDirection: "row",
+                flexShrink: 0,
+                minHeight: layout.navHeight,
+                width: "100%",
+                maxWidth: layout.navMaxWidth,
+                alignSelf: "center",
+                paddingVertical: space.xs,
+                paddingHorizontal: space.xs,
+                borderWidth: 0.5,
+                borderColor: c.border,
+                borderRadius: 32,
+                backgroundColor: c.surface,
+                ...shadows.navigation,
+              },
+            ]}
+          >
+            {ITEMS.filter(([name]) => tabVisible(name, flags)).map(
+              ([name, label, href]) => (
+                <Pressable
+                  key={name}
+                  accessibilityRole="tab"
+                  accessibilityLabel={label}
+                  aria-selected={active === name}
+                  accessibilityState={{ selected: active === name }}
+                  onPress={() => navigate(name, href)}
                   style={{
-                    fontSize: 11.5,
-                    fontWeight: "600",
-                    color: active === name ? c.accent : c.muted,
+                    flex: 1,
+                    minWidth: 0,
+                    minHeight: 56,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 3,
                   }}
                 >
-                  {label}
-                </Text>
-              </Pressable>
-            ),
-          )}
+                  {name === "create" ? (
+                    <View
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 16,
+                        backgroundColor: c.accent,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        marginTop: 0,
+                        borderWidth: 0,
+                        borderColor: c.surface,
+                      }}
+                    >
+                      <Svg
+                        width={22}
+                        height={22}
+                        viewBox="0 0 24 24"
+                        stroke={c.accentInk}
+                        strokeWidth={2.6}
+                        strokeLinecap="round"
+                      >
+                        <Path d="M12 5v14M5 12h14" />
+                      </Svg>
+                    </View>
+                  ) : (
+                    ICONS[name]({
+                      color: active === name ? c.accent : c.muted,
+                      filled: active === name,
+                    })
+                  )}
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      fontFamily: typeface,
+                      fontSize: 10.5,
+                      lineHeight: 16,
+                      fontWeight: "600",
+                      color: active === name ? c.accent : c.muted,
+                    }}
+                  >
+                    {label}
+                  </Text>
+                </Pressable>
+              ),
+            )}
+          </View>
         </View>
       ) : null}
     </View>

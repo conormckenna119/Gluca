@@ -1,0 +1,86 @@
+[
+  {
+    "name": "feed",
+    "width": 393,
+    "dark": false,
+    "overflow": false,
+    "logo": {
+      "box": {
+        "x": 2,
+        "y": 2,
+        "width": 32,
+        "height": 46
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 36,
+        "height": 36
+      },
+      "contained": false
+    }
+  },
+  {
+    "name": "feed",
+    "width": 1280,
+    "dark": false,
+    "overflow": false,
+    "logo": {
+      "box": {
+        "x": 2,
+        "y": 2,
+        "width": 32,
+        "height": 46
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 36,
+        "height": 36
+      },
+      "contained": false
+    }
+  },
+  {
+    "name": "feed",
+    "width": 393,
+    "dark": true,
+    "overflow": false,
+    "logo": {
+      "box": {
+        "x": 2,
+        "y": 2,
+        "width": 32,
+        "height": 46
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 36,
+        "height": 36
+      },
+      "contained": false
+    }
+  },
+  {
+    "name": "feed",
+    "width": 1280,
+    "dark": true,
+    "overflow": false,
+    "logo": {
+      "box": {
+        "x": 2,
+        "y": 2,
+        "width": 32,
+        "height": 46
+      },
+      "viewBox": {
+        "x": 0,
+        "y": 0,
+        "width": 36,
+        "height": 36
+      },
+      "contained": false
+    }
+  }
+]

@@ -8,7 +8,7 @@ import Svg, {
   Stop,
   Text as SvgText,
 } from "react-native-svg";
-import { useColors } from "../ui";
+import { useColors, typeface } from "../ui";
 import {
   formatGlucose,
   remapPath,
@@ -99,7 +99,7 @@ export function GlucoseChart({
             x={plot.x - 6}
             y={yOf(t.mgdl) + 4}
             fontSize={11}
-            fontFamily="system-ui, sans-serif"
+            fontFamily={typeface}
             fill={c.muted}
             textAnchor="end"
           >
@@ -138,7 +138,7 @@ export function GlucoseChart({
         x={plot.x + plot.w - 4}
         y={bandTop - 4}
         fontSize={11}
-        fontFamily="system-ui, sans-serif"
+        fontFamily={typeface}
         fontWeight="700"
         fill={c.text}
         textAnchor="end"
@@ -149,7 +149,7 @@ export function GlucoseChart({
         x={plot.x + plot.w - 4}
         y={bandBottom + 13}
         fontSize={11}
-        fontFamily="system-ui, sans-serif"
+        fontFamily={typeface}
         fontWeight="700"
         fill={c.text}
         textAnchor="end"
@@ -191,7 +191,7 @@ export function GlucoseChart({
               x={x}
               y={HEIGHT - 6}
               fontSize={11}
-              fontFamily="system-ui, sans-serif"
+              fontFamily={typeface}
               fill={c.muted}
               textAnchor={anchor}
             >

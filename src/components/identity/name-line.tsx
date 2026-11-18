@@ -5,7 +5,7 @@ import { shieldLabel } from "../../domain/shield";
 import { EMBLEM_LABEL, EmblemBadge } from "./emblem";
 import { IdentitySheet, type IdentityTarget } from "./identity-sheet";
 import { Shield } from "./shield";
-import { space, useColors } from "../../ui";
+import { space, typeface, useColors } from "../../ui";
 
 /**
  * A name followed by whatever shield and emblem the person chose to share. Each is a 44 px target that opens
@@ -16,11 +16,13 @@ export function NameLine({
   publicProfile,
   diagnosis,
   bold = true,
+  expanded = false,
 }: {
   name: string;
   publicProfile?: Pick<PublicProfile, "shield" | "emblem" | "name">;
   diagnosis?: PartialDate;
   bold?: boolean;
+  expanded?: boolean;
 }) {
   const c = useColors();
   const [target, setTarget] = useState<IdentityTarget | null>(null);
@@ -28,11 +30,14 @@ export function NameLine({
   const emblem = publicProfile?.emblem;
   const label = (
     <Text
-      numberOfLines={1}
+      numberOfLines={expanded ? 2 : 1}
       ellipsizeMode="tail"
       style={{
         color: c.text,
-        fontSize: 16,
+        fontFamily: typeface,
+        fontSize: expanded ? 26 : 16,
+        lineHeight: expanded ? 32 : 22,
+        letterSpacing: expanded ? -0.6 : 0,
         fontWeight: bold ? "700" : "400",
         flexShrink: 1,
         minWidth: 0,

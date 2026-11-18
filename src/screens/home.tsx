@@ -54,10 +54,22 @@ function HomeFeed() {
           ? "Sources labelled on each graphic"
           : undefined
       }
-      subtitle="Your Gluca posts and a labelled fictional community. Private posts are visible only to their owner."
     >
-      {getFlags().accounts ? <SocialInbox /> : null}
-      {getFlags().communityChallenges ? (
+      {getFlags().accounts ? (
+        <SocialInbox
+          extra={
+            getFlags().communityChallenges ? (
+              <Button
+                kind="ghost"
+                label="Challenges"
+                accessibilityLabel="Discover Challenges"
+                onPress={() => router.push("/challenges")}
+              />
+            ) : null
+          }
+        />
+      ) : null}
+      {getFlags().communityChallenges && !getFlags().accounts ? (
         <Button
           label="Discover Challenges"
           onPress={() => router.push("/challenges")}

@@ -162,7 +162,7 @@ test("fictional account cabinet: confirmation, export award, pin order, privacy,
         ).toBeVisible();
         await expect(
           page.getByText("Trophy Cabinet", { exact: true }),
-        ).toHaveCSS("color", dark ? "rgb(244, 247, 245)" : "rgb(16, 20, 18)");
+        ).toHaveCSS("color", dark ? "rgb(245, 248, 246)" : "rgb(19, 33, 25)");
         await expect(
           page.getByRole("button", { name: /First Story medal, earned/ }),
         ).toBeVisible();
