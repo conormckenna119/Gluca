@@ -1,3 +1,7 @@
+# Stage 8A.5 - export-to-feed
+
+server/posts.ts and post-image.ts add protected PNG publication/image reads/deletion via migration 7 on the existing backend. services/feed-posts.ts and hooks/use-feed-posts.ts merge account posts into the existing Post feed without persisting them in AsyncStorage. Existing PublishCard configures the export; exportImage retains its exact PNG for retries. Existing shared post/identity/unlock/editor components are reused. See STORY_EDITOR.md, UI_REFINEMENT.md and FUTURE_UX_ENHANCEMENTS.md.
+
 # Stage 8A - explicit account medals
 
 Existing registry/Medal/sheets/toasts/Create reused. New src/achievements/events.ts owns event eligibility and pin/order/privacy. server/achievements.ts adds authenticated encrypted owner persistence via migration 6. Existing Create/publish/comment/Boost/Log success handlers emit minimal receipts. Public profile allowlist requires collection plus individual visibility. Tests: achievement-events, server-achievements, e2e/stage8a. Guides: ACHIEVEMENT_SYSTEM.md, ACHIEVEMENT_SAFETY.md, TROPHY_CABINET.md.

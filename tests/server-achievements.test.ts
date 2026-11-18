@@ -40,7 +40,11 @@ test("encrypted account repository: auth, CSRF, idempotence, concurrent pin cons
         .status,
       400,
     );
-    for (const kind of ["post_published", "support_given", "activity_logged"])
+    for (const kind of [
+      "awareness_confirmed",
+      "support_given",
+      "activity_logged",
+    ])
       await post({ event: { id: `fictional-${kind}`, kind } });
     const before = (await a.call("GET", "/api/achievements", { cookie })).json;
     const pins = await Promise.all(

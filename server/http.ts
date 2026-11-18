@@ -22,7 +22,7 @@ export interface Ctx {
   res: ServerResponse;
   url: URL;
   session: SessionInfo | null;
-  readJson: () => Promise<unknown>;
+  readJson: (maxBytes?: number) => Promise<unknown>;
 }
 
 export class HttpError extends Error {
@@ -72,12 +72,15 @@ export function redirect(
   res.end();
 }
 
-async function readBody(req: IncomingMessage): Promise<string> {
+async function readBody(
+  req: IncomingMessage,
+  maxBytes = MAX_BODY_BYTES,
+): Promise<string> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     size += (chunk as Buffer).length;
-    if (size > MAX_BODY_BYTES)
+    if (size > maxBytes)
       throw new HttpError(413, "body_too_large", "Request body is too large.");
     chunks.push(chunk as Buffer);
   }
@@ -169,7 +172,7 @@ export function createHandler(deps: AppDeps, routes: Route[]) {
         res,
         url,
         session,
-        readJson: async () => parseJson(await readBody(req)),
+        readJson: async (maxBytes) => parseJson(await readBody(req, maxBytes)),
       });
     } catch (e) {
       if (res.headersSent) return;

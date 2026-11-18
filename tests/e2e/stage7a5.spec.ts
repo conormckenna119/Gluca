@@ -99,7 +99,7 @@ test("drag, corner resize, sliders, keyboard, reset and scene persistence", asyn
   ] as const) {
     await button(page, format).click();
     const download = page.waitForEvent("download");
-    await button(page, "Export PNG / Share").click();
+    await button(page, "Export Graphic").click();
     const bytes = await readFile((await (await download).path())!);
     await writeFile(
       `docs/screenshots/stage7a5/photo-${format.toLowerCase()}.png`,
@@ -111,7 +111,7 @@ test("drag, corner resize, sliders, keyboard, reset and scene persistence", asyn
   }
   await button(page, "Remove photo").click();
   const download = page.waitForEvent("download");
-  await button(page, "Export PNG / Share").click();
+  await button(page, "Export Graphic").click();
   const transparent = await readFile((await (await download).path())!);
   await writeFile(
     "docs/screenshots/stage7a5/transparent-square.png",

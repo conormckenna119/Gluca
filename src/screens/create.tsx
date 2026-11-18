@@ -1,13 +1,20 @@
 import {
+  feedRequest,
+  feedPublished,
+  type PublishInput,
+} from "../services/feed-posts";
+import { onSessionEvent } from "../services/session-events";
+import { useAccount } from "../hooks/use-account";
+import {
   recordAchievementEvent,
   captureAchievementScope,
 } from "../achievements/events";
 import React, { useRef, useState } from "react";
 import { BRAND } from "../art/brand";
 import { View, Platform, useWindowDimensions } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { captureRef } from "react-native-view-shot";
-import { Button, Card, Input, T, row, space } from "../ui";
+import { Button, Card, Input, T, Sheet, row, space } from "../ui";
 import { useDemo } from "../store";
 import {
   defaultOptions,
@@ -76,6 +83,38 @@ export function Create() {
   const [result, setResult] = useState<ExportResult>({ kind: "idle" });
   const [picked, setPicked] = useState<number | null>(null);
   const [busy, B] = useState(false);
+  const { status: accountStatus } = useAccount();
+  const [alsoPost, alsoPostSet] = useState(false),
+    [postCaption, postCaptionSet] = useState(""),
+    [audience, audienceSet] = useState<"private" | "public">("private"),
+    [confirmPost, confirmPostSet] = useState(false),
+    [description, descriptionSet] = useState("");
+  const [postedId, postedIdSet] = useState<string | null>(null),
+    [retryAvailable, retryAvailableSet] = useState(false);
+  const pendingPost = useRef<{ body: PublishInput; scope: number } | null>(
+      null,
+    ),
+    exportLock = useRef(false),
+    operation = useRef(0);
+  React.useEffect(
+    () =>
+      onSessionEvent((_e, _remote, reason) => {
+        if (reason !== "account") return;
+        operation.current++;
+        pendingPost.current = null;
+        exportLock.current = false;
+        B(false);
+        alsoPostSet(false);
+        postCaptionSet("");
+        descriptionSet("");
+        confirmPostSet(false);
+        postedIdSet(null);
+        retryAvailableSet(false);
+        setResult({ kind: "idle" });
+      }),
+    [],
+  );
+  const postAvailable = Platform.OS === "web" && accountStatus === "signedIn";
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [overlay, setOverlay] = useState({ ...DEFAULT_OVERLAY });
   const [positioning, setPositioning] = useState(false);
@@ -184,11 +223,66 @@ export function Create() {
 
   const patch = (p: Partial<StoryOptions>) => O((prev) => ({ ...prev, ...p }));
 
-  const doExport = async (save = false) => {
-    const awardScope = captureAchievementScope();
-    if (isDexcom && (feed.busy || !data.length || feed.day !== feed.loadedDay))
-      return;
+  const publishPending = async () => {
+    const pending = pendingPost.current;
+    if (!pending || pending.scope !== captureAchievementScope())
+      throw new Error("Account changed. This image was not posted.");
+    const posts = await feedRequest(pending.body);
+    if (pending.scope !== captureAchievementScope()) return;
+    const post = posts[0];
+    feedPublished(post);
+    postedIdSet(post.id);
+    pendingPost.current = null;
+    retryAvailableSet(false);
+    if (post.visibility === "public")
+      recordAchievementEvent("post_published", post.id, pending.scope);
+    setResult({
+      kind: "success",
+      text: `Graphic exported and posted to Gluca (${post.visibility}).`,
+    });
+  };
+  const retryPublishing = async () => {
+    if (exportLock.current) return;
+    exportLock.current = true;
+    const op = ++operation.current;
     B(true);
+    setResult({ kind: "idle" });
+    try {
+      await publishPending();
+    } catch (e) {
+      if (op !== operation.current) return;
+      setResult({
+        kind: "error",
+        text: `The graphic was exported. ${(e as Error).message}`,
+      });
+    } finally {
+      if (op === operation.current) {
+        exportLock.current = false;
+        B(false);
+      }
+    }
+  };
+  const doExport = async (save = false, publish = false) => {
+    if (exportLock.current) return;
+    if (publish && !postAvailable) {
+      setResult({
+        kind: "error",
+        text: "Sign in before posting. You can still export normally.",
+      });
+      return;
+    }
+    exportLock.current = true;
+    const op = ++operation.current;
+    const awardScope = captureAchievementScope();
+    if (
+      isDexcom &&
+      (feed.busy || !data.length || feed.day !== feed.loadedDay)
+    ) {
+      exportLock.current = false;
+      return;
+    }
+    B(true);
+    postedIdSet(null);
     setResult({ kind: "idle" });
     const evt = {
       template: o.template,
@@ -201,7 +295,7 @@ export function Create() {
         embedFont: Platform.OS === "web",
         events,
       });
-      await exportImage(
+      const artifact = await exportImage(
         o.transparent ? transformOverlaySvg(svg, w, h, overlay) : svg,
         o.format,
         () =>
@@ -215,7 +309,11 @@ export function Create() {
         save,
         `gluca-${slug(o.template)}-${o.transparent ? "transparent-" : ""}${o.format.toLowerCase()}.png`,
         composition.photoUri ?? undefined,
+        publish,
+        () => awardScope === captureAchievementScope(),
       );
+      if (op !== operation.current || awardScope !== captureAchievementScope())
+        return;
       if (Platform.OS === "web" || save)
         recordAchievementEvent("story_exported", undefined, awardScope);
       if (!isDexcom) track("export_succeeded", evt);
@@ -225,6 +323,32 @@ export function Create() {
           counters: { ...s.counters, exports: s.counters.exports + 1 },
         }));
       if (Platform.OS !== "web" && !save) track("share_sheet_opened", evt);
+      if (publish) {
+        if (!artifact.dataUri)
+          throw new Error("Posting is currently available on the web app.");
+        pendingPost.current = {
+          scope: awardScope,
+          body: {
+            requestId: globalThis.crypto.randomUUID(),
+            image: artifact.dataUri,
+            title: templateInfo[o.template].label,
+            caption: postCaption.trim(),
+            alt: (description.trim() || contents.join(". ")).slice(0, 2000),
+            visibility: audience,
+          },
+        };
+        retryAvailableSet(true);
+        try {
+          await publishPending();
+        } catch (e) {
+          if (op === operation.current)
+            setResult({
+              kind: "error",
+              text: `Graphic exported. Posting was not confirmed. ${(e as Error).message} Retry uses the same image and cannot create a duplicate.`,
+            });
+        }
+        return;
+      }
       setResult({
         kind: "success",
         text:
@@ -235,6 +359,7 @@ export function Create() {
               : `The share sheet was opened. ${BRAND.name} can’t see what you choose, and never posts for you.`,
       });
     } catch (e) {
+      if (op !== operation.current) return;
       if (!isDexcom)
         track("export_failed", { ...evt, reason: exportFailReason(e) });
       setResult({
@@ -242,7 +367,10 @@ export function Create() {
         text: e instanceof Error ? e.message : "Export failed.",
       });
     } finally {
-      B(false);
+      if (op === operation.current) {
+        exportLock.current = false;
+        B(false);
+      }
     }
   };
 
@@ -358,7 +486,10 @@ export function Create() {
             svg={previewSvg}
             width={pw}
             height={ph}
-            label={`Preview of your graphic. ${contents.join(". ")}`}
+            label={
+              description.trim() ||
+              `Preview of your graphic. ${contents.join(". ")}`
+            }
             photoUri={composition.photoUri}
             editing={
               o.transparent
@@ -440,16 +571,31 @@ export function Create() {
         />
       ) : null}
 
+      {getFlags().communityFeed ? (
+        <PublishCard
+          enabled={alsoPost}
+          onEnabled={alsoPostSet}
+          caption={postCaption}
+          onCaption={postCaptionSet}
+          visibility={audience}
+          onVisibility={audienceSet}
+          available={postAvailable}
+        />
+      ) : null}
       <ExportPanel
         busy={busy}
+        posting={alsoPost}
+        description={description}
+        onDescription={descriptionSet}
         disabled={
+          (alsoPost && retryAvailable) ||
           (templateInfo[o.template].needsData && noData) ||
           (isDexcom &&
             (feed.busy || !data.length || feed.day !== feed.loadedDay))
         }
         result={result}
         contents={isDexcom && noData ? [] : contents}
-        onShare={() => void doExport()}
+        onShare={() => (alsoPost ? confirmPostSet(true) : void doExport())}
         onSave={Platform.OS !== "web" ? () => void doExport(true) : undefined}
       />
 
@@ -459,9 +605,78 @@ export function Create() {
         rangeText={`${rangeToText(state.range.low, state.unit)}–${rangeToText(state.range.high, state.unit)} ${state.unit}`}
       />
 
-      {getFlags().communityFeed && !isDexcom ? (
-        <PublishCard options={o} rows={rows} start={start} end={end} />
+      {retryAvailable ? (
+        <>
+          <Button
+            label={busy ? "Publishing…" : "Retry publishing"}
+            disabled={busy}
+            onPress={() => void retryPublishing()}
+          />
+          <T small muted>
+            Check your feed before discarding a retry: the post may already
+            exist. Retry sends the original image, caption and audience. If the
+            response was lost, Gluca returns the existing post.
+          </T>
+          <Button
+            label="Discard publishing retry"
+            disabled={busy}
+            onPress={() => {
+              pendingPost.current = null;
+              retryAvailableSet(false);
+              setResult({ kind: "idle" });
+            }}
+          />
+        </>
       ) : null}
+      {postedId ? (
+        <Button
+          label="View published post"
+          onPress={() => router.push(`/post/${postedId}`)}
+        />
+      ) : null}
+      <Sheet
+        visible={confirmPost}
+        onClose={() => confirmPostSet(false)}
+        title="Confirm Gluca post"
+        footer={
+          <>
+            <Button
+              kind="primary"
+              label="Confirm Export & Post"
+              disabled={busy}
+              onPress={() => {
+                confirmPostSet(false);
+                void doExport(false, true);
+              }}
+            />
+            <Button label="Cancel" onPress={() => confirmPostSet(false)} />
+          </>
+        }
+      >
+        <ArtworkPreview
+          svg={previewSvg}
+          width={Math.min(pw, 240)}
+          height={(Math.min(pw, 240) * h) / w}
+          label={description.trim() || contents.join(". ")}
+          photoUri={composition.photoUri}
+        />
+        <T bold>
+          {audience === "private"
+            ? "Private · Only you"
+            : "Public · Signed-in Gluca users"}
+        </T>
+        <T>{postCaption || "No caption"}</T>
+        {description.trim() ? (
+          <T small muted>
+            Image description: {description.trim()}
+          </T>
+        ) : null}
+        <T small muted>
+          The image and its description will be stored on Gluca. No raw readings
+          or hidden profile fields are attached. Public images can be saved by
+          other users.
+        </T>
+      </Sheet>
     </Page>
   );
 }

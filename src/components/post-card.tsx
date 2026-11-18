@@ -1,9 +1,11 @@
+import { deleteFeedPost } from "../services/feed-posts";
 import React, { useState } from "react";
 import { BoostButton } from "./boost-button";
 import { BRAND } from "../art/brand";
-import { View, Share } from "react-native";
+import { View, Share, Image, Pressable } from "react-native";
 import { router } from "expo-router";
 import {
+  palette,
   Avatar,
   Button,
   Card,
@@ -46,7 +48,7 @@ export function PostCard({
   const [editing, edit] = useState(false);
   const [caption, setCaption] = useState(post.caption);
   const [message, msg] = useState("");
-  const mine = post.author === "You";
+  const mine = post.remote ? post.owned === true : post.author === "You";
   const following = state.following.includes(post.author);
   const snap = post.snapshot;
   const avg = snap
@@ -67,6 +69,7 @@ export function PostCard({
             <View style={{ flexDirection: "row", minWidth: 0 }}>
               <AuthorIdentity
                 name={post.author}
+                profile={post.remote ? post.authorProfile : undefined}
                 metadata={
                   <View
                     style={{
@@ -79,7 +82,7 @@ export function PostCard({
                     {mine ? (
                       <Pill tone="accent">You</Pill>
                     ) : (
-                      <Pill>Fictional</Pill>
+                      <Pill>{post.remote ? "Gluca" : "Fictional"}</Pill>
                     )}
                     <T small muted>
                       {post.createdAt
@@ -103,7 +106,11 @@ export function PostCard({
                 }}
               >
                 <T bold>{post.author}</T>
-                {mine ? <Pill tone="accent">You</Pill> : <Pill>Fictional</Pill>}
+                {mine ? (
+                  <Pill tone="accent">You</Pill>
+                ) : (
+                  <Pill>{post.remote ? "Gluca" : "Fictional"}</Pill>
+                )}
               </View>
               <T small muted>
                 {post.createdAt ? relativeTime(post.createdAt, Date.now()) : ""}
@@ -119,6 +126,27 @@ export function PostCard({
           onPress={() => setMenu(true)}
         />
       </View>
+      {post.media ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open published graphic"
+          onPress={() => {
+            if (!inDetail) router.push(`/post/${post.id}`);
+          }}
+        >
+          <Image
+            testID="published-graphic"
+            source={{ uri: post.media.uri }}
+            accessibilityLabel={post.media.alt}
+            resizeMode="contain"
+            style={{
+              width: "100%",
+              aspectRatio: post.media.width / post.media.height,
+              backgroundColor: palette.dark.raised,
+            }}
+          />
+        </Pressable>
+      ) : null}
       <T heading>{post.title}</T>
       <T>{post.caption}</T>
       {snap ? (
@@ -144,21 +172,27 @@ export function PostCard({
           marginLeft: -space.sm,
         }}
       >
-        <BoostButton post={post} />
+        {!post.remote ? <BoostButton post={post} /> : null}
         {inDetail ? null : (
           <IconButton
             icon="comment"
             count={post.comments.length}
-            label={`Comments, ${post.comments.length}`}
+            label={
+              post.remote ? "View post" : `Comments, ${post.comments.length}`
+            }
             onPress={() => router.push(`/post/${post.id}`)}
           />
         )}
-        <IconButton
-          icon="bookmark"
-          selected={post.saved}
-          label={post.saved ? "Remove from saved" : "Save post"}
-          onPress={() => update((p) => ({ ...p, saved: !p.saved }))}
-        />
+        {!post.remote ? (
+          <>
+            <IconButton
+              icon="bookmark"
+              selected={post.saved}
+              label={post.saved ? "Remove from saved" : "Save post"}
+              onPress={() => update((p) => ({ ...p, saved: !p.saved }))}
+            />
+          </>
+        ) : null}
       </View>
       {editing ? (
         <View style={{ gap: space.md }}>
@@ -197,11 +231,11 @@ export function PostCard({
                 return;
               }
               Share.share({
-                message: `${post.title}\n${post.caption}\n${BRAND.name} fictional demo post`,
+                message: `${post.title}\n${post.caption}\n${BRAND.name}${post.remote ? "" : " fictional demo post"}`,
               }).catch(() => msg("Sharing is unavailable."));
             }}
           />
-          {mine ? (
+          {post.remote ? null : mine ? (
             <ListRow
               icon="file"
               title="Edit caption"
@@ -249,7 +283,7 @@ export function PostCard({
               }}
             />
           )}
-          {mine ? null : (
+          {mine || post.remote ? null : (
             <ListRow
               icon="close"
               title={`Block ${post.author}`}
@@ -265,11 +299,23 @@ export function PostCard({
       <ConfirmSheet
         visible={confirmDelete}
         title="Delete this post?"
-        body="It will be removed from the demo feed on this device. This cannot be undone."
+        body={
+          post.remote
+            ? "The image and caption will be deleted from Gluca. Copies already saved by others cannot be recalled."
+            : "It will be removed from the demo feed on this device. This cannot be undone."
+        }
         confirmLabel="Delete post"
         onCancel={() => setConfirmDelete(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
           setConfirmDelete(false);
+          if (post.remote) {
+            try {
+              await deleteFeedPost(post.id);
+            } catch (e) {
+              msg((e as Error).message);
+              return;
+            }
+          }
           set((s) => ({
             ...s,
             posts: s.posts.filter((p) => p.id !== post.id),

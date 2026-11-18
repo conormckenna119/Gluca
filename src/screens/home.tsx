@@ -12,7 +12,7 @@ const EMPTY: Record<(typeof FILTERS)[number], { title: string; body: string }> =
   {
     All: {
       title: "No posts yet",
-      body: "Make a graphic and share it to the local demo feed.",
+      body: "Create a graphic and choose whether to post it to Gluca.",
     },
     Following: {
       title: "Nobody followed yet",
@@ -46,7 +46,12 @@ function HomeFeed() {
   return (
     <Page
       title="Home"
-      subtitle="A local demo feed. Members are fictional and nothing leaves this device."
+      glucoseLabel={
+        state.posts.some((p) => p.remote)
+          ? "Sources labelled on each graphic"
+          : undefined
+      }
+      subtitle="Your Gluca posts and a labelled fictional community. Private posts are visible only to their owner."
     >
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.sm }}>
         {FILTERS.map((f) => (

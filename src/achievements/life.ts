@@ -33,8 +33,8 @@ const challengeDone = (c: RuleContext, id: string) =>
 export const FIRST_POST = mk({
   id: "first_post",
   name: "First Post",
-  description:
-    "You published your first non-private post to the local demo feed.",
+  ruleVersion: 3,
+  description: "You published your first public post to Gluca.",
   category: "community",
   icon: "post",
   requiredData: ["posts"],

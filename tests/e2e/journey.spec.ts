@@ -24,7 +24,7 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   // Export the default graphic straight from Create.
   const firstDownload = page.waitForEvent("download");
   await page
-    .getByRole("button", { name: "Export PNG / Share", exact: true })
+    .getByRole("button", { name: "Export Graphic", exact: true })
     .click();
   expect((await firstDownload).suggestedFilename()).toBe(
     "gluca-daily-recap-story.png",
@@ -72,7 +72,7 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   await expect(page.getByText(/transparent PNG/).first()).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page
-    .getByRole("button", { name: "Export PNG / Share", exact: true })
+    .getByRole("button", { name: "Export Graphic", exact: true })
     .click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe(
@@ -84,18 +84,9 @@ test("welcome, demo graphic, export, then demo social, glucose, transparent expo
   expect(buffer.readUInt32BE(16)).toBe(1080);
   expect(buffer.readUInt32BE(20)).toBe(1920);
   expect(buffer[25]).toBe(6); // PNG colour type 6 = RGBA, so the transparent overlay keeps its alpha channel
-  await page
-    .getByLabel("Post caption", { exact: true })
-    .fill("My end-to-end demo moment");
-  await page.getByRole("button", { name: "Preview post", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Publish to local feed", exact: true })
-    .click();
+  // Publishing now requires an authenticated account and is covered end-to-end in stage8a5.spec.ts.
   await expect(
-    page.getByText("My end-to-end demo moment", { exact: true }),
-  ).toBeVisible();
-  await page.reload();
-  await expect(
-    page.getByText("My end-to-end demo moment", { exact: true }),
-  ).toBeVisible();
+    page.getByRole("switch", { name: "Also post to Gluca" }),
+  ).not.toBeChecked();
+  await expect(page.getByText(/Sign in on the web app to post/)).toBeVisible();
 });

@@ -31,9 +31,11 @@ const ITEMS = [
 export function ApplicationShell({
   children,
   covered,
+  feedback,
 }: {
   children: React.ReactNode;
   covered: boolean;
+  feedback?: React.ReactNode;
 }) {
   const pathname = usePathname(),
     c = useColors(),
@@ -118,6 +120,7 @@ export function ApplicationShell({
       <View style={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
         {children}
       </View>
+      {!covered ? feedback : null}
       {!covered && show ? (
         <View
           role="tablist"

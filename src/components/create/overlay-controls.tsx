@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { Button, Card, T, row } from "../../ui";
 import {
@@ -21,6 +21,7 @@ export function OverlayControls({
   onSelect: () => void;
   onChange: (t: OverlayTransform) => void;
 }) {
+  const [alternatives, showAlternatives] = useState(false);
   return (
     <Card>
       <T bold>Overlay layout</T>
@@ -57,22 +58,32 @@ export function OverlayControls({
           onChange(normalizeOverlay({ ...value, opacity: v / 100 }))
         }
       />
-      <View style={row}>
-        {(
-          [
-            ["Move left", -0.02, 0],
-            ["Move right", 0.02, 0],
-            ["Move up", 0, -0.02],
-            ["Move down", 0, 0.02],
-          ] as const
-        ).map(([label, x, y]) => (
-          <Button
-            key={label}
-            label={label}
-            onPress={() => onChange(moveOverlay(value, x, y))}
-          />
-        ))}
-      </View>
+      <Button
+        label={
+          alternatives
+            ? "Hide alternative positioning"
+            : "Alternative positioning controls"
+        }
+        onPress={() => showAlternatives((v) => !v)}
+      />
+      {alternatives ? (
+        <View style={row}>
+          {(
+            [
+              ["Move left", -0.02, 0],
+              ["Move right", 0.02, 0],
+              ["Move up", 0, -0.02],
+              ["Move down", 0, 0.02],
+            ] as const
+          ).map(([label, x, y]) => (
+            <Button
+              key={label}
+              label={label}
+              onPress={() => onChange(moveOverlay(value, x, y))}
+            />
+          ))}
+        </View>
+      ) : null}
       <T small muted>
         Layout stays in place when you change the photo, style or date. Use a
         smaller size to keep more text inside the canvas.

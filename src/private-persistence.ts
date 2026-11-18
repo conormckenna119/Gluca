@@ -5,7 +5,13 @@ export function persistableState(
   legacyProfile?: Pick<State, "profile" | "privacy">,
   legacyAwards: State["awards"] = [],
 ) {
-  return { ...state, imported: [], awards: legacyAwards, ...legacyProfile };
+  return {
+    ...state,
+    posts: state.posts.filter((p) => !p.remote),
+    imported: [],
+    awards: legacyAwards,
+    ...legacyProfile,
+  };
 }
 export function removeLegacyPlaintextHistory(raw: string) {
   try {

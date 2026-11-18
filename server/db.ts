@@ -57,6 +57,12 @@ const MIGRATIONS: string[] = [
   // 6: account-owned encrypted awards/event receipt ledger. No glucose history.
   `CREATE TABLE user_achievements (
     user_id TEXT PRIMARY KEY REFERENCES users(id), payload_enc TEXT NOT NULL);`,
+  `CREATE TABLE feed_posts (
+    id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id), request_key TEXT NOT NULL,
+    visibility TEXT NOT NULL CHECK(visibility IN ('private','public')), metadata_enc TEXT NOT NULL,
+    image_enc TEXT NOT NULL, created_at INTEGER NOT NULL, deleted_at INTEGER,
+    UNIQUE(user_id,request_key));
+   CREATE INDEX feed_posts_visible ON feed_posts(visibility,created_at);`,
 ];
 
 export function migrate(db: DatabaseSync): void {

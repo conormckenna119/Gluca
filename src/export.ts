@@ -8,6 +8,8 @@ export async function exportImage(
   save = false,
   filename = `gluca-${format.toLowerCase()}.png`,
   backgroundUri?: string,
+  retainImage = false,
+  shouldContinue = () => true,
 ) {
   if (Platform.OS === "web") {
     const [w, h] = formats[format];
@@ -53,18 +55,31 @@ export async function exportImage(
           "image/png",
         ),
       );
+      const dataUri = retainImage
+        ? await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () =>
+              reject(new Error("Unable to prepare the exported image."));
+            reader.readAsDataURL(blob);
+          })
+        : null;
+      if (!shouldContinue())
+        throw new Error("Export cancelled because the account changed.");
       const output = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = output;
       a.download = filename;
       a.click();
       setTimeout(() => URL.revokeObjectURL(output), 10000);
+      return { dataUri, width: w, height: h };
     } finally {
       URL.revokeObjectURL(url);
     }
-    return;
   }
   const uri = await nativeCapture();
+  if (!shouldContinue())
+    throw new Error("Export cancelled because the account changed.");
   if (save) {
     const media = await import("expo-media-library");
     const permission = await media.requestPermissionsAsync(true);
@@ -77,4 +92,9 @@ export async function exportImage(
       throw new Error("Sharing is unavailable on this device.");
     await sharing.shareAsync(uri, { mimeType: "image/png" });
   }
+  return {
+    dataUri: null,
+    width: formats[format][0],
+    height: formats[format][1],
+  };
 }

@@ -1,109 +1,65 @@
-import { recordAchievementEvent } from "../../achievements/events";
-import React, { useState } from "react";
+import React from "react";
 import { View } from "react-native";
-import { router } from "expo-router";
-import { Button, Card, Eyebrow, Input, T, row } from "../../ui";
-import { useDemo } from "../../store";
-import { summarize } from "../../analytics";
-import { templateInfo, type StoryOptions } from "../../story";
-import type { Post, Reading, Visibility } from "../../types";
-
+import { Button, Card, Input, SwitchRow, T, row } from "../../ui";
+/** Existing publisher, now bound to the exact exported PNG rather than a separate numerical snapshot. */
 export function PublishCard({
-  options: o,
-  rows,
-  start,
-  end,
+  enabled,
+  onEnabled,
+  caption,
+  onCaption,
+  visibility,
+  onVisibility,
+  available,
 }: {
-  options: StoryOptions;
-  rows: Reading[];
-  start: number;
-  end: number;
+  enabled: boolean;
+  onEnabled: (v: boolean) => void;
+  caption: string;
+  onCaption: (v: string) => void;
+  visibility: "private" | "public";
+  onVisibility: (v: "private" | "public") => void;
+  available: boolean;
 }) {
-  const { set } = useDemo();
-  const [caption, setCaption] = useState("");
-  const [visibility, setVisibility] = useState<Visibility>("private");
-  const [preview, setPreview] = useState(false);
-  React.useEffect(() => {
-    setPreview(false);
-  }, [o]);
-
   return (
     <Card>
-      <Eyebrow>Share to the local demo feed</Eyebrow>
-      <T small muted>
-        Publishing creates a local demo post containing only your selected
-        numerical snapshot and caption. The exported artwork is saved
-        separately. Shared images may be copied and cannot always be withdrawn.
-      </T>
-      <Input
-        label="Post caption"
-        value={caption}
+      <SwitchRow
+        title="Also post to Gluca"
+        value={enabled}
         onChange={(v) => {
-          setCaption(v);
-          setPreview(false);
+          if (available || !v) onEnabled(v);
         }}
       />
-      <View style={row}>
-        {(["private", "followers", "public"] as const).map((v) => (
-          <Button
-            key={v}
-            label={v}
-            selected={v === visibility}
-            onPress={() => {
-              setVisibility(v);
-              setPreview(false);
-            }}
-          />
-        ))}
-      </View>
-      <Button label="Preview post" onPress={() => setPreview(true)} />
-      {preview ? (
+      {!available ? (
+        <T small muted>
+          Sign in on the web app to post. Exporting works without an account.
+        </T>
+      ) : null}
+      {enabled ? (
         <>
-          <T>
-            Preview: {templateInfo[o.template].label} · {visibility} ·{" "}
-            {caption || o.caption || o.headline}
-          </T>
-          <T small muted>
-            {o.show.tir || o.show.avg
-              ? "Includes average, estimated time in range, and coverage."
-              : "No glucose statistics in the post."}{" "}
-            {o.show.date ? "Selected date range included." : "Dates hidden."}
-          </T>
-          <Button
-            kind="primary"
-            label="Publish to local feed"
-            onPress={() => {
-              const s = summarize(rows, start, end);
-              const p: Post = {
-                id: `local-${Date.now()}`,
-                createdAt: Date.now(),
-                author: "You",
-                title: templateInfo[o.template].label,
-                caption: (caption || o.caption || o.headline).slice(0, 1000),
-                visibility,
-                reactions: { counts: {}, mine: null },
-                saved: false,
-                comments: [],
-                ...(o.show.tir || o.show.avg
-                  ? {
-                      snapshot: {
-                        average: s.average,
-                        tir: s.tir,
-                        coverage: s.coverage,
-                        label: o.show.date
-                          ? new Date(start).toLocaleDateString()
-                          : "Date hidden",
-                      },
-                    }
-                  : {}),
-              };
-              set((st) => ({ ...st, posts: [p, ...st.posts] }));
-              if (visibility !== "private")
-                recordAchievementEvent("post_published", p.id);
-              setPreview(false);
-              router.push("/");
-            }}
+          <Input
+            label="Post caption (optional)"
+            value={caption}
+            onChange={(v) => onCaption(v.slice(0, 1000))}
+            multiline
           />
+          <T small bold>
+            Audience
+          </T>
+          <View style={row}>
+            {(["private", "public"] as const).map((v) => (
+              <Button
+                key={v}
+                label={v === "private" ? "Private" : "Public"}
+                selected={visibility === v}
+                onPress={() => onVisibility(v)}
+              />
+            ))}
+          </View>
+          <T small muted>
+            {visibility === "private"
+              ? "Only your signed-in account can view this post."
+              : "Visible to other signed-in Gluca users. The image includes only the graphic you confirm."}{" "}
+            Followers-only is not available.
+          </T>
         </>
       ) : null}
     </Card>

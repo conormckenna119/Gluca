@@ -97,14 +97,17 @@ export function AuthorIdentity({
   name,
   photo = true,
   metadata,
+  profile,
 }: {
   name: string;
+  profile?: PublicProfile;
   photo?: boolean;
   metadata?: React.ReactNode;
 }) {
+  const fallback = useUserIdentity(name);
   return (
     <UserIdentity
-      profile={useUserIdentity(name)}
+      profile={profile ?? fallback}
       photo={photo}
       metadata={metadata}
     />

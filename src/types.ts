@@ -30,6 +30,10 @@ export type DexcomReading = Reading & {
 };
 export type Visibility = "private" | "followers" | "public";
 export type Post = {
+  remote?: boolean;
+  owned?: boolean;
+  authorProfile?: import("./domain/profile").PublicProfile;
+  media?: {uri:string;width:number;height:number;alt:string};
   id: string;
   author: string;
   title: string;

@@ -50,6 +50,19 @@ async function update(ctx: Ctx) {
           "invalid_event",
           "Unsupported participation event.",
         );
+      if (
+        b.event.kind === "post_published" &&
+        !ctx.deps.db
+          .prepare(
+            "SELECT 1 FROM feed_posts WHERE id=? AND user_id=? AND visibility='public' AND deleted_at IS NULL",
+          )
+          .get(b.event.id, owner)
+      )
+        throw new HttpError(
+          400,
+          "unverified_post",
+          "Publish a public Gluca post before requesting this medal.",
+        );
       const row = ctx.deps.db
         .prepare("SELECT payload_enc FROM user_profiles WHERE user_id=?")
         .get(owner) as { payload_enc: string } | undefined;

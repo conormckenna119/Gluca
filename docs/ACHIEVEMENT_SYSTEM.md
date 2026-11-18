@@ -1,3 +1,11 @@
+# Stage 8A.5 update - 18 November 2026
+
+The existing unlock host now reads authoritative repository awards rather than the lagging demo-state mirror, avoiding dropped feedback immediately after a genuine award. It shows the original medal, name, neutral description, View Achievement and Dismiss, with a subtle 180ms entrance and 140ms exit. Reduced motion uses a static popup. Feedback waits until the user leaves Create/onboarding/profile editing/authentication. Loading a collection on app launch never enqueues old medals. Feedback uses a reserved area above the existing navigation, so it cannot cover page controls. It expires after eight seconds where screen-reader detection permits; otherwise it stays dismissible. React Native Web conservatively reports screen-reader mode, so web notices remain available until dismissed. Diagnosis-anniversary and medical-derived notices remain silent to avoid exposing private medical identity; those medals remain available privately in the cabinet. No new medical awards.
+
+First Post rule version 3 requires an actual public Gluca feed row owned by the account. The award is created atomically with the post in the existing encrypted repository; direct fake publication events are rejected. Private posts do not count as community publication. A lost response/retry cannot duplicate either the post or its award. Earlier version-2 local-demo medals are preserved and labelled as legacy local awards in details. Other life/community eligibility and shield calculations are unchanged. No automatic backlog awards.
+
+Premium unlock motion is a documented future design task only: see FUTURE_UX_ENHANCEMENTS.md. Full publishing architecture, privacy and remaining native/social limits are in STORY_EDITOR.md. The former local-only First Post source descriptions below are historical and superseded by this section.
+
 # Achievement system - Stage 8A
 
 The existing registry, Medal SVG artwork, detail sheets, toast and Create milestone renderer are reused. No second achievement system/backend/dependency was added. `src/achievements/events.ts` separates explicit eligibility from UI. The old snapshot evaluator is no longer mounted; historical demo posts/counters/challenges do not grant account medals.

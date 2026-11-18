@@ -50,7 +50,7 @@ test("fictional account cabinet: confirmation, export award, pin order, privacy,
     // Real application export, using synthetic demo readings, not a seeded first-story award.
     await page.goto(`${a.base}/create`);
     const download = page.waitForEvent("download");
-    await button(page, "Export PNG / Share").click();
+    await button(page, "Export Graphic").click();
     const proof = pngProof(await readFile((await (await download).path())!));
     expect([proof.width, proof.height]).toEqual([1080, 1920]);
     await expect

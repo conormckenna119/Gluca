@@ -147,7 +147,9 @@ function IdentityCards() {
             </Pressable>
             <View style={{ flex: 1, gap: 2 }}>
               <T heading>Your shield</T>
-              <T muted>{shieldLabel(info.tier, info.years, info.certain)}</T>
+              <T
+                muted
+              >{`${info.certain ? "" : "At least "}${info.years} completed ${info.years === 1 ? "year" : "years"} with diabetes`}</T>
             </View>
           </View>
           <T small muted>
@@ -178,7 +180,9 @@ function IdentityCards() {
 function OwnProfile() {
   const { state } = useDemo();
   const flags = getFlags();
-  const mine = state.posts.filter((p) => p.author === "You");
+  const mine = state.posts.filter((p) =>
+    p.remote ? p.owned === true : p.author === "You",
+  );
   return (
     <Page title="Profile">
       {flags.identity ? (

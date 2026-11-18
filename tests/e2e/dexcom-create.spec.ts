@@ -112,7 +112,7 @@ test("MOCK PASS: authenticated Dexcom provider → historical Create preview →
     const [download] = await Promise.all([
       page.waitForEvent("download"),
       page
-        .getByRole("button", { name: "Export PNG / Share", exact: true })
+        .getByRole("button", { name: "Export Graphic", exact: true })
         .click(),
     ]);
     const filename = await download.path();

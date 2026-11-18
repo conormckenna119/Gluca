@@ -51,6 +51,16 @@ function PostConversation() {
         />
       </Page>
     );
+  if (p.remote)
+    return (
+      <Page title="Post" glucoseLabel="Source labelled on graphic">
+        <PostCard post={p} inDetail />
+        <T small muted>
+          Comments and reactions for account posts are not available yet.
+        </T>
+        <Button label="Back to feed" onPress={() => router.replace("/")} />
+      </Page>
+    );
   const send = () => {
     const text = comment.trim().slice(0, 1000);
     if (!text) return;

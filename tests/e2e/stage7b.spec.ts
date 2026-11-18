@@ -47,7 +47,7 @@ test("identity visual matrix at compact sizes and in both themes", async ({
           })
           .click();
         await expect(
-          page.getByText("Shield style · bronze", { exact: true }),
+          page.getByText("Color · bronze", { exact: true }),
         ).toBeVisible();
         await expect(button(page, "Done")).toBeInViewport({ ratio: 1 });
         await page.screenshot({
@@ -112,11 +112,9 @@ test("clean shield geometry, compact names and private precision details", async
   expect(hit.height).toBeGreaterThanOrEqual(44);
   await limited.click();
   await expect(
-    page.getByText("9 years with diabetes", { exact: true }),
+    page.getByText("At least 9 years with diabetes", { exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByText("Shield style · bronze", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("Color · bronze", { exact: true })).toBeVisible();
   await expect(
     page.getByText(/The diagnosis date is partial or estimated/),
   ).toBeVisible();

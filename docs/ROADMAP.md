@@ -1,3 +1,7 @@
+# Stage 8A.5 - focused refinement
+
+Confirmed PNG export-to-feed publishing, encrypted account image storage, Private/Public authorization, idempotent retries and partial-failure states implemented. Simplified controls, shield details and deferred unlock feedback are scoped refinements. Verification/limits: UI_REFINEMENT.md and STORY_EDITOR.md. Followers-only, native posting and production/moderation gates remain open. Stop after Stage 8A.5; do not start 8B.
+
 # Stage 8A - scoped achievement delivery
 
 Encrypted account-owned nonmedical awards and Trophy Cabinet implemented; no demo backfill. Exact-date anniversaries, reduced-motion notices, pin/order/privacy and existing Create sharing. Native/production/social-service verification remain open. Stop at Stage 8A; Stage 8B is not authorized. See ACHIEVEMENT_SYSTEM.md for verification.

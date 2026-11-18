@@ -58,7 +58,7 @@ test("fictional participation facts award once without importing old prototype s
         a.userId === "fictional-supporter" &&
         a.visibility === "private" &&
         !a.pinned &&
-        a.ruleVersion === 2 &&
+        a.ruleVersion >= 2 &&
         a.relatedEvent,
     ),
   );

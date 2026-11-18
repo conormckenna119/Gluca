@@ -15,6 +15,7 @@ import { configureFlags } from "../src/flags";
 import { configureTelemetry, track } from "../src/telemetry";
 import { useArtFonts } from "../src/fonts";
 import { useAchievements } from "../src/hooks/use-achievements";
+import { useFeedPosts } from "../src/hooks/use-feed-posts";
 import { UnlockToastHost } from "../src/components/achievements/unlock-toast";
 import { GlucoseDataProvider } from "../src/glucose-context";
 import { ApplicationShell } from "../src/components/application-shell";
@@ -43,6 +44,7 @@ function Nav() {
   const pathname = usePathname();
   const fontsDone = useArtFonts();
   useAchievements({ evaluate: true });
+  useFeedPosts();
   const navReady = !!useRootNavigationState()?.key;
   // First run: once saved state has loaded, a person who has not seen the welcome screen is sent there.
   const needsWelcome = ready && !state.seenWelcome && pathname !== "/welcome";
@@ -58,7 +60,7 @@ function Nav() {
   return (
     <>
       <StatusBar style={state.dark ? "light" : "dark"} />
-      <ApplicationShell covered={covered}>
+      <ApplicationShell covered={covered} feedback={<UnlockToastHost />}>
         <Stack
           screenOptions={{
             headerTitle: BRAND.name,
@@ -94,7 +96,6 @@ function Nav() {
           />
         </Stack>
       </ApplicationShell>
-      {covered ? null : <UnlockToastHost />}
       {covered ? (
         <View
           pointerEvents="auto"

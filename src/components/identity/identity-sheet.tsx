@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { Button, T, space } from "../../ui";
 import type { Emblem } from "../../domain/profile";
@@ -8,6 +8,7 @@ import {
   shieldPrecisionNote,
   tierById,
   localToday,
+  SHIELD_TIERS,
 } from "../../domain/shield";
 import type { PartialDate } from "../../domain/profile";
 import { Sheet } from "../../ui";
@@ -34,6 +35,8 @@ export function IdentitySheet({
   target: IdentityTarget | null;
   onClose: () => void;
 }) {
+  const [explore, showExplore] = useState(false);
+  useEffect(() => showExplore(false), [target]);
   if (!target) return null;
   const isShield = target.kind === "shield";
   const title = isShield
@@ -66,21 +69,47 @@ export function IdentitySheet({
         {isShield ? (
           <T bold>
             {target.showNumber !== false && target.years !== undefined
-              ? `${target.years} ${target.years === 1 ? "year" : "years"} with diabetes`
+              ? `${target.certain === false ? "At least " : ""}${target.years} ${target.years === 1 ? "year" : "years"} with diabetes`
               : "Years kept private"}
           </T>
         ) : null}
       </View>
       {isShield ? (
         <>
-          <T bold>Shield style · {tier?.label ?? "Unknown"}</T>
+          <T small muted>
+            Color · {tier?.label ?? "Unknown"}
+          </T>
           <T>
-            A personal way to share time with diabetes. Everyone’s experience is
-            different.
+            The number represents completed years with diabetes. Colors mark
+            different spans of time and change as supported anniversaries pass.
+            They do not indicate expertise, health or status.
           </T>
           <T muted>
             {shieldPrecisionNote(target.diagnosis, target.certain ?? true)}
           </T>
+          <Button
+            label={explore ? "Hide shield colors" : "Explore shield colors"}
+            onPress={() => showExplore((v) => !v)}
+          />
+          {explore ? (
+            <View style={{ gap: space.md }}>
+              {SHIELD_TIERS.map((style, i) => (
+                <View
+                  key={style.id}
+                  style={{
+                    flexDirection: "row",
+                    gap: space.md,
+                    alignItems: "center",
+                  }}
+                >
+                  <Shield tier={style.id} years={style.minYears} size={32} />
+                  <T
+                    small
+                  >{`${style.label} · ${i === 0 ? "Less than one year" : i === SHIELD_TIERS.length - 1 ? `${style.minYears}+ years` : `${style.minYears}–${SHIELD_TIERS[i + 1].minYears - 1} years`}`}</T>
+                </View>
+              ))}
+            </View>
+          ) : null}
           {next ? (
             <T muted>Next anniversary: {formatLocalDate(next)}.</T>
           ) : null}

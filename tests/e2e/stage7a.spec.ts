@@ -23,7 +23,7 @@ async function addPhoto(page: Page, label: string, file: string) {
 }
 async function exported(page: Page) {
   const event = page.waitForEvent("download");
-  await button(page, "Export PNG / Share").click();
+  await button(page, "Export Graphic").click();
   const file = await (await event).path();
   expect(file).not.toBeNull();
   return pngProof(await readFile(file!));

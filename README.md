@@ -1,3 +1,7 @@
+# Stage 8A.5 - export directly to Gluca
+
+Sign in, open Create, enable Also post to Gluca, choose Private/Public and confirm Export & Post. Export Graphic remains independent and does not publish. The same PNG reaches the existing feed; retries cannot duplicate a submission. Rebuild the web export and restart the existing backend to load migration 7/routes. [Editor/setup and limits](docs/STORY_EDITOR.md), [verification](docs/UI_REFINEMENT.md), [future design notes](docs/FUTURE_UX_ENHANCEMENTS.md). Native posting and production release remain gated.
+
 # Stage 8A - Trophy Cabinet
 
 Enable achievements with identity/accounts, rebuild the existing web export and restart the same backend. Profile -> Trophy Cabinet: eight explicit nonmedical event awards, three ordered pins, privacy controls and optional Create sharing. No demo-history backfill. [Setup and sources](docs/ACHIEVEMENT_SYSTEM.md), [cabinet](docs/TROPHY_CABINET.md), [safety](docs/ACHIEVEMENT_SAFETY.md). Native/production/social verification remain gated. Stop after Stage 8A.

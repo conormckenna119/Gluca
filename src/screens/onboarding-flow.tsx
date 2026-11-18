@@ -1,5 +1,6 @@
+import { IdentitySheet } from "../components/identity/identity-sheet";
 import React, { useState, useEffect, useRef } from "react";
-import { View, Animated, AccessibilityInfo } from "react-native";
+import { View, Animated, AccessibilityInfo, Pressable } from "react-native";
 import { Redirect, router } from "expo-router";
 import {
   Button,
@@ -49,6 +50,7 @@ import { localToday, shieldFor, shieldLabel } from "../domain/shield";
 import { suggestedFor } from "../domain/communities";
 
 function ExperiencePreview({ profile }: { profile: Profile }) {
+  const [detail, showDetail] = useState(false);
   const info = shieldFor(profile.diagnosis, localToday()),
     opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {
@@ -77,16 +79,39 @@ function ExperiencePreview({ profile }: { profile: Profile }) {
         gap: space.md,
       }}
     >
-      <Shield
-        tier={info.tier.id}
-        years={info.years}
-        certain={info.certain}
-        size={64}
-      />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="About your years with diabetes shield"
+        onPress={() => showDetail(true)}
+        style={{ minWidth: 44, minHeight: 44 }}
+      >
+        <Shield
+          tier={info.tier.id}
+          years={info.years}
+          certain={info.certain}
+          size={40}
+        />
+      </Pressable>
       <View style={{ flex: 1 }}>
         <T bold>Your shield</T>
-        <T small>{shieldLabel(info.tier, info.years, info.certain)}</T>
+        <T
+          small
+        >{`${info.certain ? "" : "At least "}${info.years} completed ${info.years === 1 ? "year" : "years"} with diabetes`}</T>
       </View>
+      <IdentitySheet
+        target={
+          detail
+            ? {
+                kind: "shield",
+                tier: info.tier.id,
+                years: info.years,
+                certain: info.certain,
+                diagnosis: profile.diagnosis,
+              }
+            : null
+        }
+        onClose={() => showDetail(false)}
+      />
     </Animated.View>
   ) : (
     <T small muted>
