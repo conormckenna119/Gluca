@@ -1,6 +1,16 @@
+import {
+  getCommunity,
+  recommendedCommunityIds,
+} from "../domain/community-discovery";
 import { IdentitySheet } from "../components/identity/identity-sheet";
 import React, { useState, useEffect, useRef } from "react";
-import { View, Animated, AccessibilityInfo, Pressable } from "react-native";
+import {
+  View,
+  Animated,
+  AccessibilityInfo,
+  Pressable,
+  Platform,
+} from "react-native";
 import { Redirect, router } from "expo-router";
 import {
   Button,
@@ -150,7 +160,13 @@ function OnboardingEditor() {
     clubVisibility: {},
     awards: [],
   });
-  const suggestions = suggestedFor(p, localToday(), []).slice(0, 3);
+  const suggestions = (
+    getFlags().accounts && getFlags().clubs && Platform.OS === "web"
+      ? recommendedCommunityIds(p, localToday()).map((id) => ({
+          community: getCommunity(id)!,
+        }))
+      : suggestedFor(p, localToday(), [])
+  ).slice(0, 3);
   const finish = async () => {
     E("");
     B(true);

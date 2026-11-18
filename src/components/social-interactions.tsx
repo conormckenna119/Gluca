@@ -1,3 +1,4 @@
+import { ReportAction } from "./community-report";
 import { REACTION_WORDS } from "../reaction-copy";
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, View } from "react-native";
@@ -19,7 +20,7 @@ import type { Post } from "../types";
 import { AuthorIdentity } from "./identity/user-identity";
 import { Button, Card, Input, Notice, Sheet, T, space } from "../ui";
 
-function useResource<T>(path: string) {
+export function useResource<T>(path: string, prefix = "/api/social") {
   const [data, D] = useState<T | null>(null),
     [error, E] = useState(""),
     [busy, B] = useState(false);
@@ -30,7 +31,7 @@ function useResource<T>(path: string) {
     const scope = captureAchievementScope(),
       read = ++epoch.current;
     try {
-      const result = await socialRequest<T>(path);
+      const result = await socialRequest<T>(path, undefined, prefix);
       if (
         mounted.current &&
         scope === captureAchievementScope() &&
@@ -69,7 +70,7 @@ function useResource<T>(path: string) {
       session();
       refresh();
     };
-  }, [path]);
+  }, [path, prefix]);
   const act = async (fn: () => Promise<void>) => {
     if (lock.current) return;
     lock.current = true;
@@ -313,6 +314,7 @@ export function AccountConversation({ post }: { post: Post }) {
             <MemberActions id={c.authorId} profile={c.authorProfile} compact />
           ) : null}
           <T>{c.text}</T>
+          {!c.owned ? <ReportAction kind="comment" id={c.id} /> : null}
           {c.owned ? (
             <Button
               label="Delete my comment"

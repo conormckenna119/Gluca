@@ -89,6 +89,22 @@ const MIGRATIONS: string[] = [
     created_at INTEGER NOT NULL, seen INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY(recipient_id,actor_id,kind,subject_id));
    CREATE INDEX social_inbox ON social_notifications(recipient_id,created_at);`,
+  // 10: explicit account communities; additive to existing posts/social storage.
+  `CREATE TABLE community_memberships (
+    community_id TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id),
+    active INTEGER NOT NULL DEFAULT 1 CHECK(active IN(0,1)), visible INTEGER NOT NULL DEFAULT 0 CHECK(visible IN(0,1)),
+    restricted INTEGER NOT NULL DEFAULT 0 CHECK(restricted IN(0,1)), joined_at INTEGER NOT NULL,
+    PRIMARY KEY(community_id,user_id));
+   CREATE TABLE community_moderators (
+    community_id TEXT NOT NULL,user_id TEXT NOT NULL REFERENCES users(id),PRIMARY KEY(community_id,user_id));
+   CREATE TABLE community_reports (
+    reporter_id TEXT NOT NULL REFERENCES users(id),kind TEXT NOT NULL CHECK(kind IN('post','comment','community')),
+    target_id TEXT NOT NULL,community_id TEXT,reason TEXT NOT NULL,created_at INTEGER NOT NULL,
+    PRIMARY KEY(reporter_id,kind,target_id));
+   ALTER TABLE feed_posts ADD COLUMN community_id TEXT;
+   ALTER TABLE feed_posts ADD COLUMN moderated_at INTEGER;
+   ALTER TABLE post_comments ADD COLUMN moderated_at INTEGER;
+   CREATE INDEX community_posts ON feed_posts(community_id,created_at);`,
 ];
 
 export function migrate(db: DatabaseSync): void {

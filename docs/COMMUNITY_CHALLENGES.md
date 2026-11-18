@@ -9,7 +9,7 @@ Open **Community/Home -> Discover Challenges** or **Explore -> Explore Challenge
 | Share a Moment (`share_moment`)                              | A new Public post committed through the existing authenticated Create-to-feed workflow after enrollment. Private posts, exports, old posts and upload retries do not count.                                                                 | First Post           |
 | Get Moving (`activity_of_choice`)                            | Explicit confirmation of a completed activity, or a new activity saved through the existing Log link opened from the enrollment. Both are self-reported. No duration, intensity, calories, pace or glucose requirement.                     | First Activity       |
 | Spread Awareness (`awareness_event`)                         | Explicit confirmation of taking part in an awareness activity; no evidence/name/date required.                                                                                                                                              | Awareness            |
-| Make a Connection (`helpful_experience`, retained legacy ID) | Two explicit confirmations: joined an existing community outside Gluca, and had a meaningful exchange. Gluca's current communities are demos, so demo joins/Boosts never automatically qualify. No group name or conversation is collected. | Community Connection |
+| Make a Connection (`helpful_experience`, retained legacy ID) | Two explicit confirmations: joined an existing community outside Gluca, and had a meaningful exchange. Joining or Boosting alone does not establish a meaningful exchange; this confirmation remains an outside-community action. No group name or conversation is collected. | Community Connection |
 | Celebrate a Milestone (`personal_milestone`)                 | Explicit private confirmation of a meaningful event; no medical details, date or publication required.                                                                                                                                      | Personal Milestone   |
 
 Supporters and people living with diabetes are equally eligible; Dexcom is not required. Share a Moment can use the existing glucose-free Milestone template for a photo or personal update. The challenge opens Create but never pre-enables posting or selects Public for the person. Actual publication still requires image/audience confirmation. No plain-text posting service was added.
@@ -57,7 +57,7 @@ npx playwright test tests/e2e/stage8b.spec.ts --workers 1
 
 ## Safety and current limits
 
-No glucose/A1C outcomes, insulin/food restriction, medical competitions, exercise targets, punitive streaks, public standings or spam-based interaction counts. No medical information is required. Only the explicitly chosen Share a Moment Public post leaves private participation; other challenges can complete privately. Make a Connection is self-reported outside-community participation because live Gluca group interactions/membership verification do not exist yet. No live groups, messages or reactions were fabricated.
+No glucose/A1C outcomes, insulin/food restriction, medical competitions, exercise targets, punitive streaks, public standings or spam-based interaction counts. No medical information is required. Only the explicitly chosen Share a Moment Public post leaves private participation; other challenges can complete privately. Make a Connection retains its self-reported outside-community criteria. Stage 9B adds real Gluca groups, but membership/Boost counts alone do not verify a meaningful exchange. No live groups, messages or reactions were fabricated.
 
 Durable account enrollment is supported in the existing web account architecture. Native account handoff/device accessibility remain gated; native can browse the catalog but should not be described as having verified account persistence. Physical mobile/screen-reader testing, production authentication/recovery/retention/moderation and future repeatability remain open. No public deployment, extra social service, Dexcom feature or raw-health database was introduced. Creative note for Claude: future artwork refinements should extend the existing original glyph/medal language, preserve accessible contrast/equal emphasis, and avoid status or rarity styling.
 
@@ -112,3 +112,6 @@ The existing local backend was reloaded with the new routes/migration. Refresh G
 - `tests/server-challenges.test.ts`
 
 Evidence: `docs/screenshots/stage8b/`. No dependency, credential file, glucose calculation/provider or identity-shield artwork changed.
+
+
+Stage 9B: member-restricted community posts reuse the existing publisher but do not automatically qualify as Public general-feed publication for Share a Moment or First Post. The existing public-post verification now checks that the post has no community restriction. No challenge auto-completion on join, and no fabricated interaction awards.

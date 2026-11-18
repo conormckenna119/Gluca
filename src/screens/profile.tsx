@@ -1,3 +1,5 @@
+import { OwnCommunities } from "../components/community-discovery";
+import { COMMUNITY_CATALOGUE } from "../domain/community-discovery";
 import { MemberActions } from "../components/social-interactions";
 import React from "react";
 import { Pressable, View } from "react-native";
@@ -203,11 +205,16 @@ function OwnProfile() {
           <ProfileMedalsLink />
         </View>
       ) : null}
-      {flags.accounts ? <MemberActions /> : null}
+      {flags.accounts ? (
+        <>
+          <MemberActions />
+          <OwnCommunities />
+        </>
+      ) : null}
       <View style={{ flexDirection: "row", gap: space.lg }}>
         <Stat value={String(mine.length)} label="Posts" />
         <Stat value={String(state.following.length)} label="Demo following" />
-        <Stat value={String(state.clubs.length)} label="Clubs" />
+        <Stat value={String(state.clubs.length)} label="Demo clubs" />
       </View>
       {flags.communityFeed ? (
         <Section title="Your posts">
@@ -310,6 +317,20 @@ function MemberProfile({ username }: { username: string }) {
           <UserIdentity expanded profile={data} />
           {data.accountId ? (
             <MemberActions id={data.accountId} profile={data} />
+          ) : null}
+          {data.communities?.length ? (
+            <Section title="Public communities">
+              {data.communities.map((name) => {
+                const c = COMMUNITY_CATALOGUE.find((c) => c.name === name);
+                return c ? (
+                  <Button
+                    key={c.id}
+                    label={`Open ${c.name}`}
+                    onPress={() => router.push(`/community/${c.id}` as never)}
+                  />
+                ) : null;
+              })}
+            </Section>
           ) : null}
           {getFlags().achievements && data.medals?.length ? (
             <Section title="Trophy Cabinet">

@@ -30,6 +30,9 @@ export type DexcomReading = Reading & {
 };
 export type Visibility = "private" | "followers" | "public";
 export type Post = {
+  moderated?: boolean;
+  communityId?: string;
+  communityName?: string;
   authorId?: string;
   isFollowing?: boolean;
   commentCount?: number;

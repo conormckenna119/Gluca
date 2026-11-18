@@ -59,7 +59,12 @@ export function primaryTabFor(pathname: string): TabName {
   )
     return "profile";
   if (p === "/create") return "create";
-  if (p.startsWith("/explore") || p === "/challenges") return "explore";
+  if (
+    p.startsWith("/explore") ||
+    p.startsWith("/community/") ||
+    p === "/challenges"
+  )
+    return "explore";
   if (["/glucose", "/import", "/log", "/dexcom-data"].includes(p))
     return "glucose";
   return "index";

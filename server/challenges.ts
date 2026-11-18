@@ -127,7 +127,7 @@ export function completeChallengeForPost(ctx: Ctx, postId: string) {
   if (
     !ctx.deps.db
       .prepare(
-        "SELECT 1 FROM feed_posts WHERE id=? AND user_id=? AND visibility='public' AND deleted_at IS NULL",
+        "SELECT 1 FROM feed_posts WHERE id=? AND user_id=? AND visibility='public' AND community_id IS NULL AND moderated_at IS NULL AND deleted_at IS NULL",
       )
       .get(postId, ctx.session!.userId)
   )

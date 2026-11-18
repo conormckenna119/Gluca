@@ -391,7 +391,12 @@ test("shared identities render in feed, comments, community and following displa
       await expect(
         page.getByRole("textbox", { name: "Your comment", exact: true }),
       ).not.toBeVisible();
-      // Existing people list, not a new membership system.
+      const fictional = page.getByRole("button", {
+        name: "Explore fictional demo",
+        exact: true,
+      });
+      if (await fictional.count()) await fictional.click();
+      // Existing people list remains explicitly fictional.
       await expect(
         page.getByTestId("user-identity").filter({ visible: true }).first(),
       ).toBeVisible();

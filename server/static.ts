@@ -52,7 +52,9 @@ export async function serveWeb(
     pathname.split("/").some((p) => p.startsWith("."))
   )
     return false;
-  const spa = ROUTES.has(pathname) || /^\/post\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const spa =
+    ROUTES.has(pathname) ||
+    /^\/(?:post|community)\/[a-zA-Z0-9_-]+$/.test(pathname);
   if (
     !spa &&
     !pathname.startsWith("/assets/") &&

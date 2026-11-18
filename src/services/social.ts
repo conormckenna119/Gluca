@@ -41,9 +41,10 @@ export class SocialError extends Error {
 export async function socialRequest<T>(
   path: string,
   body?: unknown,
+  prefix = "/api/social",
 ): Promise<T> {
   const scope = captureAchievementScope();
-  const r = await fetch(`/api/social/${path}`, {
+  const r = await fetch(`${prefix}${path ? `/${path}` : ""}`, {
     method: body === undefined ? "GET" : "POST",
     credentials: "include",
     cache: "no-store",

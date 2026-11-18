@@ -1,3 +1,5 @@
+import { CommunityDiscovery } from "../components/community-discovery";
+import { Platform } from "react-native";
 import React from "react";
 import { router } from "expo-router";
 import {
@@ -189,6 +191,8 @@ function Grid({ children }: { children: React.ReactNode }) {
 
 function ExploreBody() {
   const flags = getFlags();
+  const live = flags.accounts && flags.clubs && Platform.OS === "web";
+  const [showDemo, SHOW] = React.useState(false);
   const { state, set } = useDemo();
   const visiblePeople = flags.communityFeed
     ? people.filter((p) => !state.blocked.includes(p))
@@ -218,115 +222,139 @@ function ExploreBody() {
     }));
 
   return (
-    <Page title="Explore" subtitle="Discover people and communities.">
+    <Page
+      title="Explore"
+      subtitle="Discover people and communities."
+      accountCommunity={live && !showDemo}
+    >
       {flags.communityChallenges ? (
-        <Card>
-          <T heading>Challenges</T>
-          <T small muted>
-            Optional community experiences. No glucose targets or streaks.
-          </T>
+        live ? (
           <Button
             label="Explore Challenges"
             onPress={() => router.push("/challenges")}
           />
-        </Card>
+        ) : (
+          <Card>
+            <T heading>Challenges</T>
+            <T small muted>
+              Optional community experiences. No glucose targets or streaks.
+            </T>
+            <Button
+              label="Explore Challenges"
+              onPress={() => router.push("/challenges")}
+            />
+          </Card>
+        )
       ) : null}
-      {suggestions.length ? (
-        <Section
-          title="Suggested for you"
-          note="Based only on what you chose to put in your profile. Nothing is joined until you tap Join."
-        >
-          <Grid>
-            {suggestions.map(({ community, reason }) => (
-              <Entry
-                key={community.id}
-                name={community.name}
-                line={`${reason}. ${community.blurb}`}
-                toggle={
-                  <Toggle
-                    on={false}
-                    offLabel="Join"
-                    onLabel="Joined"
-                    a11yOff={`Join ${community.name}`}
-                    a11yOn={`Leave ${community.name}`}
-                    onPress={() => joinedToggle(community.name, false)}
-                  />
-                }
-              />
-            ))}
-          </Grid>
-        </Section>
-      ) : null}
-      {visibleClubs.length ? (
-        <Section
-          title="Clubs"
-          note="Fictional demo clubs. Be kind, respect privacy, and avoid treatment advice."
-        >
-          <Grid>
-            {visibleClubs.map(({ name: n, line }) => {
-              const joined = state.clubs.includes(n);
-              return (
-                <Entry
-                  key={n}
-                  name={n}
-                  line={line}
-                  extra={
-                    identity && joined ? (
-                      <VisibleSwitch
-                        club={n}
-                        value={state.clubVisibility[n] === true}
-                        onChange={(v) =>
-                          set((s) => setCommunityVisible(s, n, v))
-                        }
-                      />
-                    ) : null
-                  }
-                  toggle={
-                    <Toggle
-                      on={joined}
-                      offLabel="Join"
-                      onLabel="Joined"
-                      a11yOff={`Join ${n}`}
-                      a11yOn={`Leave ${n}`}
-                      onPress={() => joinedToggle(n, joined)}
-                    />
-                  }
-                />
-              );
-            })}
-          </Grid>
-        </Section>
-      ) : null}
-      {visiblePeople.length ? (
-        <Section title="People" note="Fictional profiles for this demo.">
-          <Grid>
-            {visiblePeople.map((p) => (
-              <Entry
-                key={p}
-                name={p}
-                nameNode={identity ? <AuthorIdentity name={p} /> : undefined}
-                line={personLines[people.indexOf(p) % personLines.length]}
-                toggle={
-                  <Toggle
-                    on={state.following.includes(p)}
-                    offLabel="Follow"
-                    onLabel="Following"
-                    a11yOff={`Follow ${p}`}
-                    a11yOn={`Unfollow ${p}`}
-                    onPress={() => toggleIn("following", p)}
-                  />
-                }
-              />
-            ))}
-          </Grid>
-        </Section>
-      ) : null}
-      {!visibleClubs.length && !visiblePeople.length ? (
-        <EmptyState
-          icon="user"
-          title="Nobody to show yet"
-          body="People and clubs will appear here when they are available. Blocked people stay hidden."
+      {live ? <CommunityDiscovery /> : null}
+      {live ? (
+        <Button
+          label={showDemo ? "Hide fictional demo" : "Explore fictional demo"}
+          onPress={() => SHOW(!showDemo)}
         />
+      ) : null}
+      {!live || showDemo ? (
+        <>
+          {suggestions.length ? (
+            <Section
+              title="Suggested for you"
+              note="Based only on what you chose to put in your profile. Nothing is joined until you tap Join."
+            >
+              <Grid>
+                {suggestions.map(({ community, reason }) => (
+                  <Entry
+                    key={community.id}
+                    name={community.name}
+                    line={`${reason}. ${community.blurb}`}
+                    toggle={
+                      <Toggle
+                        on={false}
+                        offLabel="Join"
+                        onLabel="Joined"
+                        a11yOff={`Join ${community.name}`}
+                        a11yOn={`Leave ${community.name}`}
+                        onPress={() => joinedToggle(community.name, false)}
+                      />
+                    }
+                  />
+                ))}
+              </Grid>
+            </Section>
+          ) : null}
+          {visibleClubs.length ? (
+            <Section
+              title="Clubs"
+              note="Fictional demo clubs. Be kind, respect privacy, and avoid treatment advice."
+            >
+              <Grid>
+                {visibleClubs.map(({ name: n, line }) => {
+                  const joined = state.clubs.includes(n);
+                  return (
+                    <Entry
+                      key={n}
+                      name={n}
+                      line={line}
+                      extra={
+                        identity && joined ? (
+                          <VisibleSwitch
+                            club={n}
+                            value={state.clubVisibility[n] === true}
+                            onChange={(v) =>
+                              set((s) => setCommunityVisible(s, n, v))
+                            }
+                          />
+                        ) : null
+                      }
+                      toggle={
+                        <Toggle
+                          on={joined}
+                          offLabel="Join"
+                          onLabel="Joined"
+                          a11yOff={`Join ${n}`}
+                          a11yOn={`Leave ${n}`}
+                          onPress={() => joinedToggle(n, joined)}
+                        />
+                      }
+                    />
+                  );
+                })}
+              </Grid>
+            </Section>
+          ) : null}
+          {visiblePeople.length ? (
+            <Section title="People" note="Fictional profiles for this demo.">
+              <Grid>
+                {visiblePeople.map((p) => (
+                  <Entry
+                    key={p}
+                    name={p}
+                    nameNode={
+                      identity ? <AuthorIdentity name={p} /> : undefined
+                    }
+                    line={personLines[people.indexOf(p) % personLines.length]}
+                    toggle={
+                      <Toggle
+                        on={state.following.includes(p)}
+                        offLabel="Follow"
+                        onLabel="Following"
+                        a11yOff={`Follow ${p}`}
+                        a11yOn={`Unfollow ${p}`}
+                        onPress={() => toggleIn("following", p)}
+                      />
+                    }
+                  />
+                ))}
+              </Grid>
+            </Section>
+          ) : null}
+          {!visibleClubs.length && !visiblePeople.length ? (
+            <EmptyState
+              icon="user"
+              title="Nobody to show yet"
+              body="People and clubs will appear here when they are available. Blocked people stay hidden."
+            />
+          ) : null}
+        </>
       ) : null}
     </Page>
   );

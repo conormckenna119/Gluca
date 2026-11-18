@@ -340,14 +340,14 @@ test("additive migration preserves existing encrypted publications; repeat migra
     const db = a.app.deps.db,
       before = db.prepare("SELECT * FROM feed_posts ORDER BY id").all();
     db.exec(
-      "DROP TABLE social_notifications; DROP TABLE post_comments; DROP TABLE post_reactions; DROP TABLE user_blocks; DROP TABLE user_follows; PRAGMA user_version=8;",
+      "DROP TABLE community_reports; DROP TABLE community_moderators; DROP TABLE community_memberships; DROP INDEX community_posts; ALTER TABLE feed_posts DROP COLUMN community_id; ALTER TABLE feed_posts DROP COLUMN moderated_at; DROP TABLE social_notifications; DROP TABLE post_comments; DROP TABLE post_reactions; DROP TABLE user_blocks; DROP TABLE user_follows; PRAGMA user_version=8;",
     );
     migrate(db);
     migrate(db);
     assert.equal(
       (db.prepare("PRAGMA user_version").get() as { user_version: number })
         .user_version,
-      9,
+      10,
     );
     assert.deepEqual(
       db.prepare("SELECT * FROM feed_posts ORDER BY id").all(),

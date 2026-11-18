@@ -1,3 +1,4 @@
+import { sharedCommunities } from "./community-access";
 import { blocked } from "./social-core";
 import { encrypt, decrypt } from "./crypto";
 import { HttpError, sendJson, type Ctx, type Route } from "./http";
@@ -169,6 +170,9 @@ function publicProfile(ctx: Ctx) {
       awards: [],
     }),
     ...(cabinet.public ? { medals } : {}),
+    ...(sharedCommunities(ctx, r.user_id).length
+      ? { communities: sharedCommunities(ctx, r.user_id).map((c) => c.name) }
+      : {}),
   });
 }
 export const profileRoutes: Route[] = [

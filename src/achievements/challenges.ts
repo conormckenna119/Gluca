@@ -87,7 +87,7 @@ export const CHALLENGES: Challenge[] = [
     prompt:
       "Join an existing community and take part in a thoughtful exchange.",
     howToComplete:
-      "Confirm you joined an existing community outside Gluca and had a meaningful exchange. Gluca spaces are currently demos; demo joins and likes do not count. No group name or conversation is collected.",
+      "Confirm you joined an existing community outside Gluca and had a meaningful exchange. Joining a group or giving a Boost alone does not establish a meaningful exchange. No group name or conversation is collected.",
     criterion: "connection",
     medalId: "community_connection",
     artwork: { icon: "community", category: "community" },

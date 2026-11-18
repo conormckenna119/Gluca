@@ -79,10 +79,10 @@ type CommentRow = {
   deleted_at: number | null;
 };
 function comments(ctx: Ctx, id: string) {
-  accessiblePost(ctx, id);
+  accessiblePost(ctx, id, true);
   const rows = ctx.deps.db
     .prepare(
-      "SELECT * FROM post_comments WHERE post_id=? AND deleted_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 100",
+      "SELECT * FROM post_comments WHERE post_id=? AND deleted_at IS NULL AND moderated_at IS NULL ORDER BY created_at DESC,id DESC LIMIT 100",
     )
     .all(id) as CommentRow[];
   return rows
@@ -124,7 +124,7 @@ export const socialRoutes: Route[] = [
       if (typeof b.active !== "boolean")
         throw new HttpError(400, "invalid_social", "Choose whether to Boost.");
       const result = transaction(ctx, () => {
-        const p = accessiblePost(ctx, b.id as string),
+        const p = accessiblePost(ctx, b.id as string, true),
           owner = ctx.session!.userId;
         if (p.user_id === owner)
           throw new HttpError(
@@ -179,7 +179,7 @@ export const socialRoutes: Route[] = [
           "Use a comment of 1–1000 characters.",
         );
       const result = transaction(ctx, () => {
-        const p = accessiblePost(ctx, b.id as string),
+        const p = accessiblePost(ctx, b.id as string, true),
           owner = ctx.session!.userId,
           text = (b.text as string).trim();
         const existing = ctx.deps.db
@@ -367,7 +367,7 @@ export const socialRoutes: Route[] = [
               )
               .get(r.actor_id, ctx.session!.userId);
           try {
-            accessiblePost(ctx, r.subject_id);
+            accessiblePost(ctx, r.subject_id, true);
           } catch {
             return false;
           }
@@ -375,7 +375,7 @@ export const socialRoutes: Route[] = [
             .prepare(
               r.kind === "boost"
                 ? "SELECT 1 FROM post_reactions WHERE post_id=? AND user_id=?"
-                : "SELECT 1 FROM post_comments WHERE post_id=? AND user_id=? AND deleted_at IS NULL",
+                : "SELECT 1 FROM post_comments WHERE post_id=? AND user_id=? AND deleted_at IS NULL AND moderated_at IS NULL",
             )
             .get(r.subject_id, r.actor_id);
         })

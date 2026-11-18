@@ -1,3 +1,4 @@
+import { membership } from "./community-access";
 import { decrypt } from "./crypto";
 import { HttpError, type Ctx } from "./http";
 import { sanitizeProfile, sanitizePrivacy } from "../src/domain/profile";
@@ -35,13 +36,15 @@ export function publicIdentity(ctx: Ctx, owner: string) {
     awards: [],
   });
 }
-export function accessiblePost(ctx: Ctx, id: string) {
+export function accessiblePost(ctx: Ctx, id: string, writable = false) {
   const r = ctx.deps.db
     .prepare(
       "SELECT * FROM feed_posts WHERE id=? AND deleted_at IS NULL AND (user_id=? OR visibility='public')",
     )
     .get(id, ctx.session!.userId) as
     | {
+        community_id: string | null;
+        moderated_at: number | null;
         id: string;
         user_id: string;
         visibility: "private" | "public";
@@ -50,7 +53,15 @@ export function accessiblePost(ctx: Ctx, id: string) {
         created_at: number;
       }
     | undefined;
-  if (!r || blocked(ctx, r.user_id))
+  if (
+    !r ||
+    blocked(ctx, r.user_id) ||
+    (r.moderated_at !== null && r.user_id !== ctx.session!.userId) ||
+    (r.community_id &&
+      (writable || r.user_id !== ctx.session!.userId) &&
+      (!membership(ctx, r.community_id)?.active ||
+        membership(ctx, r.community_id)?.restricted))
+  )
     throw new HttpError(404, "not_found", "Post unavailable.");
   return r;
 }
@@ -66,7 +77,7 @@ export function socialCounts(ctx: Ctx, id: string) {
     .get(id, owner) as { kind: string } | undefined;
   const count = ctx.deps.db
     .prepare(
-      "SELECT COUNT(*) AS n FROM post_comments c WHERE post_id=? AND deleted_at IS NULL AND NOT EXISTS(SELECT 1 FROM user_blocks b WHERE (b.user_id=? AND b.target_id=c.user_id) OR (b.user_id=c.user_id AND b.target_id=?))",
+      "SELECT COUNT(*) AS n FROM post_comments c WHERE post_id=? AND deleted_at IS NULL AND moderated_at IS NULL AND NOT EXISTS(SELECT 1 FROM user_blocks b WHERE (b.user_id=? AND b.target_id=c.user_id) OR (b.user_id=c.user_id AND b.target_id=?))",
     )
     .get(id, owner, owner) as { n: number };
   return {

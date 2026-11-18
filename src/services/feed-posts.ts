@@ -1,22 +1,33 @@
+import { captureAchievementScope } from "../achievements/events";
 import type { Post } from "../types";
 export type PublishInput = {
   requestId: string;
-  image: string;
+  image?: string;
+  communityId?: string;
   title: string;
   caption: string;
   alt: string;
   visibility: "private" | "public";
 };
-export async function feedRequest(body?: PublishInput): Promise<Post[]> {
-  const r = await fetch("/api/posts", {
-    method: body ? "POST" : "GET",
-    credentials: "include",
-    cache: "no-store",
-    redirect: "error",
-    signal: AbortSignal.timeout(30000),
-    headers: { "Content-Type": "application/json", "X-Gluca-Request": "1" },
-    ...(body ? { body: JSON.stringify(body) } : {}),
-  });
+export async function feedRequest(
+  body?: PublishInput,
+  communityId?: string,
+): Promise<Post[]> {
+  const scope = captureAchievementScope();
+  const r = await fetch(
+    communityId
+      ? `/api/posts?communityId=${encodeURIComponent(communityId)}`
+      : "/api/posts",
+    {
+      method: body ? "POST" : "GET",
+      credentials: "include",
+      cache: "no-store",
+      redirect: "error",
+      signal: AbortSignal.timeout(30000),
+      headers: { "Content-Type": "application/json", "X-Gluca-Request": "1" },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    },
+  );
   if (r.status === 401)
     throw new Error(
       "Sign in to Gluca before posting. Exporting still works without an account.",
@@ -30,6 +41,8 @@ export async function feedRequest(body?: PublishInput): Promise<Post[]> {
           : "Gluca could not confirm the post. Retry publishing this same export safely.",
     );
   const b = await r.json();
+  if (scope !== captureAchievementScope())
+    throw new Error("Account changed. Reload before posting.");
   return body ? [b.post] : b.posts;
 }
 export async function deleteFeedPost(id: string) {

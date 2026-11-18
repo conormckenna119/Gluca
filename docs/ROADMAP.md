@@ -401,3 +401,13 @@ Authenticated Boosts, comments, follows, mutual blocks, grouped in-app notificat
 
 
 Stage 9A verification (2026-11-18): 389 core tests, 26 full Edge tests, 3 final affected-screen checks and both dedicated mocked Dexcom journeys passed. Typecheck and targeted Prettier checks clean; no lint script exists. No live Dexcom re-verification or native-device claim. Full evidence and remaining limits: SOCIAL_INTERACTIONS.md. Stage 9A complete; stop before Stage 9B.
+
+
+## Stage 9B — 2026-11-18
+
+- [x] Account-backed Discover and interest communities, private explicit membership, local-only suggestions, member-restricted text/photo/story publishing, shared Boosts/comments, public privacy-gated directories and basic protected report/moderator hooks.
+
+Reused existing backend/auth/profile/post/award/renderer/navigation systems; no new dependency or primary tab. Existing fictional demo data remains separate and is not automatically uploaded. Verification and current limitations are recorded in COMMUNITY_SYSTEM.md. Native account operation, staffed moderation and production hosting remain future work. Stop after Stage 9B.
+
+
+Stage 9B verification (2026-11-18): 398 core tests, 29 full Edge tests, four final affected-screen checks and both dedicated mocked Dexcom journeys passed. Typecheck/formatting checks passed. Responsive light/dark evidence is synthetic. No live Dexcom or native-device verification. Full results and moderation/production limitations: COMMUNITY_SYSTEM.md. Stop after Stage 9B.

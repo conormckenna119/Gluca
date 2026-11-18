@@ -85,7 +85,7 @@ async function update(ctx: Ctx) {
         b.event.kind === "post_published" &&
         !ctx.deps.db
           .prepare(
-            "SELECT 1 FROM feed_posts WHERE id=? AND user_id=? AND visibility='public' AND deleted_at IS NULL",
+            "SELECT 1 FROM feed_posts WHERE id=? AND user_id=? AND visibility='public' AND community_id IS NULL AND moderated_at IS NULL AND deleted_at IS NULL",
           )
           .get(b.event.id, owner)
       )

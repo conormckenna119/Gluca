@@ -1,3 +1,4 @@
+import { getCommunity } from "../domain/community-discovery";
 import {
   feedRequest,
   feedPublished,
@@ -84,6 +85,7 @@ export function Create() {
   const [picked, setPicked] = useState<number | null>(null);
   const [busy, B] = useState(false);
   const { status: accountStatus } = useAccount();
+  const [postCommunity, POST_COMMUNITY] = useState<string | undefined>();
   const [alsoPost, alsoPostSet] = useState(false),
     [postCaption, postCaptionSet] = useState(""),
     [audience, audienceSet] = useState<"private" | "public">("private"),
@@ -105,6 +107,7 @@ export function Create() {
         exportLock.current = false;
         B(false);
         alsoPostSet(false);
+        POST_COMMUNITY(undefined);
         postCaptionSet("");
         descriptionSet("");
         confirmPostSet(false);
@@ -131,14 +134,19 @@ export function Create() {
   const art = useRef<React.ElementRef<typeof View>>(null);
   // Welcome opens Create with ?template=milestone; apply it when the param arrives.
   const {
+    communityId: wantedCommunity,
     template: wanted,
     headline: wantedHeadline,
     big: wantedBig,
   } = useLocalSearchParams<{
+    communityId?: string;
     template?: string;
     headline?: string;
     big?: string;
   }>();
+  React.useEffect(() => {
+    POST_COMMUNITY(getCommunity(wantedCommunity)?.id);
+  }, [wantedCommunity]);
   React.useEffect(() => {
     const id = templateIds.find((t) => t === wanted);
     if (id) {
@@ -234,11 +242,11 @@ export function Create() {
     postedIdSet(post.id);
     pendingPost.current = null;
     retryAvailableSet(false);
-    if (post.visibility === "public")
+    if (post.visibility === "public" && !post.communityId)
       recordAchievementEvent("post_published", post.id, pending.scope);
     setResult({
       kind: "success",
-      text: `Graphic exported and posted to Gluca (${post.visibility}).`,
+      text: `Graphic exported and posted to Gluca (${post.communityId ? `${post.communityName} members` : post.visibility}).`,
     });
   };
   const retryPublishing = async () => {
@@ -334,7 +342,8 @@ export function Create() {
             title: templateInfo[o.template].label,
             caption: postCaption.trim(),
             alt: (description.trim() || contents.join(". ")).slice(0, 2000),
-            visibility: audience,
+            visibility: postCommunity ? "public" : audience,
+            ...(postCommunity ? { communityId: postCommunity } : {}),
           },
         };
         retryAvailableSet(true);
@@ -580,6 +589,10 @@ export function Create() {
           visibility={audience}
           onVisibility={audienceSet}
           available={postAvailable}
+          communityId={postCommunity}
+          onCommunity={
+            postAvailable && getFlags().clubs ? POST_COMMUNITY : undefined
+          }
         />
       ) : null}
       <ExportPanel
@@ -661,9 +674,11 @@ export function Create() {
           photoUri={composition.photoUri}
         />
         <T bold>
-          {audience === "private"
-            ? "Private · Only you"
-            : "Public · Signed-in Gluca users"}
+          {postCommunity
+            ? `${getCommunity(postCommunity)?.name} · Community members`
+            : audience === "private"
+              ? "Private · Only you"
+              : "Public · Signed-in Gluca users"}
         </T>
         <T>{postCaption || "No caption"}</T>
         {description.trim() ? (
@@ -673,7 +688,7 @@ export function Create() {
         ) : null}
         <T small muted>
           The image and its description will be stored on Gluca. No raw readings
-          or hidden profile fields are attached. Public images can be saved by
+          or hidden profile fields are attached. Shared images can be saved by
           other users.
         </T>
       </Sheet>

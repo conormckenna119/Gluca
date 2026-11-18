@@ -165,3 +165,8 @@ The dashboard's day selection uses local midnight; its 24-hour option follows th
 CSV timestamps with explicit offsets retain those offsets. Local timestamps require a user-selected date order and fixed UTC offset. Split local-time files at DST transitions or provide explicit offsets per row. This does not infer an IANA timezone or all vendor/localized CSV variants. It intentionally asks for units rather than guessing.
 
 `src/providers.ts` exposes Mock and CSV implementations plus rejecting placeholders for Dexcom, Apple Health and Health Connect. `src/analytics.ts` is pure calculation logic. `src/store.tsx` owns local community state; the files in `src/screens/` compose functional screens; `src/story.ts` produces export artwork independently of editor controls. See [integration preparation](docs/INTEGRATIONS.md) for server architecture requirements.
+
+
+### Stage 9B — Community discovery
+
+Explore → Discover now offers 12 configured account communities, local-only suggestions, explicit private membership, member-restricted text/photo/story feeds and existing social interactions. Public member lists require both membership and profile privacy opt-in; hidden members are excluded from counts. The existing fictional demo is available separately. No new secrets or services: rebuild the existing web app with accounts/clubs enabled and restart the current backend for migration 10. [Setup, privacy, moderation, testing and limitations](docs/COMMUNITY_SYSTEM.md) · [Discovery configuration](docs/COMMUNITY_DISCOVERY.md). Native devices, staffed moderation and public deployment remain unverified.

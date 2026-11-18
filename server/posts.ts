@@ -1,4 +1,10 @@
 import {
+  requireCommunityMember,
+  communityDefinition,
+  membership,
+} from "./community-access";
+import { getCommunity } from "../src/domain/community-discovery";
+import {
   accessiblePost,
   blocked,
   publicIdentity,
@@ -14,6 +20,8 @@ import { loadCabinet } from "./achievements";
 import { completeChallengeForPost } from "./challenges";
 import { applyEvent } from "../src/achievements/events";
 type Row = {
+  community_id?: string | null;
+  moderated_at?: number | null;
   deleted_at?: number | null;
   id: string;
   user_id: string;
@@ -49,16 +57,31 @@ export function postView(ctx: Ctx, r: Row) {
     createdAt: r.created_at,
     remote: true,
     owned: mine,
+    moderated: r.moderated_at != null,
     authorProfile: identity,
     authorId: r.user_id,
+    ...(r.community_id
+      ? {
+          communityId: r.community_id,
+          communityName: getCommunity(r.community_id)?.name,
+        }
+      : {}),
     isFollowing: following(ctx, r.user_id),
-    media: {
-      uri: `/api/posts/image?id=${r.id}`,
-      width: m.width,
-      height: m.height,
-      alt: m.alt,
-    },
-    ...socialCounts(ctx, r.id),
+    ...(m.hasMedia === false
+      ? {}
+      : {
+          media: {
+            uri: `/api/posts/image?id=${r.id}`,
+            width: m.width,
+            height: m.height,
+            alt: m.alt,
+          },
+        }),
+    ...(r.community_id &&
+    (!membership(ctx, r.community_id)?.active ||
+      membership(ctx, r.community_id)?.restricted)
+      ? { reactions: { counts: {}, mine: null }, commentCount: 0 }
+      : socialCounts(ctx, r.id)),
     saved: false,
     comments: [],
   };
@@ -85,9 +108,20 @@ async function create(ctx: Ctx) {
       "invalid_post",
       "Check caption, description and audience. Followers-only is unavailable.",
     );
-  let png;
+  const communityId =
+    b.communityId === undefined ? null : communityDefinition(b.communityId).id;
+  if (communityId && b.visibility !== "public")
+    throw new HttpError(
+      400,
+      "invalid_audience",
+      "Community posts use the community-members audience.",
+    );
+  const hasMedia = b.image !== undefined;
+  if (!hasMedia && (!communityId || !(b.caption as string).trim()))
+    throw new HttpError(400, "invalid_post", "Add text or an image.");
+  let png: ReturnType<typeof exportedPng> | null = null;
   try {
-    png = exportedPng(b.image);
+    if (hasMedia) png = exportedPng(b.image);
   } catch {
     throw new HttpError(
       400,
@@ -96,12 +130,20 @@ async function create(ctx: Ctx) {
     );
   }
   const fingerprint = sha256hex(
-      JSON.stringify([b.image, b.caption, b.title, b.alt, b.visibility]),
+      JSON.stringify([
+        b.image,
+        b.caption,
+        b.title,
+        b.alt,
+        b.visibility,
+        ...(communityId ? [communityId] : []),
+      ]),
     ),
     owner = ctx.session!.userId;
   ctx.deps.db.exec("BEGIN IMMEDIATE");
   let row: Row;
   try {
+    if (communityId) requireCommunityMember(ctx, communityId);
     const existing = ctx.deps.db
       .prepare("SELECT * FROM feed_posts WHERE user_id=? AND request_key=?")
       .get(owner, b.requestId) as Row | undefined;
@@ -122,13 +164,14 @@ async function create(ctx: Ctx) {
         title: b.title,
         caption: b.caption,
         alt: b.alt,
-        width: png.width,
-        height: png.height,
+        hasMedia,
+        width: png?.width,
+        height: png?.height,
         fingerprint,
       };
       ctx.deps.db
         .prepare(
-          "INSERT INTO feed_posts(id,user_id,request_key,visibility,metadata_enc,image_enc,created_at) VALUES(?,?,?,?,?,?,?)",
+          "INSERT INTO feed_posts(id,user_id,request_key,visibility,metadata_enc,image_enc,created_at,community_id) VALUES(?,?,?,?,?,?,?,?)",
         )
         .run(
           id,
@@ -136,15 +179,19 @@ async function create(ctx: Ctx) {
           b.requestId,
           b.visibility as string,
           encrypt(JSON.stringify(metadata), key(ctx), `post:v1:${owner}:${id}`),
-          encrypt(
-            png.bytes.toString("base64"),
-            key(ctx),
-            `post-image:v1:${owner}:${id}`,
-          ),
+          png
+            ? encrypt(
+                png.bytes.toString("base64"),
+                key(ctx),
+                `post-image:v1:${owner}:${id}`,
+              )
+            : "",
           now,
+          communityId,
         );
       row = {
         id,
+        community_id: communityId,
         user_id: owner,
         visibility: b.visibility as "private" | "public",
         metadata_enc: encrypt(
@@ -154,7 +201,7 @@ async function create(ctx: Ctx) {
         ),
         created_at: now,
       };
-      if (b.visibility === "public") {
+      if (b.visibility === "public" && !communityId) {
         const cabinet = applyEvent(
           loadCabinet(ctx),
           { kind: "post_published", id },
@@ -175,7 +222,7 @@ async function create(ctx: Ctx) {
           );
       }
     }
-    if (!existing && b.visibility === "public")
+    if (!existing && b.visibility === "public" && !communityId)
       completeChallengeForPost(ctx, row.id);
     ctx.deps.db.exec("COMMIT");
   } catch (e) {
@@ -198,11 +245,19 @@ export const postRoutes: Route[] = [
         sendJson(ctx.res, 200, { post: postView(ctx, accessible(ctx)) });
         return;
       }
+      const communityId = ctx.url.searchParams.get("communityId");
+      if (communityId) requireCommunityMember(ctx, communityId);
       const rows = ctx.deps.db
         .prepare(
-          "SELECT id,user_id,visibility,metadata_enc,created_at FROM feed_posts WHERE deleted_at IS NULL AND (user_id=? OR visibility='public') ORDER BY created_at DESC,id DESC LIMIT 30",
+          communityId
+            ? "SELECT * FROM feed_posts WHERE community_id=? AND deleted_at IS NULL AND (visibility='public' OR user_id=?) AND (moderated_at IS NULL OR user_id=?) ORDER BY created_at DESC,id DESC LIMIT 30"
+            : "SELECT * FROM feed_posts WHERE deleted_at IS NULL AND (user_id=? OR (visibility='public' AND moderated_at IS NULL AND (community_id IS NULL OR EXISTS(SELECT 1 FROM community_memberships m WHERE m.community_id=feed_posts.community_id AND m.user_id=? AND m.active=1 AND m.restricted=0)))) ORDER BY created_at DESC,id DESC LIMIT 30",
         )
-        .all(ctx.session!.userId) as Row[];
+        .all(
+          ...(communityId
+            ? [communityId, ctx.session!.userId, ctx.session!.userId]
+            : [ctx.session!.userId, ctx.session!.userId]),
+        ) as Row[];
       sendJson(ctx.res, 200, {
         posts: rows
           .filter((r) => !blocked(ctx, r.user_id))
@@ -214,11 +269,13 @@ export const postRoutes: Route[] = [
     method: "GET",
     path: "/api/posts/image",
     handler: (ctx) => {
-      const r = accessible(ctx),
-        bytes = Buffer.from(
-          decrypt(r.image_enc!, key(ctx), `post-image:v1:${r.user_id}:${r.id}`),
-          "base64",
-        );
+      const r = accessible(ctx);
+      if (meta(ctx, r).hasMedia === false)
+        throw new HttpError(404, "not_found", "Image unavailable.");
+      const bytes = Buffer.from(
+        decrypt(r.image_enc!, key(ctx), `post-image:v1:${r.user_id}:${r.id}`),
+        "base64",
+      );
       ctx.res.writeHead(200, {
         "Content-Type": "image/png",
         "Content-Length": bytes.length,

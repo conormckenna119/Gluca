@@ -10,6 +10,7 @@ export async function exportImage(
   backgroundUri?: string,
   retainImage = false,
   shouldContinue = () => true,
+  download = true,
 ) {
   if (Platform.OS === "web") {
     const [w, h] = formats[format];
@@ -70,7 +71,7 @@ export async function exportImage(
       const a = document.createElement("a");
       a.href = output;
       a.download = filename;
-      a.click();
+      if (download) a.click();
       setTimeout(() => URL.revokeObjectURL(output), 10000);
       return { dataUri, width: w, height: h };
     } finally {

@@ -11,11 +11,13 @@ export function Page({
   subtitle,
   children,
   glucoseLabel,
+  accountCommunity = false,
 }: {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
   glucoseLabel?: string;
+  accountCommunity?: boolean;
 }) {
   const c = useColors();
   const { ready, storageError, state, privacyNotice } = useDemo();
@@ -40,14 +42,20 @@ export function Page({
         <T large>{title}</T>
         {subtitle ? <T muted>{subtitle}</T> : null}
         <View style={row}>
-          <Pill>Local demo</Pill>
-          {community ? <Pill>Fictional community</Pill> : null}
-          <Pill tone={state.imported.length ? "accent" : "neutral"}>
-            {glucoseLabel ??
-              (state.imported.length
-                ? "Imported CSV glucose"
-                : "Synthetic glucose")}
-          </Pill>
+          {accountCommunity ? (
+            <Pill>Account communities</Pill>
+          ) : (
+            <>
+              <Pill>Local demo</Pill>
+              {community ? <Pill>Fictional community</Pill> : null}
+              <Pill tone={state.imported.length ? "accent" : "neutral"}>
+                {glucoseLabel ??
+                  (state.imported.length
+                    ? "Imported CSV glucose"
+                    : "Synthetic glucose")}
+              </Pill>
+            </>
+          )}
         </View>
       </View>
       {storageError ? <T>{storageError}</T> : null}

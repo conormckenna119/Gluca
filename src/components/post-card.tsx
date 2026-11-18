@@ -1,3 +1,4 @@
+import { ReportAction } from "./community-report";
 import { MemberActions } from "./social-interactions";
 import { deleteFeedPost } from "../services/feed-posts";
 import React, { useState } from "react";
@@ -45,6 +46,7 @@ export function PostCard({
       posts: s.posts.map((p) => (p.id === post.id ? fn(p) : p)),
     }));
   const [menu, setMenu] = useState(false);
+  const [report, REPORT] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editing, edit] = useState(false);
   const [caption, setCaption] = useState(post.caption);
@@ -90,7 +92,9 @@ export function PostCard({
                         ? relativeTime(post.createdAt, Date.now())
                         : ""}
                       {post.createdAt && mine ? " · " : ""}
-                      {mine ? `Visible to: ${post.visibility}` : ""}
+                      {mine
+                        ? `Visible to: ${post.communityId ? `${post.communityName} members` : post.visibility}`
+                        : ""}
                     </T>
                   </View>
                 }
@@ -116,7 +120,9 @@ export function PostCard({
               <T small muted>
                 {post.createdAt ? relativeTime(post.createdAt, Date.now()) : ""}
                 {post.createdAt && mine ? " · " : ""}
-                {mine ? `Visible to: ${post.visibility}` : ""}
+                {mine
+                  ? `Visible to: ${post.communityId ? `${post.communityName} members` : post.visibility}`
+                  : ""}
               </T>
             </>
           )}
@@ -154,6 +160,14 @@ export function PostCard({
             }}
           />
         </Pressable>
+      ) : null}
+      {post.communityId ? (
+        <T small muted>
+          {post.communityName} · Community members
+        </T>
+      ) : null}
+      {post.moderated ? (
+        <Notice>Hidden from other community members.</Notice>
       ) : null}
       <T heading>{post.title}</T>
       <T>{post.caption}</T>
@@ -232,7 +246,7 @@ export function PostCard({
             detail="Opens your device share sheet. Nothing is posted anywhere."
             onPress={() => {
               close();
-              if (post.visibility !== "public") {
+              if (post.visibility !== "public" || post.communityId) {
                 msg("Only public posts can be shared.");
                 return;
               }
@@ -275,6 +289,15 @@ export function PostCard({
                 setConfirmDelete(true);
               }}
             />
+          ) : post.remote ? (
+            <ListRow
+              icon="alert"
+              title="Report post"
+              onPress={() => {
+                close();
+                REPORT(true);
+              }}
+            />
           ) : (
             <ListRow
               icon="alert"
@@ -302,6 +325,13 @@ export function PostCard({
           )}
         </Group>
       </Sheet>
+      <ReportAction
+        kind="post"
+        id={post.id}
+        visible={report}
+        onClose={() => REPORT(false)}
+        hideTrigger
+      />
       <ConfirmSheet
         visible={confirmDelete}
         title="Delete this post?"

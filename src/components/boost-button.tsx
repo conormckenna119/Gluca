@@ -86,11 +86,16 @@ export function BoostButton({ post }: { post: Post }) {
       setLine("");
       set((s) => ({
         ...s,
-        posts: s.posts.map((p) =>
-          p.id === post.id
-            ? { ...p, reactions: toggleReaction(p.reactions) }
-            : p,
-        ),
+        posts: s.posts.some((p) => p.id === post.id)
+          ? s.posts.map((p) =>
+              p.id === post.id
+                ? { ...p, reactions: toggleReaction(p.reactions) }
+                : p,
+            )
+          : [
+              ...s.posts,
+              { ...post, reactions: toggleReaction(post.reactions) },
+            ],
       }));
       if (!given) pulse();
       try {

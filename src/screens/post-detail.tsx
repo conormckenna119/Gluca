@@ -99,7 +99,11 @@ function PostConversation() {
     );
   if (p.remote)
     return (
-      <Page title="Post" glucoseLabel="Source labelled on graphic">
+      <Page
+        title="Post"
+        glucoseLabel="Source labelled on graphic"
+        accountCommunity={!!p.communityId}
+      >
         <PostCard post={p} inDetail />
         <AccountConversation post={p} />
         <Button label="Back to feed" onPress={() => router.replace("/")} />
